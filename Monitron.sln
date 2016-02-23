@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Common", "Monitron.Common\Monitron.Common.csproj", "{F6C59DF6-5C97-4B51-925C-DBD8DC245779}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Clients.XMPP", "Monitron.Clients.XMPP\Monitron.Clients.XMPP.csproj", "{9531CE9C-0770-47E0-985A-B35701D096B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Clients.XMPP.Tests", "Monitron.Clients.XMPP.Tests\Monitron.Clients.XMPP.Tests.csproj", "{5CEAEA81-01F3-4DA9-81C3-150AFF2F93DD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5CEAEA81-01F3-4DA9-81C3-150AFF2F93DD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5CEAEA81-01F3-4DA9-81C3-150AFF2F93DD}.Debug|x86.Build.0 = Debug|Any CPU
+		{5CEAEA81-01F3-4DA9-81C3-150AFF2F93DD}.Release|x86.ActiveCfg = Release|Any CPU
+		{5CEAEA81-01F3-4DA9-81C3-150AFF2F93DD}.Release|x86.Build.0 = Release|Any CPU
+		{9531CE9C-0770-47E0-985A-B35701D096B9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9531CE9C-0770-47E0-985A-B35701D096B9}.Debug|x86.Build.0 = Debug|Any CPU
+		{9531CE9C-0770-47E0-985A-B35701D096B9}.Release|x86.ActiveCfg = Release|Any CPU
+		{9531CE9C-0770-47E0-985A-B35701D096B9}.Release|x86.Build.0 = Release|Any CPU
+		{F6C59DF6-5C97-4B51-925C-DBD8DC245779}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6C59DF6-5C97-4B51-925C-DBD8DC245779}.Debug|x86.Build.0 = Debug|Any CPU
+		{F6C59DF6-5C97-4B51-925C-DBD8DC245779}.Release|x86.ActiveCfg = Release|Any CPU
+		{F6C59DF6-5C97-4B51-925C-DBD8DC245779}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
