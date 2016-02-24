@@ -9,9 +9,17 @@ namespace Monitron.Common
 
         public override bool Equals(object i_Obj)
         {
-            Identity other = (Identity)i_Obj;
-            return this.UserName == other.UserName &&
-                this.Host == other.Host;
+            try
+            {
+                Identity other = (Identity)i_Obj;
+                return this.UserName == other.UserName &&
+                    this.Host == other.Host;
+            }
+            catch
+            {
+                return false;
+            }
+
         }
 
         public override int GetHashCode()

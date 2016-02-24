@@ -61,7 +61,7 @@ namespace Monitron.Clients.XMPP
 
         private void onClientMessageArrived(object i_Sender, MessageEventArgs i_Args)
         {
-            this.OnMessageArrivedEventArgs(new MessageArrivedEventArgs(
+            this.OnMessageArrived(new MessageArrivedEventArgs(
                 i_Args.Jid.ToIdentity(),
                 i_Args.Message.Body
             ));
@@ -69,18 +69,18 @@ namespace Monitron.Clients.XMPP
 
         public void onClientRosterUpdated(object sender, RosterUpdatedEventArgs e)
         {
-            OnBuddyListChangedEventArgs(new BuddyListChangedEventArgs(
+            OnBuddyListChanged(new BuddyListChangedEventArgs(
                 new BuddyListItem(e.Item.Jid.ToIdentity(), e.Item.Groups),
                 e.Removed
             ));
         }
 
-        public void OnBuddyListChangedEventArgs(BuddyListChangedEventArgs i_EventArgs)
+        public void OnBuddyListChanged(BuddyListChangedEventArgs i_EventArgs)
         {
             this.BuddyListChanged?.Invoke(this, i_EventArgs);
         }
 
-        public void OnMessageArrivedEventArgs(MessageArrivedEventArgs i_EventArgs)
+        public void OnMessageArrived(MessageArrivedEventArgs i_EventArgs)
         {
             this.MessageArrived?.Invoke(this, i_EventArgs);
         }

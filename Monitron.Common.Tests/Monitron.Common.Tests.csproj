@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</ProjectGuid>
+    <ProjectGuid>{F50B88F1-64C1-435B-892C-31AA653B9F2D}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Monitron.Common</RootNamespace>
-    <AssemblyName>Monitron.Common</AssemblyName>
+    <RootNamespace>Monitron.Common.Tests</RootNamespace>
+    <AssemblyName>Monitron.Common.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -29,18 +29,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IMessengerClient.cs" />
-    <Compile Include="MessageArrivedEventArgs.cs" />
-    <Compile Include="Account.cs" />
-    <Compile Include="BuddySignedInEventArgs.cs" />
-    <Compile Include="BuddySignedOutEventArgs.cs" />
-    <Compile Include="BuddyListItem.cs" />
-    <Compile Include="Identity.cs" />
-    <Compile Include="BuddyListChangedEventArgs.cs" />
-    <Compile Include="BuddyListCache.cs" />
+    <Compile Include="BuddyListCacheTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Monitron.Clients.Mock\Monitron.Clients.Mock.csproj">
+      <Project>{FEBBB41F-7A01-485E-9936-5207FF5BADF3}</Project>
+      <Name>Monitron.Clients.Mock</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
+      <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
+      <Name>Monitron.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

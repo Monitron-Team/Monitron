@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Clients.XMPP", "Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Clients.XMPP.Tests", "Monitron.Clients.XMPP.Tests\Monitron.Clients.XMPP.Tests.csproj", "{5CEAEA81-01F3-4DA9-81C3-150AFF2F93DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Clients.Mock", "Monitron.Clients.Mock\Monitron.Clients.Mock.csproj", "{FEBBB41F-7A01-485E-9936-5207FF5BADF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Common.Tests", "Monitron.Common.Tests\Monitron.Common.Tests.csproj", "{F50B88F1-64C1-435B-892C-31AA653B9F2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -21,9 +25,17 @@ Global
 		{9531CE9C-0770-47E0-985A-B35701D096B9}.Debug|x86.Build.0 = Debug|Any CPU
 		{9531CE9C-0770-47E0-985A-B35701D096B9}.Release|x86.ActiveCfg = Release|Any CPU
 		{9531CE9C-0770-47E0-985A-B35701D096B9}.Release|x86.Build.0 = Release|Any CPU
+		{F50B88F1-64C1-435B-892C-31AA653B9F2D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F50B88F1-64C1-435B-892C-31AA653B9F2D}.Debug|x86.Build.0 = Debug|Any CPU
+		{F50B88F1-64C1-435B-892C-31AA653B9F2D}.Release|x86.ActiveCfg = Release|Any CPU
+		{F50B88F1-64C1-435B-892C-31AA653B9F2D}.Release|x86.Build.0 = Release|Any CPU
 		{F6C59DF6-5C97-4B51-925C-DBD8DC245779}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{F6C59DF6-5C97-4B51-925C-DBD8DC245779}.Debug|x86.Build.0 = Debug|Any CPU
 		{F6C59DF6-5C97-4B51-925C-DBD8DC245779}.Release|x86.ActiveCfg = Release|Any CPU
 		{F6C59DF6-5C97-4B51-925C-DBD8DC245779}.Release|x86.Build.0 = Release|Any CPU
+		{FEBBB41F-7A01-485E-9936-5207FF5BADF3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FEBBB41F-7A01-485E-9936-5207FF5BADF3}.Debug|x86.Build.0 = Debug|Any CPU
+		{FEBBB41F-7A01-485E-9936-5207FF5BADF3}.Release|x86.ActiveCfg = Release|Any CPU
+		{FEBBB41F-7A01-485E-9936-5207FF5BADF3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
