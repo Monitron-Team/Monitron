@@ -22,7 +22,6 @@ namespace Monitron.Clients.XMPP
 
         public event EventHandler<BuddyListChangedEventArgs> BuddyListChanged;
 
-
         public IEnumerable<BuddyListItem> Buddies
         {
             get
