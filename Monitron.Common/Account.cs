@@ -11,7 +11,7 @@ namespace Monitron.Common
         {
             Identity = new Identity {
                 UserName = i_UserName,
-                Host = i_Host
+                Domain = i_Host
             };
             Password = i_Password;
         }

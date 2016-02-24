@@ -2,6 +2,7 @@
 
 using S22.Xmpp;
 using S22.Xmpp.Client;
+using S22.Xmpp.Extensions;
 using S22.Xmpp.Im;
 
 using Monitron.Common;
@@ -50,16 +51,40 @@ namespace Monitron.Clients.XMPP
             this.r_Account = i_Account;
 
             m_Client = new XmppClient(
-                hostname: i_Account.Identity.Host,
+                hostname: i_Account.Identity.Domain,
                 username: i_Account.Identity.UserName,
                 password: i_Account.Password
             );
             m_Client.Connect(k_DefaultResource);
-            m_Client.Message += onClientMessageArrived;
-            m_Client.RosterUpdated += onClientRosterUpdated;
+            m_Client.Message += m_Client_MessageArrived;
+            m_Client.RosterUpdated += m_Client_RosterUpdated;
+            m_Client.StatusChanged += m_Client_StatusChanged;
         }
 
-        private void onClientMessageArrived(object i_Sender, MessageEventArgs i_Args)
+        private void m_Client_StatusChanged(object i_Sender, StatusEventArgs i_Args)
+        {
+            switch (i_Args.Status)
+            {
+                case Availability.Online:
+                    OnBuddySignedIn(new BuddySignedInEventArgs(i_Args.Jid.ToIdentity()));
+                    break;
+                case Availability.Offline:
+                    OnBuddySignedOut(new BuddySignedOutEventArgs(i_Args.Jid.ToIdentity()));
+                    break;
+            }
+        }
+
+        public void OnBuddySignedIn(BuddySignedInEventArgs i_BuddySignedInEventArgs)
+        {
+            BuddySignedIn?.Invoke(this, i_BuddySignedInEventArgs);
+        }
+
+        public void OnBuddySignedOut(BuddySignedOutEventArgs i_BuddySignedOutEventArgs)
+        {
+            BuddySignedOut?.Invoke(this, i_BuddySignedOutEventArgs);
+        }
+
+        private void m_Client_MessageArrived(object i_Sender, MessageEventArgs i_Args)
         {
             this.OnMessageArrived(new MessageArrivedEventArgs(
                 i_Args.Jid.ToIdentity(),
@@ -67,11 +92,11 @@ namespace Monitron.Clients.XMPP
             ));
         }
 
-        public void onClientRosterUpdated(object sender, RosterUpdatedEventArgs e)
+        public void m_Client_RosterUpdated(object i_Sender, RosterUpdatedEventArgs i_Args)
         {
             OnBuddyListChanged(new BuddyListChangedEventArgs(
-                new BuddyListItem(e.Item.Jid.ToIdentity(), e.Item.Groups),
-                e.Removed
+                new BuddyListItem(i_Args.Item.Jid.ToIdentity(), i_Args.Item.Groups),
+                i_Args.Removed
             ));
         }
 

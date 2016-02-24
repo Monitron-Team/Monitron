@@ -5,7 +5,7 @@ namespace Monitron.Common
     public struct Identity
     {
         public string UserName { get; set; }
-        public string Host { get; set; }
+        public string Domain { get; set; }
 
         public override bool Equals(object i_Obj)
         {
@@ -13,7 +13,7 @@ namespace Monitron.Common
             {
                 Identity other = (Identity)i_Obj;
                 return this.UserName == other.UserName &&
-                    this.Host == other.Host;
+                    this.Domain == other.Domain;
             }
             catch
             {
@@ -24,7 +24,7 @@ namespace Monitron.Common
 
         public override int GetHashCode()
         {
-            return (UserName + "@" + Host).GetHashCode();
+            return (UserName + "@" + Domain).GetHashCode();
         }
     }
 }

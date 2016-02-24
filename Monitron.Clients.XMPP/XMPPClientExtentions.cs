@@ -10,14 +10,14 @@ namespace Monitron.Clients.XMPP
     {
         public static Jid ToJid(this Identity i_Identity)
         {
-            return new Jid(i_Identity.UserName + "@" + i_Identity.Host);
+            return new Jid(i_Identity.UserName + "@" + i_Identity.Domain);
         }
 
         public static Identity ToIdentity(this Jid i_Jid)
         {
             return new Identity {
                 UserName = i_Jid.Node,
-                Host = i_Jid.Domain
+                Domain = i_Jid.Domain
             };
         }
     }
