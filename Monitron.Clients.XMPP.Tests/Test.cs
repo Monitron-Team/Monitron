@@ -66,32 +66,30 @@ namespace Monitron.Clients.XMPP.Tests
             TimeSpan testTimeout = TimeSpan.FromSeconds(30);
             XMPPMessengerClient client1 = getTestClient("TestUser01");
             Account account2 = getTestAccount("TestUser02");
-            IBuddyList buddyList = client1.BuddyList;
 
             clearBuddyList(client1);
-            buddyList.AddBuddy(account2.Identity);
+            client1.AddBuddy(account2.Identity);
             // It takes a while for the buddy to be added in the server
             // This loop will wait until it happens or we time out
             DateTime start = DateTime.Now;
             while (DateTime.Now - start < testTimeout)
             {
-                if (buddyList.Buddies.Count != 0)
+                if (client1.Buddies.Count() != 0)
                 {
                     break;
                 }
 
                 Thread.Sleep(buddyListUpdateSleepTimeSpan);
             }
-            Assert.AreEqual(1, buddyList.Buddies.Count);
-            Assert.AreEqual(account2.Identity, buddyList.Buddies.First().Identity);
+            Assert.AreEqual(1, client1.Buddies.Count());
+            Assert.AreEqual(account2.Identity, client1.Buddies.First().Identity);
         }
 
         private void clearBuddyList(IMessengerClient i_Client)
         {
-            IBuddyList buddyList = i_Client.BuddyList;
-            foreach (BuddyListItem item in buddyList.Buddies.ToList())
+            foreach (BuddyListItem item in i_Client.Buddies.ToList())
             {
-                buddyList.RemoveBuddy(item.Identity);
+                i_Client.RemoveBuddy(item.Identity);
             }
         }
     }

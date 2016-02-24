@@ -37,9 +37,9 @@
     <Compile Include="Account.cs" />
     <Compile Include="BuddySignedInEventArgs.cs" />
     <Compile Include="BuddySignedOutEventArgs.cs" />
-    <Compile Include="IBuddyList.cs" />
     <Compile Include="BuddyListItem.cs" />
     <Compile Include="Identity.cs" />
+    <Compile Include="BuddyListChangedEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

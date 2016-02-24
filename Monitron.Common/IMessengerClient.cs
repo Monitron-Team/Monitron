@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Monitron.Common
 {
@@ -7,12 +8,17 @@ namespace Monitron.Common
         event EventHandler<MessageArrivedEventArgs> MessageArrived;
         event EventHandler<BuddySignedInEventArgs> BuddySignedIn;
         event EventHandler<BuddySignedOutEventArgs> BuddySignedOut;
+        event EventHandler<BuddyListChangedEventArgs> BuddyListChanged;
 
-        IBuddyList BuddyList { get; }
+        IEnumerable<BuddyListItem> Buddies { get; }
 
         Identity Identity { get; }
 
         void sendMessage(Identity i_Buddy, string i_Message);
+
+        void AddBuddy(Identity i_Identity, params string [] i_Groups);
+        void RemoveBuddy(Identity i_Identity);
+
     }
 }
 

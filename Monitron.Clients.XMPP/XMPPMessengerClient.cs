@@ -5,6 +5,7 @@ using S22.Xmpp.Client;
 using S22.Xmpp.Im;
 
 using Monitron.Common;
+using System.Collections.Generic;
 
 namespace Monitron.Clients.XMPP
 {
@@ -18,7 +19,19 @@ namespace Monitron.Clients.XMPP
 
         public event EventHandler<BuddySignedOutEventArgs> BuddySignedOut;
 
-        public IBuddyList BuddyList { get; private set; }
+        public event EventHandler<BuddyListChangedEventArgs> BuddyListChanged;
+
+
+        public IEnumerable<BuddyListItem> Buddies
+        {
+            get
+            {
+                foreach (RosterItem item in m_Client.GetRoster())
+                {
+                    yield return new BuddyListItem(item.Jid.ToIdentity(), item.Groups);
+                }
+            }
+        }
 
         public Identity Identity
         {
@@ -30,20 +43,20 @@ namespace Monitron.Clients.XMPP
 
         private readonly Account r_Account;
 
-        private XmppClient m_client;
+        private XmppClient m_Client;
 
         public XMPPMessengerClient(Account i_Account)
         {
             this.r_Account = i_Account;
 
-            m_client = new XmppClient(
+            m_Client = new XmppClient(
                 hostname: i_Account.Identity.Host,
                 username: i_Account.Identity.UserName,
                 password: i_Account.Password
             );
-            BuddyList = new XMPPBuddyList(m_client);
-            m_client.Connect(k_DefaultResource);
-            m_client.Message += onClientMessageArrived;
+            m_Client.Connect(k_DefaultResource);
+            m_Client.Message += onClientMessageArrived;
+            m_Client.RosterUpdated += onClientRosterUpdated;
         }
 
         private void onClientMessageArrived(object i_Sender, MessageEventArgs i_Args)
@@ -54,6 +67,19 @@ namespace Monitron.Clients.XMPP
             ));
         }
 
+        public void onClientRosterUpdated(object sender, RosterUpdatedEventArgs e)
+        {
+            OnBuddyListChangedEventArgs(new BuddyListChangedEventArgs(
+                new BuddyListItem(e.Item.Jid.ToIdentity(), e.Item.Groups),
+                e.Removed
+            ));
+        }
+
+        public void OnBuddyListChangedEventArgs(BuddyListChangedEventArgs i_EventArgs)
+        {
+            this.BuddyListChanged?.Invoke(this, i_EventArgs);
+        }
+
         public void OnMessageArrivedEventArgs(MessageArrivedEventArgs i_EventArgs)
         {
             this.MessageArrived?.Invoke(this, i_EventArgs);
@@ -61,7 +87,17 @@ namespace Monitron.Clients.XMPP
         
         public void sendMessage(Identity i_Buddy, string i_Message)
         {
-            m_client.SendMessage(new Message(i_Buddy.ToJid(), i_Message));
+            m_Client.SendMessage(new Message(i_Buddy.ToJid(), i_Message));
+        }
+
+        public void AddBuddy(Identity i_Identity, params string[] i_Groups)
+        {
+            m_Client.AddContact(jid: i_Identity.ToJid(), groups: i_Groups);
+        }
+
+        public void RemoveBuddy(Identity i_Identity)
+        {
+            m_Client.RemoveContact(i_Identity.ToJid());
         }
     }
 }
