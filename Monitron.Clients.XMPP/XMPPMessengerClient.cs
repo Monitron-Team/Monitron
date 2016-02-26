@@ -62,7 +62,7 @@ namespace Monitron.Clients.XMPP
 
         private void m_Client_StatusChanged(object i_Sender, StatusEventArgs i_Args)
         {
-            switch (i_Args.Status)
+            switch (i_Args.Status.Availability)
             {
                 case Availability.Online:
                     OnBuddySignedIn(new BuddySignedInEventArgs(i_Args.Jid.ToIdentity()));
