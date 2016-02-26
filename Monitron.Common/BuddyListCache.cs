@@ -42,7 +42,15 @@ namespace Monitron.Common
 
         private void r_Client_BuddyListChanged(object sender, BuddyListChangedEventArgs e)
         {
-            r_Buddies.Remove(e.Item.Identity);
+            try
+            {
+                r_Buddies.Remove(e.Item.Identity);
+            }
+            catch(KeyNotFoundException)
+            {
+                // The user might have just been added
+            }
+
             if (!e.Removed)
             {
                 HashSet<string> groupSet = new HashSet<string>();
