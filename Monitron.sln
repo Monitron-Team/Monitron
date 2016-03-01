@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Clients.Mock", "Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Common.Tests", "Monitron.Common.Tests\Monitron.Common.Tests.csproj", "{F50B88F1-64C1-435B-892C-31AA653B9F2D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Node", "Monitron.Node\Monitron.Node.csproj", "{E02F1A0F-AF66-47B8-BD17-498540CC17C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Node.Tests", "Monitron.Node.Tests\Monitron.Node.Tests.csproj", "{C4974800-90A6-4691-8202-5EC0199EDB8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -25,6 +29,14 @@ Global
 		{9531CE9C-0770-47E0-985A-B35701D096B9}.Debug|x86.Build.0 = Debug|Any CPU
 		{9531CE9C-0770-47E0-985A-B35701D096B9}.Release|x86.ActiveCfg = Release|Any CPU
 		{9531CE9C-0770-47E0-985A-B35701D096B9}.Release|x86.Build.0 = Release|Any CPU
+		{C4974800-90A6-4691-8202-5EC0199EDB8D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C4974800-90A6-4691-8202-5EC0199EDB8D}.Debug|x86.Build.0 = Debug|Any CPU
+		{C4974800-90A6-4691-8202-5EC0199EDB8D}.Release|x86.ActiveCfg = Release|Any CPU
+		{C4974800-90A6-4691-8202-5EC0199EDB8D}.Release|x86.Build.0 = Release|Any CPU
+		{E02F1A0F-AF66-47B8-BD17-498540CC17C5}.Debug|x86.ActiveCfg = Debug|x86
+		{E02F1A0F-AF66-47B8-BD17-498540CC17C5}.Debug|x86.Build.0 = Debug|x86
+		{E02F1A0F-AF66-47B8-BD17-498540CC17C5}.Release|x86.ActiveCfg = Release|x86
+		{E02F1A0F-AF66-47B8-BD17-498540CC17C5}.Release|x86.Build.0 = Release|x86
 		{F50B88F1-64C1-435B-892C-31AA653B9F2D}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{F50B88F1-64C1-435B-892C-31AA653B9F2D}.Debug|x86.Build.0 = Debug|Any CPU
 		{F50B88F1-64C1-435B-892C-31AA653B9F2D}.Release|x86.ActiveCfg = Release|Any CPU
