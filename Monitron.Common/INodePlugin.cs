@@ -4,10 +4,9 @@ using Monitron.Common;
 
 namespace Monitron.Common
 {
-	public interface IPlugin
+	public interface INodePlugin
 	{
 		IMessengerClient MessangerClient { get; }
-
 	}
 }
 

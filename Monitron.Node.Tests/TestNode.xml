@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <Account>
+    <Identity>
+      <Username>user</Username>
+      <Domain>domain</Domain>
+    </Identity>
+    <Password>password</Password>
+  </Account>
+  <Plugin>
+    <DllPath>path</DllPath>
+    <DllName>Monitron.Node.Tests</DllName>
+    <Type>Plugin</Type>
+    <AssemblyName>Assembly</AssemblyName>
+  </Plugin>
+</configuration>

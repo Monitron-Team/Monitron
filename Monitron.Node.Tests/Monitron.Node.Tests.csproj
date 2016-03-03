@@ -32,19 +32,28 @@
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Test.cs" />
+    <Compile Include="TestNodePlugin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="node.config" />
+    <None Include="node.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestNode.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monitron.Node\Monitron.Node.csproj">
       <Project>{E02F1A0F-AF66-47B8-BD17-498540CC17C5}</Project>
       <Name>Monitron.Node</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
+      <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
+      <Name>Monitron.Common</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

@@ -41,8 +41,7 @@
     <Compile Include="Identity.cs" />
     <Compile Include="BuddyListChangedEventArgs.cs" />
     <Compile Include="BuddyListCache.cs" />
-    <Compile Include="IPlugin.cs" />
-    <Compile Include="TestPlugin.cs" />
+    <Compile Include="INodePlugin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
