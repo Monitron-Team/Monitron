@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Default</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ItemType>GenericProject</ItemType>
+    <ProjectGuid>{E297C441-9FF1-4882-9FEE-8C8903CAE94A}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Default|AnyCPU' ">
+    <OutputPath>.</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="mod_monitron_adhoc.lua" />
+    <None Include="boostrap.yml" />
+    <None Include="cert_vault.yml" />
+    <None Include="deploy.sh" />
+    <None Include="monitron.ddns.net.cfg.lua" />
+    <None Include="monitron_inventory" />
+    <None Include="passwords_vault.yml" />
+    <None Include="prosody.cfg.lua" />
+    <None Include="deploy.yml" />
+  </ItemGroup>
+</Project>

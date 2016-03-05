@@ -1,11 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <appSettings>
-  	    <add key="TestUser01_username" value="monitron_test_1"/>
-  	    <add key="TestUser01_host" value="dukgo.com"/>
-  	    <add key="TestUser01_password" value="XXXX"/>
-	    <add key="TestUser02_username" value="monitron_test_2"/>
-	    <add key="TestUser02_password" value="XXXX"/>
-	    <add key="TestUser02_host" value="dukgo.com"/>
+  	    <add key="admin_username" value="monitron_test_admin"/>
+  	    <add key="admin_host" value="monitron.ddns.net"/>
+  	    <add key="admin_password" value="XXXX"/>
   </appSettings>
 </configuration>

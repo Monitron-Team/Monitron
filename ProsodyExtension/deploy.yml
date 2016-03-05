@@ -1,0 +1,85 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+   - name: install packages for ansible support
+     raw: dnf -y -e0 -d0 install python python-dnf
+
+- hosts: all
+  gather_facts: false
+  tasks:
+   - name: Install Ansible dependencies
+     dnf: name=libselinux-python state=latest
+
+- hosts: messenger_servers
+  vars_files:
+   - cert_vault.yml
+   - passwords_vault.yml
+  vars:
+   - prosody_conf_path: /etc/prosody/prosody.cfg.lua
+   - monitron_site_conf_path: /etc/prosody/conf.d/monitron.ddns.net.cfg.lua
+   - pki_path: /etc/pki/prosody/
+   - prosody_module_path: /usr/lib64/prosody/modules/
+  tasks:
+   - name: Install Prosody
+     dnf: name=prosody state=latest
+     notify:
+      - Enable Prosody
+      - Start Prosody
+
+   - name: Upload Prosody server configuration
+     copy: src=prosody.cfg.lua dest={{prosody_conf_path}} mode=640 owner=root group=prosody
+
+   - name: Upload Monitron site configuration
+     copy: src=monitron.ddns.net.cfg.lua dest={{monitron_site_conf_path}} mode=640 owner=root group=prosody
+     notify:
+      - Restart Prosody
+
+   - name: Upload Monitron site cert (crt)
+     copy:
+      content: "{{ monitron_cert_crt }}"
+      dest: "{{pki_path}}/monitron.ddns.net.crt"
+      mode: 0644
+      owner: root
+      group: root
+     notify:
+      - Restart Prosody
+
+   - name: Upload Monitron site cert (key)
+     copy:
+      content: "{{ monitron_cert_key }}"
+      dest: "{{pki_path}}/monitron.ddns.net.key"
+      mode: 0640
+      owner: root
+      group: prosody
+     notify:
+      - Restart Prosody
+
+   - name: Upload Monitron site cert (cnf)
+     copy:
+      content: "{{ monitron_cert_cnf }}"
+      dest: "{{pki_path}}/monitron.ddns.net.cnf"
+      mode: 0640
+      owner: root
+      group: prosody
+     notify:
+      - Restart Prosody
+
+   - name: Upload Monitron Ad-Hoc module
+     copy: src=mod_monitron_adhoc.lua dest={{prosody_module_path}} mode=644 owner=root group=root
+     notify:
+      - Restart Prosody
+
+   - name: Create Monitron admin
+     raw: prosodyctl deluser monitron_admin@monitron.ddns.net; echo -e {{monitron_admin_password}}\\n{{monitron_admin_password}} | prosodyctl adduser monitron_admin@monitron.ddns.net
+
+   - name: Create Server admin
+     raw: prosodyctl deluser admin@monitron.ddns.net; echo -e {{admin_password}}\\n{{admin_password}} | prosodyctl adduser admin@monitron.ddns.net
+
+  handlers:
+   - name: Enable Prosody
+     service: name=prosody enabled=yes
+   - name: Start Prosody
+     service: name=prosody state=started
+   - name: Restart Prosody
+     service: name=prosody state=restarted
