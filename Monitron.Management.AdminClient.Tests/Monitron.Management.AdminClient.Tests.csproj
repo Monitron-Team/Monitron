@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9531CE9C-0770-47E0-985A-B35701D096B9}</ProjectGuid>
+    <ProjectGuid>{9BBD22E2-54A4-4D13-A4CF-627D310CBED3}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Monitron.Clients.XMPP</RootNamespace>
-    <AssemblyName>Monitron.XMPPMessengerClient</AssemblyName>
+    <RootNamespace>Monitron.Management.AdminClient.Tests</RootNamespace>
+    <AssemblyName>Monitron.Management.AdminClient.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -29,17 +29,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XMPPMessengerClient.cs" />
-    <Compile Include="XMPPClientExtentions.cs" />
+    <Compile Include="Test.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
-      <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
-      <Name>Monitron.Common</Name>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Monitron.Management.AdminClient\Monitron.Management.AdminClient.csproj">
+      <Project>{922C026D-E653-477E-9F99-F150F6FD4C60}</Project>
+      <Name>Monitron.Management.AdminClient</Name>
     </ProjectReference>
     <ProjectReference Include="..\S22.Xmpp\S22.Xmpp.csproj">
       <Project>{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}</Project>
