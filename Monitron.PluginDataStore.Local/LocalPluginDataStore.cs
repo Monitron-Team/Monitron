@@ -9,13 +9,13 @@ namespace Monitron.PluginDataStore.Local
 {
     public class LocalPluginDataStore : IPluginDataStore
     {
-        private string dataStoreFilePath;
-        private Dictionary<string, string> dataStoreDictionary;
+        private string m_DataStoreFilePath;
+        private Dictionary<string, string> m_DataStoreDictionary;
 
         public LocalPluginDataStore(string i_DataStoreFilePath)
         {
-            dataStoreFilePath = i_DataStoreFilePath;
-            dataStoreDictionary = new Dictionary<string, string>();
+            m_DataStoreFilePath = i_DataStoreFilePath;
+            m_DataStoreDictionary = new Dictionary<string, string>();
             readFileToDictionary();
         }
 
@@ -23,7 +23,7 @@ namespace Monitron.PluginDataStore.Local
         {
             try
             {
-                dataStoreDictionary.Remove(i_Key);
+                m_DataStoreDictionary.Remove(i_Key);
                 writeDictionaryToFile();
             }
             catch (Exception)
@@ -40,7 +40,7 @@ namespace Monitron.PluginDataStore.Local
 
             if (keyFound == true)
             {
-                dataStoreDictionary.TryGetValue(i_Key, out valueString);
+                m_DataStoreDictionary.TryGetValue(i_Key, out valueString);
                 valueT = deserialization<T>(valueString);
             }
             else
@@ -59,11 +59,11 @@ namespace Monitron.PluginDataStore.Local
 
             if (keyFound == true)
             {
-                dataStoreDictionary[i_Key] = stringValue;
+                m_DataStoreDictionary[i_Key] = stringValue;
             }
             else
             {
-                dataStoreDictionary.Add(i_Key, stringValue);
+                m_DataStoreDictionary.Add(i_Key, stringValue);
             }
 
             writeDictionaryToFile();
@@ -71,26 +71,26 @@ namespace Monitron.PluginDataStore.Local
 
         private void readFileToDictionary()
         {
-            using(StreamReader sr = new StreamReader(dataStoreFilePath, Encoding.UTF8))
+            using(StreamReader sr = new StreamReader(m_DataStoreFilePath, Encoding.UTF8))
             {
                 string fileContentString = sr.ReadToEnd(); // TBD what if the file is very large?
-                DataContractJsonSerializer ser = new DataContractJsonSerializer(dataStoreDictionary.GetType(),
+                DataContractJsonSerializer ser = new DataContractJsonSerializer(m_DataStoreDictionary.GetType(),
                     new DataContractJsonSerializerSettings() { UseSimpleDictionaryFormat = true });
                 using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(fileContentString)))
                 {
-                    dataStoreDictionary = (Dictionary<string, string>)ser.ReadObject(ms); //TBD couldn't use 'dataStoreDictionary.GetType()'
+                    m_DataStoreDictionary = (Dictionary<string, string>)ser.ReadObject(ms); //TBD couldn't use 'dataStoreDictionary.GetType()'
                 }
             }
         }
 
         private void writeDictionaryToFile()
         {
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(dataStoreDictionary.GetType(),
+            DataContractJsonSerializer ser = new DataContractJsonSerializer(m_DataStoreDictionary.GetType(),
                     new DataContractJsonSerializerSettings() { UseSimpleDictionaryFormat = true });
             using (MemoryStream ms = new MemoryStream())
             {
-                ser.WriteObject(ms, dataStoreDictionary);
-                using (FileStream file = new FileStream(dataStoreFilePath, FileMode.Create, FileAccess.Write))
+                ser.WriteObject(ms, m_DataStoreDictionary);
+                using (FileStream file = new FileStream(m_DataStoreFilePath, FileMode.Create, FileAccess.Write))
                 {
                     ms.WriteTo(file);
                 }
@@ -101,7 +101,7 @@ namespace Monitron.PluginDataStore.Local
         {
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(T));
             T deserializedValue = default(T);
-            using (MemoryStream ms = new MemoryStream(System.Text.ASCIIEncoding.ASCII.GetBytes(valueString)))
+            using (MemoryStream ms = new MemoryStream(System.Text.ASCIIEncoding.ASCII.GetBytes(i_ValueString)))
             {
                 deserializedValue = (T)js.ReadObject(ms); //TBD if the object types are not the same - exception
             }
@@ -129,7 +129,7 @@ namespace Monitron.PluginDataStore.Local
             bool keyFound = false;
             try
             {
-                keyFound = dataStoreDictionary.ContainsKey(i_Key);
+                keyFound = m_DataStoreDictionary.ContainsKey(i_Key);
             }
             catch (ArgumentNullException)
             {
