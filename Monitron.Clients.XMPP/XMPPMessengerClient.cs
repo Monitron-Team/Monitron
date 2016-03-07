@@ -89,6 +89,7 @@ namespace Monitron.Clients.XMPP
                 i_Args.Jid.ToIdentity(),
                 i_Args.Message.Body
             ));
+            
         }
 
         public void m_Client_RosterUpdated(object i_Sender, RosterUpdatedEventArgs i_Args)
