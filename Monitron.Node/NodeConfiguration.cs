@@ -2,49 +2,50 @@
 using Monitron.Common;
 using System.Xml;
 using System.Xml.Serialization;
+using System.IO;
 
 namespace Monitron.Node
 {
-	public sealed class NodeConfiguration: IXmlSerializable
+	public sealed class NodeConfiguration : IXmlSerializable
 	{
-		public Account Account{ get; set;}
+		public Account Account { get; set; }
+
 		public string DllPath { get; set; }
-		public string DllName{ get; set; }
-		public string Plugin{ get ; set;}
-		public string PluginAssemblyName{ get; set;}
+		public string DllName { get; set; }
+		public string Plugin { get ; set; }
+		public string PluginAssemblyName { get; set; }
 
-		public NodeConfiguration(){
+		public NodeConfiguration()
+        {
 		}
 			
-		public void LoadConfigFromFile(string i_FilePath)
-		{
-			XmlDocument doc = getXmlDocument (i_FilePath);
-			String userName = doc.GetElementsByTagName ("Username")[0].InnerXml;
-			String domain = doc.GetElementsByTagName ("Domain")[0].InnerXml;
-			String password = doc.GetElementsByTagName ("Password")[0].InnerXml;
-			Plugin = doc.GetElementsByTagName ("Type")[0].InnerXml;
-			PluginAssemblyName = doc.GetElementsByTagName ("AssemblyName")[0].InnerXml;
-			Account = new Account (userName, password, domain);
-		}
+        public static NodeConfiguration Load(string i_Path)
+        {
+            using (FileStream file = new FileStream(i_Path, FileMode.Open))
+            {
+                return Load(file);
+            }
+        }
+        public static NodeConfiguration Load(Stream i_Stream)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(NodeConfiguration));
+            return (NodeConfiguration) serializer.Deserialize(i_Stream);
+        }
+
+        public void Save(string i_Path)
+        {
+            using (FileStream file = new FileStream(i_Path, FileMode.OpenOrCreate))
+            {
+                Save(file);
+            }
+        }
+
+        public void Save(Stream i_Stream)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(NodeConfiguration));
+            serializer.Serialize(i_Stream, this);
+        }
 			
-		private XmlDocument getXmlDocument(string i_FilePath)
-		{
-			XmlDocument doc = new XmlDocument ();
-
-			try
-			{
-				doc.Load(i_FilePath);
-			}
-			catch(System.IO.FileNotFoundException e)
-			{
-				throw new Exception("No configuration file found", e);
-			}
-
-			return doc;
-		}
-
-		#region IXmlSerializable implementation
-
 		public System.Xml.Schema.XmlSchema GetSchema()
 		{
 			return(null);
@@ -52,36 +53,73 @@ namespace Monitron.Node
 
 		public void ReadXml(XmlReader reader)
 		{
-			reader.ReadToFollowing("Username");
-			string userName = reader.ReadElementContentAsString();
-			reader.ReadToFollowing("Domain");
-			string domain = reader.ReadElementContentAsString();
-			reader.ReadToFollowing("Password");
-			string password = reader.ReadElementContentAsString();
-			Account = new Account(userName, password, domain);
-			reader.ReadToFollowing("DllPath");
-			DllPath = reader.ReadElementContentAsString();
-			reader.ReadToFollowing("DllName");
-			DllName = reader.ReadElementContentAsString();
-			reader.ReadToFollowing("Type");
-			Plugin = reader.ReadElementContentAsString();
-			reader.ReadToFollowing("AssemblyName");
-			PluginAssemblyName = reader.ReadElementContentAsString();
+            reader.ReadStartElement("NodeConfiguration");
+            string userName = "";
+            string domain = "";
+            string password = "";
+
+            while (reader.IsStartElement())
+            {
+                switch (reader.Name)
+                {
+                    case "Account":
+                        reader.ReadStartElement();
+                        while (reader.IsStartElement())
+                        {
+                            switch (reader.Name)
+                            {
+                                case "Username":
+                                    userName = reader.ReadElementContentAsString();
+                                    break;
+                                case "Domain":
+                                    domain = reader.ReadElementContentAsString();
+                                    break;
+                                case "Password":
+                                    password = reader.ReadElementContentAsString();
+                                    break;
+                            }
+                        }
+
+                        Account = new Account(userName, password, domain);
+                        break;
+                    case "Plugin":
+                        reader.ReadStartElement();
+                        while (reader.IsStartElement())
+                        {
+                            switch (reader.Name)
+                            {
+                        
+                                case "DllPath":
+                                    DllPath = reader.ReadElementContentAsString();
+                                    break;
+                                case "DllName":
+                                    DllName = reader.ReadElementContentAsString();
+                                    break;
+                                case "Type":
+                                    Plugin = reader.ReadElementContentAsString();
+                                    break;
+                                case "AssemblyName":
+                                    PluginAssemblyName = reader.ReadElementContentAsString();
+                                    break;
+                            }
+                        }
+                        break;
+                }
+
+                reader.ReadEndElement();
+            }
+            reader.ReadEndElement();
 		}
 
 		public void WriteXml(XmlWriter writer)
 		{
-			writer.WriteStartElement("configuration");
 			writer.WriteStartElement("Account");
-			writer.WriteStartElement("Identity");
 			string accountUserName = Account?.Identity.UserName ?? "";
 			string accountDomain = Account?.Identity.Domain ?? "";
 			string accountPassword = Account?.Password ?? "";
 			writer.WriteElementString("Username", accountUserName);
 			writer.WriteElementString("Domain", accountDomain);
-			//end of identity element
-			writer.WriteEndElement();
-			writer.WriteElementString("Password", Account.Password);
+            writer.WriteElementString("Password", accountPassword);
 			//end of Account element
 			writer.WriteEndElement();
 			writer.WriteStartElement("Plugin");
@@ -91,11 +129,7 @@ namespace Monitron.Node
 			writer.WriteElementString("AssemblyName", PluginAssemblyName);
 			//end of Plugin Element
 			writer.WriteEndElement();
-			//end of configuration element
-			writer.WriteEndElement();
 		}
-
-		#endregion
 	}
 }
 

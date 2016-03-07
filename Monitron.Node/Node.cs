@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Threading;
+
 using Monitron.Common;
 using Monitron.Clients.XMPP;
-using System.Linq;
 
 namespace Monitron.Node
 {
@@ -12,6 +14,7 @@ namespace Monitron.Node
 		private Account m_Account;
 		private IMessengerClient m_MessangerClient;
 		private NodeConfiguration m_NodeConfig;
+        private readonly EventWaitHandle r_StopWaitHandle = new EventWaitHandle(initialState: false, mode: EventResetMode.ManualReset);
 		public INodePlugin Plugin { get; private set;}
 
 		public Node(NodeConfiguration i_NodeConfig)
@@ -52,6 +55,16 @@ namespace Monitron.Node
 				}
 			}
 		}
+
+        public void Stop()
+        {
+            r_StopWaitHandle.Set();
+        }
+
+        public void Run()
+        {
+            r_StopWaitHandle.WaitOne();
+        }
 	}
 }
 

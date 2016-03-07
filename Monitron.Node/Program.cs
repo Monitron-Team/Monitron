@@ -12,23 +12,28 @@ namespace Monitron.Node
 		static void Main(string[] args)
 		{
 			//local installation - the config file will be placed in %appdata%/Monitron folder by the admin
-			string appDataFolder = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
+			string appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 			string configFilePath = Path.Combine(appDataFolder, k_MainAppDataFolder, k_ConfigName);
+            Node node;
 
 			if (File.Exists(configFilePath))
 			{
-				NodeConfiguration nodeConfig = new NodeConfiguration();
-				XmlReader xmlReader = XmlReader.Create(configFilePath);
-				nodeConfig.ReadXml(xmlReader);
+                NodeConfiguration nodeConfig = NodeConfiguration.Load(configFilePath);
 				try
 				{
-					Node node = new Node(nodeConfig);
+					node = new Node(nodeConfig);
 				}
-				catch(TypeLoadException)
+				catch(TypeLoadException e)
 				{
 					//couldn't create node due to failing in loading the plugin
+                    Console.WriteLine("Could start node: " + e.Message);
+                    return;
 				}
+
+                node.Run();
 			}
+
+            Console.WriteLine("Could not find configuration");
 		}
 	}
 }

@@ -35,16 +35,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Test.cs" />
     <Compile Include="TestNodePlugin.cs" />
+    <Compile Include="NodeConfigurationTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="node.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestNode.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monitron.Node\Monitron.Node.csproj">
