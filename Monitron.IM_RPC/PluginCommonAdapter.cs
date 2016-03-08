@@ -2,6 +2,7 @@
 
 using Monitron.Common;
 
+
 namespace Monitron.ImRpc
 {
     public class PluginCommonAdapter
