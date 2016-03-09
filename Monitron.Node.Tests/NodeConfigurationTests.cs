@@ -18,9 +18,13 @@ namespace Monitron.Node.Tests
             string assemblyLocation = Assembly.GetCallingAssembly().Location;
             string assemblyDirectory = Path.GetDirectoryName(assemblyLocation);
             string assemblyFileName = Path.GetFileName(assemblyLocation);
-            string assemblyName = Assembly.GetCallingAssembly().FullName;
             return string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
 <NodeConfiguration>
+  <MessangerClient>
+	<DllPath>{0}</DllPath>
+	<DllName>{1}</DllName>
+	<Type>Monitron.Node.Tests.TestClientMessanger</Type>
+  </MessangerClient>
   <Account>
     <Username>test_node_001</Username>
     <Domain>monitron.ddns.net</Domain>
@@ -30,12 +34,10 @@ namespace Monitron.Node.Tests
     <DllPath>{0}</DllPath>
     <DllName>{1}</DllName>
     <Type>Monitron.Node.Tests.TestNodePlugin</Type>
-    <AssemblyName>{{{2}}}</AssemblyName>
   </Plugin>
 </NodeConfiguration>",
             assemblyDirectory,
-            assemblyFileName,
-            assemblyName);
+            assemblyFileName);
         }
         
 		[Test()]
@@ -46,10 +48,12 @@ namespace Monitron.Node.Tests
 
 			NodeConfiguration nodeTestConfig = new NodeConfiguration();
 			nodeTestConfig.Account = new Monitron.Common.Account("user", "password", "domain");
-			nodeTestConfig.DllPath = "path";
-			nodeTestConfig.DllName = "Monitron.Node.Tests";
-			nodeTestConfig.Plugin = "Plugin";
-			nodeTestConfig.PluginAssemblyName = "Assembly";
+			nodeTestConfig.Plugin.DllPath = "PluginPath";
+			nodeTestConfig.Plugin.DllName = "Monitron.Node.Tests";
+			nodeTestConfig.Plugin.Type = "PluginType";
+			nodeTestConfig.MessageClient.DllPath = "MessageClientPath";
+			nodeTestConfig.MessageClient.DllName = "MessageClientTest";
+			nodeTestConfig.MessageClient.Type = "MessageClientType";
             nodeTestConfig.Save(stream);
             //Deserialize
             stream.SetLength(stream.Position);
@@ -58,10 +62,12 @@ namespace Monitron.Node.Tests
 			Assert.AreEqual("user", nodeLoadFromConfig.Account.Identity.UserName);
 			Assert.AreEqual("domain", nodeLoadFromConfig.Account.Identity.Domain);
 			Assert.AreEqual("password", nodeLoadFromConfig.Account.Password);
-			Assert.AreEqual("path", nodeLoadFromConfig.DllPath);
-			Assert.AreEqual("Monitron.Node.Tests", nodeLoadFromConfig.DllName);
-			Assert.AreEqual("Plugin", nodeLoadFromConfig.Plugin);
-			Assert.AreEqual("Assembly", nodeLoadFromConfig.PluginAssemblyName);
+			Assert.AreEqual("PluginPath", nodeLoadFromConfig.Plugin.DllPath);
+			Assert.AreEqual("Monitron.Node.Tests", nodeLoadFromConfig.Plugin.DllName);
+			Assert.AreEqual("PluginType", nodeLoadFromConfig.Plugin.Type);
+			Assert.AreEqual("MessageClientPath", nodeLoadFromConfig.MessageClient.DllPath);
+			Assert.AreEqual("MessageClientTest", nodeLoadFromConfig.MessageClient.DllName);
+			Assert.AreEqual("MessageClientType", nodeLoadFromConfig.MessageClient.Type);
 		}
 
 		[Test()]
@@ -71,6 +77,7 @@ namespace Monitron.Node.Tests
             NodeConfiguration nodeConfig = NodeConfiguration.Load(stream);
             Node node = new Node(nodeConfig);
 			Assert.AreEqual(typeof(Monitron.Node.Tests.TestNodePlugin).ToString(), node.Plugin.ToString());
+			Assert.AreEqual(typeof(Monitron.Node.Tests.TestClientMessanger).ToString(), node.MessangerClient.ToString());
 		}
 	}
 }
