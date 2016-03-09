@@ -1,13 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <NodeConfiguration>
+	<MessangerClient>
+		<DllPath>C:\Users\danielk\Documents\Monitron-Team\Monitron.git\Monitron.Clients.XMPP\bin\Debug</DllPath>
+		<DllName>Monitron.XMPPMessengerClient.dll</DllName>
+		<Type>Monitron.Clients.XMPP.XMPPMessengerClient</Type>
+	</MessangerClient>
 	<Account>
 		<Username>test_node_001</Username>
 		<Domain>monitron.ddns.net</Domain>
 		<Password>XXX</Password>
 	 </Account>
-	 <Pluggin>
-	 	<Type>Monitron.Common.TestPlugin</Type>
-	 	<AssemblyName>Monitron.Common, Version=1.0.5901.33397, Culture=neutral, PublicKeyToken=null</AssemblyName>
-	 	<PlugginConfiguration>path</PlugginConfiguration>
-	 </Pluggin>
+	 <Plugin>
+	 	<DllPath>C:\Users\danielk\Documents\Monitron-Team\Monitron.git\Monitron.Node.Tests\bin\Debug</DllPath>
+		<DllName>Monitron.Node.Tests.dll</DllName>
+		<Type>Monitron.Node.Tests.TestNodePlugin</Type>
+	 </Plugin>
  </NodeConfiguration>
+
