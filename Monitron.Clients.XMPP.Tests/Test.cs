@@ -92,5 +92,13 @@ namespace Monitron.Clients.XMPP.Tests
                 i_Client.RemoveBuddy(item.Identity);
             }
         }
+
+        public XMPPMessengerClient GetXMPPMessengerClient(string i_UserName)
+        {
+            XMPPMessengerClient client1 = getTestClient(i_UserName);//"TestUser01"//TestUser02"
+            return client1;
+        }
+
+
     }
 }

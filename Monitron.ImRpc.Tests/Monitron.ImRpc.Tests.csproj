@@ -29,7 +29,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.0.5813.39031, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.0.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,6 +52,10 @@
     <Compile Include="TestClasses.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Monitron.Clients.Mock\Monitron.Clients.Mock.csproj">
+      <Project>{febbb41f-7a01-485e-9936-5207ff5badf3}</Project>
+      <Name>Monitron.Clients.Mock</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
       <Project>{f6c59df6-5c97-4b51-925c-dbd8dc245779}</Project>
       <Name>Monitron.Common</Name>
@@ -53,6 +64,9 @@
       <Project>{50d209c8-c9f4-4690-8d3c-558b592ec80b}</Project>
       <Name>Monitron.ImRpc</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

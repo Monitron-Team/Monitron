@@ -42,6 +42,11 @@ namespace Monitron.Clients.Mock
             SentMessageQueue.Enqueue(Tuple.Create(i_Buddy, i_Message));
         }
 
+        public void PushMessage(Identity i_Buddy, string i_Message)
+        {
+            MessageArrived?.Invoke(this, new MessageArrivedEventArgs(i_Buddy, i_Message));
+        }
+
         public void AddBuddy(Identity i_Identity, params string[] i_Groups)
         {
             if (BuddyDictionary.ContainsKey(i_Identity))
