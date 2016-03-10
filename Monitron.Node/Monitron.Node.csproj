@@ -33,7 +33,9 @@
   <ItemGroup>
     <Compile Include="Node.cs" />
     <Compile Include="NodeConfiguration.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Program.cs">
+      <DeployService-Deploy>True</DeployService-Deploy>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
@@ -47,10 +49,14 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Xml" />
+    <Reference Include="NDesk.Options">
+      <HintPath>..\packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="node.config.example">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

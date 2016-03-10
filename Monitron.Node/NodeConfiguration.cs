@@ -9,14 +9,31 @@ namespace Monitron.Node
 	public sealed class NodeConfiguration : IXmlSerializable
 	{
 		public Account Account { get; set; }
+		public NodePlugin Plugin { get; set; }
+		public MessangerClient MessageClient { get; set; }
 
-		public string DllPath { get; set; }
-		public string DllName { get; set; }
-		public string Plugin { get ; set; }
-		public string PluginAssemblyName { get; set; }
+		public class NodePlugin
+		{
+			internal NodePlugin(){}
 
+			public string DllPath { get; set; }
+			public string DllName { get; set; }
+			public string Type { get; set; }
+		}
+
+		public class MessangerClient
+		{
+			internal MessangerClient(){}
+
+			public string DllPath { get; set; }
+			public string DllName { get; set; }
+			public string Type { get; set; }
+		}
+			
 		public NodeConfiguration()
         {
+			Plugin = new NodePlugin();
+			MessageClient = new MessangerClient();
 		}
 			
         public static NodeConfiguration Load(string i_Path)
@@ -62,49 +79,63 @@ namespace Monitron.Node
             {
                 switch (reader.Name)
                 {
-                    case "Account":
-                        reader.ReadStartElement();
-                        while (reader.IsStartElement())
+				case "MessangerClient":
+					reader.ReadStartElement();
+					while (reader.IsStartElement())
+					{
+						switch (reader.Name)
+						{
+						case "DllPath":
+							MessageClient.DllPath = reader.ReadElementContentAsString();
+							break;
+						case "DllName":
+							MessageClient.DllName = reader.ReadElementContentAsString();
+							break;
+						case "Type":
+							MessageClient.Type = reader.ReadElementContentAsString();
+							break;
+						}
+					}
+					break;
+				case "Account":
+                    reader.ReadStartElement();
+                    while (reader.IsStartElement())
+                    {
+                        switch (reader.Name)
                         {
-                            switch (reader.Name)
-                            {
-                                case "Username":
-                                    userName = reader.ReadElementContentAsString();
-                                    break;
-                                case "Domain":
-                                    domain = reader.ReadElementContentAsString();
-                                    break;
-                                case "Password":
-                                    password = reader.ReadElementContentAsString();
-                                    break;
-                            }
+                            case "Username":
+                                userName = reader.ReadElementContentAsString();
+                                break;
+                            case "Domain":
+                                domain = reader.ReadElementContentAsString();
+                                break;
+                            case "Password":
+                                password = reader.ReadElementContentAsString();
+                                break;
                         }
+                    }
 
-                        Account = new Account(userName, password, domain);
-                        break;
-                    case "Plugin":
-                        reader.ReadStartElement();
-                        while (reader.IsStartElement())
+                    Account = new Account(userName, password, domain);
+                    break;
+                case "Plugin":
+                    reader.ReadStartElement();
+                    while (reader.IsStartElement())
+                    {
+                        switch (reader.Name)
                         {
-                            switch (reader.Name)
-                            {
-                        
-                                case "DllPath":
-                                    DllPath = reader.ReadElementContentAsString();
-                                    break;
-                                case "DllName":
-                                    DllName = reader.ReadElementContentAsString();
-                                    break;
-                                case "Type":
-                                    Plugin = reader.ReadElementContentAsString();
-                                    break;
-                                case "AssemblyName":
-                                    PluginAssemblyName = reader.ReadElementContentAsString();
-                                    break;
-                            }
+                            case "DllPath":
+								Plugin.DllPath = reader.ReadElementContentAsString();
+                                break;
+                            case "DllName":
+								Plugin.DllName = reader.ReadElementContentAsString();
+                                break;
+                            case "Type":
+								Plugin.Type = reader.ReadElementContentAsString();
+                                break;
                         }
-                        break;
-                }
+                    }
+                    break;
+            	}
 
                 reader.ReadEndElement();
             }
@@ -113,6 +144,12 @@ namespace Monitron.Node
 
 		public void WriteXml(XmlWriter writer)
 		{
+			writer.WriteStartElement("MessangerClient");
+			writer.WriteElementString("DllPath", MessageClient.DllPath);
+			writer.WriteElementString("DllName", MessageClient.DllName);
+			writer.WriteElementString("Type", MessageClient.Type);
+			writer.WriteEndElement();
+			//end of MessangerClient element
 			writer.WriteStartElement("Account");
 			string accountUserName = Account?.Identity.UserName ?? "";
 			string accountDomain = Account?.Identity.Domain ?? "";
@@ -123,10 +160,9 @@ namespace Monitron.Node
 			//end of Account element
 			writer.WriteEndElement();
 			writer.WriteStartElement("Plugin");
-			writer.WriteElementString("DllPath", DllPath);
-			writer.WriteElementString("DllName", DllName);
-			writer.WriteElementString("Type", Plugin);
-			writer.WriteElementString("AssemblyName", PluginAssemblyName);
+			writer.WriteElementString("DllPath", Plugin.DllPath);
+			writer.WriteElementString("DllName", Plugin.DllName);
+			writer.WriteElementString("Type", Plugin.Type);
 			//end of Plugin Element
 			writer.WriteEndElement();
 		}
