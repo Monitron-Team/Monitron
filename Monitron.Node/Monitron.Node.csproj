@@ -40,10 +40,6 @@
       <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
       <Name>Monitron.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Monitron.Clients.XMPP\Monitron.Clients.XMPP.csproj">
-      <Project>{9531CE9C-0770-47E0-985A-B35701D096B9}</Project>
-      <Name>Monitron.Clients.XMPP</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Xml" />
