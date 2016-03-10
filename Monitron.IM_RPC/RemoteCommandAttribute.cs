@@ -7,5 +7,4 @@ namespace Monitron.ImRpc
     {
         public string m_MethodName;
     }
-
 }
