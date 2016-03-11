@@ -89,7 +89,7 @@ namespace Monitron.Clients.XMPP.Tests
                     waitHandle.Set();
             };
             
-            client1.sendMessage(client2.Identity, "Hello");
+            client1.SendMessage(client2.Identity, "Hello");
 
             Assert.IsTrue(waitHandle.WaitOne(testTimeout));
         }

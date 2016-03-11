@@ -3,6 +3,6 @@
   <appSettings>
   	    <add key="admin_username" value="monitron_test_admin"/>
   	    <add key="admin_host" value="monitron.ddns.net"/>
-  	    <add key="admin_password" value="NoRestForTheWicked"/>
+  	    <add key="admin_password" value="XXXX"/>
   </appSettings>
 </configuration>

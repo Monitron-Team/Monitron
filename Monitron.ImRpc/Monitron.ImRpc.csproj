@@ -7,8 +7,8 @@
     <ProjectGuid>{50D209C8-C9F4-4690-8D3C-558B592EC80B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Monitron.IM_RPC</RootNamespace>
-    <AssemblyName>Monitron.IM_RPC</AssemblyName>
+    <RootNamespace>Monitron.ImRpc</RootNamespace>
+    <AssemblyName>Monitron.ImRpc</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -10,6 +10,9 @@ namespace Monitron.Node
 {
 	public sealed class Node
 	{
+        private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
+            (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
 		private Account m_Account;
 		private NodeConfiguration m_NodeConfig;
 		private readonly EventWaitHandle r_StopWaitHandle = new EventWaitHandle(initialState: false, mode: EventResetMode.ManualReset);
@@ -21,43 +24,25 @@ namespace Monitron.Node
 			m_NodeConfig = i_NodeConfig;
 			m_Account = i_NodeConfig.Account;
 
-			try
-			{
-				loadMessangerClient();
-			}
-			catch(TypeLoadException) 
-			{
-				MessangerClient = null;
-			}
-			try
-			{
-				loadPlugin();
-			}
-			catch(TypeLoadException e)
-			{
-				throw new TypeLoadException("Could not load plugin " + i_NodeConfig.Plugin.Type, e);
-			}
-		}
+            loadMessangerClient();
+            loadPlugin();
+        }
 
-		private void loadMessangerClient()
-		{
+        private void loadMessangerClient()
+        {
+            sr_Log.Info("Loading messenger client...");
 			Type type = loadDll(m_NodeConfig.MessageClient.DllPath, m_NodeConfig.MessageClient.DllName, 
 				m_NodeConfig.MessageClient.Type);
-
-			if (type != null)
-			{
-				MessangerClient = (IMessengerClient)Activator.CreateInstance(type, m_Account);
-			}
+            sr_Log.DebugFormat("Messenger client is {0}", type.FullName);
+			MessangerClient = (IMessengerClient)Activator.CreateInstance(type, m_Account);
 		}
 
 		private void loadPlugin()
 		{
+            sr_Log.Info("Loading plugin client...");
 			Type type = loadDll(m_NodeConfig.Plugin.DllPath, m_NodeConfig.Plugin.DllName, m_NodeConfig.Plugin.Type);
-
-			if (type != null)
-			{
-				Plugin = (INodePlugin)Activator.CreateInstance(type, MessangerClient);
-			}
+            sr_Log.DebugFormat("Plugin client is {0}", type.FullName);
+		    Plugin = (INodePlugin)Activator.CreateInstance(type, MessangerClient);
 		}
 
 		private Type loadDll(string i_DllPath, string i_DllName, string i_ClassType)
@@ -71,6 +56,11 @@ namespace Monitron.Node
 				type = Dll.GetType(i_ClassType);
 			}
 
+            if (type == null)
+            {
+                throw new TypeLoadException("Could not find type");
+            }
+
 			return type;
 		}
 
@@ -81,6 +71,7 @@ namespace Monitron.Node
 
         public void Run()
         {
+            sr_Log.Info("Running");
             r_StopWaitHandle.WaitOne();
         }
 	}

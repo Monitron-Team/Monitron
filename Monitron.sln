@@ -27,16 +27,28 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.ImRpc", "Monitron.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.ImRpc.Tests", "Monitron.ImRpc.Tests\Monitron.ImRpc.Tests.csproj", "{DB21DEA2-97A5-4B1A-8D28-466CEB35F660}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.Management", "Monitron.Plugins.Management\Monitron.Plugins.Management.csproj", "{58199704-1F8F-4268-82CA-456AEE7D010F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.Management.Test", "Monitron.Plugins.Management.Test\Monitron.Plugins.Management.Test.csproj", "{20E31832-C620-4A55-9096-16401E7A007B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{20E31832-C620-4A55-9096-16401E7A007B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20E31832-C620-4A55-9096-16401E7A007B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20E31832-C620-4A55-9096-16401E7A007B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20E31832-C620-4A55-9096-16401E7A007B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{50D209C8-C9F4-4690-8D3C-558B592EC80B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{50D209C8-C9F4-4690-8D3C-558B592EC80B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50D209C8-C9F4-4690-8D3C-558B592EC80B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50D209C8-C9F4-4690-8D3C-558B592EC80B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58199704-1F8F-4268-82CA-456AEE7D010F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58199704-1F8F-4268-82CA-456AEE7D010F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58199704-1F8F-4268-82CA-456AEE7D010F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58199704-1F8F-4268-82CA-456AEE7D010F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5CEAEA81-01F3-4DA9-81C3-150AFF2F93DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5CEAEA81-01F3-4DA9-81C3-150AFF2F93DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CEAEA81-01F3-4DA9-81C3-150AFF2F93DD}.Release|Any CPU.ActiveCfg = Release|Any CPU

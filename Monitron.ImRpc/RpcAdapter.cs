@@ -32,7 +32,7 @@ namespace Monitron.ImRpc
             bool wasSuccess = ParseExecute(cmd, out retuenedValue);
             if (wasSuccess)
             {
-                this.m_MessangerClient.sendMessage(i_EventArgs.Buddy, retuenedValue);
+                this.m_MessangerClient.SendMessage(i_EventArgs.Buddy, retuenedValue);
             }
             else
             {
@@ -40,7 +40,7 @@ namespace Monitron.ImRpc
             }
             try
             {
-                m_MessangerClient.sendMessage(i_EventArgs.Buddy, retuenedValue);
+                m_MessangerClient.SendMessage(i_EventArgs.Buddy, retuenedValue);
             }
             catch (Exception)
             {
@@ -60,9 +60,9 @@ namespace Monitron.ImRpc
                 if (attr != null)
                 {
                     //If the method has the attribute, add to cache
-                    if (!this.r_MainCache.ContainsKey(attr.m_MethodName))
+                    if (!this.r_MainCache.ContainsKey(attr.MethodName))
                     {
-                        this.r_MainCache.Add(attr.m_MethodName, meth);
+                        this.r_MainCache.Add(attr.MethodName, meth);
                     }
                 }
             }

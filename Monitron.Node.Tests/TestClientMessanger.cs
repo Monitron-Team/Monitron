@@ -1,10 +1,16 @@
 ﻿using System;
 using Monitron.Common;
+using System.IO;
 
 namespace Monitron.Node.Tests
 {
-	public class TestClientMessanger : IMessengerClient
+    public class TestClientMessanger : IMessengerClient
 	{
+        public void SetAvatar(Stream i_stream)
+        {
+            // Do nothing
+        }
+
 		private readonly Account r_Account;
 
 		public TestClientMessanger(Account i_Account)
@@ -28,7 +34,7 @@ namespace Monitron.Node.Tests
 
 		public event EventHandler<BuddyListChangedEventArgs> BuddyListChanged;
 
-		public void sendMessage(Identity i_Buddy, string i_Message)
+		public void SendMessage(Identity i_Buddy, string i_Message)
 		{
 			throw new NotImplementedException();
 		}

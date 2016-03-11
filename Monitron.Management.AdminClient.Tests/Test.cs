@@ -100,6 +100,20 @@ namespace Monitron.Management.AdminClient.Tests
                 adminClient.DeleteUser(account, buddy);
             }
         }
+
+        [Test()]
+        public void SetUpBuddies()
+        {
+            AdminClient adminClient = getAdminClient();
+
+            Jid mgmt = new Jid("themanagement@monitron.ddns.net");
+            foreach (string name in new string[] {"saggi", "daniel", "maor", "tzafi"})
+            {
+                Jid account = new Jid(name +"@monitron.ddns.net");
+                adminClient.AddRosterItem(mgmt, account, "admin");
+                adminClient.AddRosterItem(account, mgmt, "Monitron Bots");
+            }
+        }
     }
 }
 

@@ -13,8 +13,8 @@ namespace Monitron.Common.Tests
         [Test()]
         public void TestInitalLoad()
         {
-            Identity clientIdnetity = new Identity{ UserName = "test", Domain = "test" };
-            Identity friendIdentity = new Identity(){ UserName = "friend", Domain = "test" };
+            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
+            Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
             MockMessengerClient client = new MockMessengerClient(clientIdnetity);
             client.BuddyDictionary.Add(friendIdentity, new string[]{ "admin" });
             BuddyListCache cache = new BuddyListCache(client);
@@ -25,8 +25,8 @@ namespace Monitron.Common.Tests
         [Test()]
         public void TestBuddyAddition()
         {
-            Identity clientIdnetity = new Identity{ UserName = "test", Domain = "test" };
-            Identity friendIdentity = new Identity(){ UserName = "friend", Domain = "test" };
+            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
+            Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
             MockMessengerClient client = new MockMessengerClient(clientIdnetity);
             BuddyListCache cache = new BuddyListCache(client);
             client.AddBuddy(friendIdentity, new string[]{ "admin" });
@@ -37,8 +37,8 @@ namespace Monitron.Common.Tests
         [Test()]
         public void TestBuddyDeletion()
         {
-            Identity clientIdnetity = new Identity{ UserName = "test", Domain = "test" };
-            Identity friendIdentity = new Identity(){ UserName = "friend", Domain = "test" };
+            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
+            Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
             MockMessengerClient client = new MockMessengerClient(clientIdnetity);
             client.BuddyDictionary.Add(friendIdentity, new string[]{ "admin" });
             BuddyListCache cache = new BuddyListCache(client);

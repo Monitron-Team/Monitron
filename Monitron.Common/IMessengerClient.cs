@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Monitron.Common
 {
@@ -14,10 +15,13 @@ namespace Monitron.Common
 
         Identity Identity { get; }
 
-        void sendMessage(Identity i_Buddy, string i_Message);
+        void SendMessage(Identity i_Buddy, string i_Message);
 
         void AddBuddy(Identity i_Identity, params string [] i_Groups);
+
         void RemoveBuddy(Identity i_Identity);
+
+        void SetAvatar(Stream i_stream);
 
     }
 }

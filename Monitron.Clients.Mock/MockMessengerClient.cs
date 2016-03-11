@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using Monitron.Common;
+using System.IO;
 
 namespace Monitron.Clients.Mock
 {
@@ -35,14 +36,33 @@ namespace Monitron.Clients.Mock
             }
         }
         
-        public Identity Identity { get; set; }
+        public Account Account { get; set; }
+
+        public Identity Identity
+        {
+            get
+            {
+                return Account.Identity;
+            }
+        }
 
         public MockMessengerClient(Identity i_Identity)
         {
-            Identity = i_Identity;
+            Account account = new Account(
+                i_UserName: i_Identity.UserName,
+                i_Host: i_Identity.Domain,
+                i_Password: null
+            );
+
+            Account = account;
+        }
+
+        public MockMessengerClient(Account i_Account)
+        {
+            Account = i_Account;
         }
         
-        public void sendMessage(Identity i_Buddy, string i_Message)
+        public void SendMessage(Identity i_Buddy, string i_Message)
         {
             SentMessageQueue.Enqueue(Tuple.Create(i_Buddy, i_Message));
         }
@@ -54,7 +74,7 @@ namespace Monitron.Clients.Mock
                 BuddyDictionary.Remove(i_Identity);
             }
 
-            BuddyDictionary.Add(Identity, i_Groups);
+            BuddyDictionary.Add(Account.Identity, i_Groups);
             OnBuddyListChanged(new BuddyListChangedEventArgs(
                 new BuddyListItem(i_Identity, i_Groups), false)
             );
@@ -82,6 +102,11 @@ namespace Monitron.Clients.Mock
             OnBuddyListChanged(new BuddyListChangedEventArgs(
                 new BuddyListItem(i_Identity, groups), true)
             );
+        }
+
+        public void SetAvatar(Stream stream)
+        {
+            // Do nothing
         }
     }
 }

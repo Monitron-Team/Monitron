@@ -841,6 +841,36 @@ namespace S22.Xmpp.Client {
 			userAvatar.Publish(filePath);
 		}
 
+        /// <summary>
+        /// Publishes the image contained in the stream as the user's avatar.
+        /// </summary>
+        /// <param name="stream">The steam containng the image to publish as the user's
+        /// avatar.</param>
+        /// <exception cref="ArgumentNullException">The stream parameter is
+        /// null.</exception>
+        /// <exception cref="NotSupportedException">stream is in an invalid
+        /// format, or the server does not support the 'Personal Eventing
+        /// Protocol' extension.</exception>
+        /// <exception cref="XmppErrorException">The server returned an XMPP error code.
+        /// Use the Error property of the XmppErrorException to obtain the specific
+        /// error condition.</exception>
+        /// <exception cref="XmppException">The server returned invalid data or another
+        /// unspecified XMPP error occurred.</exception>
+        /// <exception cref="InvalidOperationException">The XmppClient instance is not
+        /// connected to a remote host, or the XmppClient instance has not authenticated with
+        /// the XMPP server.</exception>
+        /// <exception cref="ObjectDisposedException">The XmppClient object has been
+        /// disposed.</exception>
+        /// <remarks>
+        /// The following file types are supported:
+        ///  BMP, GIF, JPEG, PNG and TIFF.
+        /// </remarks>
+        public void SetAvatar(Stream stream) {
+            AssertValid();
+            stream.ThrowIfNull("stream");
+            userAvatar.Publish(stream);
+        }
+
 		/// <summary>
 		/// Sets the user's mood to the specified mood value.
 		/// </summary>

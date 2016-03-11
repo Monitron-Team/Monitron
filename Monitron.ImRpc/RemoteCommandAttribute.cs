@@ -5,6 +5,6 @@ namespace Monitron.ImRpc
     [AttributeUsage(AttributeTargets.Method)]
     public class RemoteCommandAttribute : Attribute
     {
-        public string m_MethodName;
+        public string MethodName { get; set; }
     }
 }

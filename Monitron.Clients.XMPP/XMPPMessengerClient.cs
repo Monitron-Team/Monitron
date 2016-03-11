@@ -7,6 +7,7 @@ using S22.Xmpp.Im;
 
 using Monitron.Common;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Monitron.Clients.XMPP
 {
@@ -109,7 +110,7 @@ namespace Monitron.Clients.XMPP
             this.MessageArrived?.Invoke(this, i_EventArgs);
         }
         
-        public void sendMessage(Identity i_Buddy, string i_Message)
+        public void SendMessage(Identity i_Buddy, string i_Message)
         {
             m_Client.SendMessage(new Message(i_Buddy.ToJid(), i_Message));
         }
@@ -122,6 +123,11 @@ namespace Monitron.Clients.XMPP
         public void RemoveBuddy(Identity i_Identity)
         {
             m_Client.RemoveContact(i_Identity.ToJid());
+        }
+
+        public void SetAvatar(Stream i_Stream)
+        {
+            m_Client.SetAvatar(i_Stream);
         }
     }
 }
