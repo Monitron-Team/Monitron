@@ -7,23 +7,24 @@ using Monitron.Common;
 
 namespace Monitron.ImRpc
 {
-    public class PluginCommonAdapter
+    public class RpcAdapter
     {
         object m_Obj;
         IMessengerClient m_MessangerClient;
-        private Dictionary<string, MethodInfo> m_MainCache = new Dictionary<string, MethodInfo>();
-        private Dictionary<Type, MethodInfo> m_ArgumentParsersCache = new Dictionary<Type, MethodInfo>();
+        private readonly Dictionary<string, MethodInfo> r_MainCache = new Dictionary<string, MethodInfo>();
+        private readonly Dictionary<Type, MethodInfo> r_ArgumentParsersCache = new Dictionary<Type, MethodInfo>();
 
-        public PluginCommonAdapter(object i_Obj, IMessengerClient i_MessangerClient)
+        public RpcAdapter(object i_Obj, IMessengerClient i_MessangerClient)
         {
             m_Obj = i_Obj;
-            this.m_MainCache = new Dictionary<string, MethodInfo>();
-            this.m_ArgumentParsersCache = new Dictionary<Type, MethodInfo>();
+            this.r_MainCache = new Dictionary<string, MethodInfo>();
+            this.r_ArgumentParsersCache = new Dictionary<Type, MethodInfo>();
             this.addMethodsToMainCache();
             addArgumentParsersToCache();
             i_MessangerClient.MessageArrived += DoWhenMessageAvrrived;
             m_MessangerClient = i_MessangerClient;
         }
+
         public void DoWhenMessageAvrrived(object i_Sender, MessageArrivedEventArgs i_EventArgs)
         {
             Command cmd = Command.Parse(i_EventArgs.Message);
@@ -31,7 +32,7 @@ namespace Monitron.ImRpc
             bool wasSuccess = ParseExecute(cmd, out retuenedValue);
             if (wasSuccess)
             {
-                Console.WriteLine(retuenedValue);  //TODO: response to instant message. how??
+                this.m_MessangerClient.sendMessage(i_EventArgs.Buddy, retuenedValue);
             }
             else
             {
@@ -59,22 +60,12 @@ namespace Monitron.ImRpc
                 if (attr != null)
                 {
                     //If the method has the attribute, add to cache
-                    if (!this.m_MainCache.ContainsKey(attr.m_MethodName))
+                    if (!this.r_MainCache.ContainsKey(attr.m_MethodName))
                     {
-                        this.m_MainCache.Add(attr.m_MethodName, meth);
+                        this.r_MainCache.Add(attr.m_MethodName, meth);
                     }
                 }
             }
-        }
-
-        private MethodInfo getArgumentParserFromCache(Type i_ObjType)
-        {
-            MethodInfo result = null;
-            if (this.m_ArgumentParsersCache.ContainsKey(i_ObjType))
-            {
-                result = this.m_ArgumentParsersCache[i_ObjType];
-            }
-            return result;
         }
 
         private void addArgumentParsersToCache()
@@ -88,19 +79,18 @@ namespace Monitron.ImRpc
                 if (att != null)
                 {
                     //add to cache
-                    this.m_ArgumentParsersCache.Add(meth.ReturnType, meth);
-                    break;
+                    this.r_ArgumentParsersCache.Add(meth.ReturnType, meth);
                 }
             }
         }
 
-        public bool ParseExecute(Command i_Command, out string o_ReturnedValue)
+        internal bool ParseExecute(Command i_Command, out string o_ReturnedValue)
         {
             bool result = false;
             object returnValue = null;
-            if (this.m_MainCache.ContainsKey(i_Command.Name))
+            if (this.r_MainCache.ContainsKey(i_Command.Name))
             {
-                MethodInfo method = this.m_MainCache[i_Command.Name];
+                MethodInfo method = this.r_MainCache[i_Command.Name];
                 ParameterInfo[] pi = method.GetParameters();
                 //var iter = i_Command.Args.GetEnumerator();
                 IList<string> args = i_Command.Args;//.ToArray();
@@ -127,6 +117,7 @@ namespace Monitron.ImRpc
                             /////cancle!! or throw  (missing parameters)
                         }
                     }
+
                     returnValue = method.Invoke(this.m_Obj, parsedArgs);
                     result = true;
                 }
@@ -148,49 +139,34 @@ namespace Monitron.ImRpc
             object parsedObj = null;
             try
             {
-                //Saggie it didn't accept the Type parameter to the switch :(
-                switch (i_ParamType.Name)
+                if (this.r_ArgumentParsersCache.ContainsKey(i_ParamType))
                 {
-                    case "Int32":  // int
-                        {
-                            parsedObj = Int32.Parse(i_CcurrentParam);
-                            break;
-                        }
-                    case "String":
-                        {
-                            parsedObj = i_CcurrentParam;
-                            break;
-                        }
-                    case "Double":
-                        {
-                            parsedObj = Double.Parse(i_CcurrentParam);
-                            break;
-                        }
-                    case "Single":  //float
-                        {
-                            parsedObj = Single.Parse(i_CcurrentParam);
-                            break;
-                        }
-                    default:
-                        {
-                           if (this.m_ArgumentParsersCache.ContainsKey(i_ParamType))
-                            {
-                                MethodInfo argumentParser = this.m_ArgumentParsersCache[i_ParamType];
-                                parsedObj = argumentParser.Invoke(null, new object[] { i_CcurrentParam });
-                            }
-                            break;
-                        }
+                    MethodInfo argumentParser = this.r_ArgumentParsersCache[i_ParamType];
+                    parsedObj = argumentParser.Invoke(null, new object[] { i_CcurrentParam });
                 }
-                result = true;
+                else
+                {
+                    parsedObj = Convert.ChangeType(i_CcurrentParam, i_ParamType);
+                }
             }
             catch (Exception)
             {
                 //parsing failed!
             }
+
+            if (parsedObj != null)
+            {
+                result = true;
+            }
+
             i_CurrInputArg = parsedObj;
+
             return result;
         }
 
+        public static T ChangeType<T>(object i_Obj)
+        {
+            return (T)Convert.ChangeType(i_Obj, typeof(T));
+        }
     }
-
 }

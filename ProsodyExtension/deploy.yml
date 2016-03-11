@@ -29,6 +29,8 @@
 
    - name: Upload Prosody server configuration
      copy: src=prosody.cfg.lua dest={{prosody_conf_path}} mode=640 owner=root group=prosody
+     notify:
+      - Restart Prosody
 
    - name: Upload Monitron site configuration
      copy: src=monitron.ddns.net.cfg.lua dest={{monitron_site_conf_path}} mode=640 owner=root group=prosody

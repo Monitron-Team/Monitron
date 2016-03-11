@@ -18,6 +18,11 @@ namespace Monitron.Clients.Mock
         public readonly Dictionary<Identity, string[]> BuddyDictionary = new Dictionary<Identity, string[]>();
 
         public readonly Queue<Tuple<Identity, string>> SentMessageQueue = new Queue<Tuple<Identity, string>>();
+
+        public void PushMessage(Identity i_Buddy, string i_Message)
+        {
+            MessageArrived?.Invoke(this, new MessageArrivedEventArgs(i_Buddy, i_Message));
+        }
         
         public IEnumerable<BuddyListItem> Buddies
         {
@@ -58,6 +63,16 @@ namespace Monitron.Clients.Mock
         public void OnBuddyListChanged(BuddyListChangedEventArgs i_EventArgs)
         {
             this.BuddyListChanged?.Invoke(this, i_EventArgs);
+        }
+
+        public void OnBuddySignedIn(BuddySignedInEventArgs i_EventArgs)
+        {
+            this.BuddySignedIn?.Invoke(this, i_EventArgs);
+        }
+
+        public void OnBuddySignedOut(BuddySignedOutEventArgs i_EventArgs)
+        {
+            this.BuddySignedOut?.Invoke(this, i_EventArgs);
         }
 
         public void RemoveBuddy(Identity i_Identity)

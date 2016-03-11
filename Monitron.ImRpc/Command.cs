@@ -4,17 +4,15 @@ using System.Linq;
 
 namespace Monitron.ImRpc
 {
-    public class Command
+    internal class Command
     {
         public string Name { get; set; }
         public IList<string> Args { get; set; }
 
-        //parsing the string to method name and args. Acutally I think it can be a ctor instead of a static func (according to design)
         public static Command Parse(string i_Message)
         {
             Command result = null;
-            //char[] stringSeparators = new char[] { ' ', '\n', '\t' };
-            List<string> clean = (i_Message.Split(null)).ToList();
+            List<string> clean = i_Message.Split(null).ToList();
             if (clean.Count > 0)
             {
                 result = new Command { Name = clean.First() };
@@ -22,8 +20,8 @@ namespace Monitron.ImRpc
                 clean.RemoveAll(i_I => i_I == "");
                 result.Args = clean;
             }
-            return result;
 
+            return result;
         }
 
         public Command()

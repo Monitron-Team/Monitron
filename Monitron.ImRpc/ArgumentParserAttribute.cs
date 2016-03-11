@@ -6,5 +6,4 @@ namespace Monitron.ImRpc
     public class ArgumentParserAttribute : Attribute
     {
     }
-
 }
