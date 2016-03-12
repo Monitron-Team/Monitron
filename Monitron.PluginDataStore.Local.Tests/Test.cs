@@ -1,5 +1,8 @@
-﻿using NUnit.Framework;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
+using System.IO;
+
+using NUnit.Framework;
+
 using Monitron.Common;
 using Monitron.PluginDataStore;
 
@@ -9,12 +12,19 @@ namespace Monitron.PluginDataStore.Local.Tests
     public class Test
     {
         // Who ever runs these tests - please choose the path for the DB file:
-        private const string c_Path = @"C:\Temp\";
+        private readonly string k_Path = Path.GetTempPath() + "/test.dict";
         private IPluginDataStore m_LocalDataStore;
 
-        public Test()
+        [SetUp()]
+        public void SetUp()
         {
-            m_LocalDataStore = new LocalPluginDataStore(c_Path);
+            m_LocalDataStore = new LocalPluginDataStore(k_Path);
+        }
+
+        [TearDown()]
+        public void TearDown()
+        {
+            File.Delete(k_Path);
         }
 
         [Test()]
@@ -31,10 +41,12 @@ namespace Monitron.PluginDataStore.Local.Tests
         [Test()]
         public void Read()
         {
+            Person person3 = new Person("Katy Perry", 1984, true);
+            m_LocalDataStore.Write<Person>("key #3", person3);
             Person katy = m_LocalDataStore.Read<Person>("key #3");
-            Assert.Equals(katy.Name, "Katy Perry");
-            Assert.Equals(katy.BirthYear, 1984);
-            Assert.Equals(katy.IsAlive, true);
+            Assert.AreEqual(katy.Name, "Katy Perry");
+            Assert.AreEqual(katy.BirthYear, 1984);
+            Assert.AreEqual(katy.IsAlive, true);
         }
 
         [Test()]

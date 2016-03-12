@@ -9,12 +9,12 @@ namespace Monitron.PluginDataStore.Local
 {
     public class LocalPluginDataStore : IPluginDataStore
     {
-        private string m_DataStoreFilePath;
+        private readonly string r_DataStoreFilePath;
         private Dictionary<string, string> m_DataStoreDictionary;
 
         public LocalPluginDataStore(string i_DataStoreFilePath)
         {
-            m_DataStoreFilePath = i_DataStoreFilePath;
+            r_DataStoreFilePath = i_DataStoreFilePath;
             m_DataStoreDictionary = new Dictionary<string, string>();
             readFileToDictionary();
         }
@@ -71,14 +71,17 @@ namespace Monitron.PluginDataStore.Local
 
         private void readFileToDictionary()
         {
-            using(StreamReader sr = new StreamReader(m_DataStoreFilePath, Encoding.UTF8))
+            if (!File.Exists(r_DataStoreFilePath))
             {
-                string fileContentString = sr.ReadToEnd(); // TBD what if the file is very large?
+                m_DataStoreDictionary = new Dictionary<string, string>();
+            }
+            else
+            {
                 DataContractJsonSerializer ser = new DataContractJsonSerializer(m_DataStoreDictionary.GetType(),
-                    new DataContractJsonSerializerSettings() { UseSimpleDictionaryFormat = true });
-                using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(fileContentString)))
+                                                 new DataContractJsonSerializerSettings() { UseSimpleDictionaryFormat = true });
+                using (FileStream ms = new FileStream(r_DataStoreFilePath, FileMode.Open))
                 {
-                    m_DataStoreDictionary = (Dictionary<string, string>)ser.ReadObject(ms); //TBD couldn't use 'dataStoreDictionary.GetType()'
+                    m_DataStoreDictionary = (Dictionary<string, string>)ser.ReadObject(ms);
                 }
             }
         }
@@ -90,7 +93,7 @@ namespace Monitron.PluginDataStore.Local
             using (MemoryStream ms = new MemoryStream())
             {
                 ser.WriteObject(ms, m_DataStoreDictionary);
-                using (FileStream file = new FileStream(m_DataStoreFilePath, FileMode.Create, FileAccess.Write))
+                using (FileStream file = new FileStream(r_DataStoreFilePath, FileMode.Create, FileAccess.Write))
                 {
                     ms.WriteTo(file);
                 }
