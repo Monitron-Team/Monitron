@@ -10,10 +10,13 @@ namespace Monitron.Common
         event EventHandler<BuddySignedInEventArgs> BuddySignedIn;
         event EventHandler<BuddySignedOutEventArgs> BuddySignedOut;
         event EventHandler<BuddyListChangedEventArgs> BuddyListChanged;
+        event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
 
         IEnumerable<BuddyListItem> Buddies { get; }
 
         Identity Identity { get; }
+
+        bool IsConnected { get; }
 
         void SendMessage(Identity i_Buddy, string i_Message);
 

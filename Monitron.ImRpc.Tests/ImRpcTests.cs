@@ -23,7 +23,6 @@ namespace Monitron.ImRpc.Tests
             Assert.AreEqual(client.SentMessageQueue.Dequeue().Item2, ExpectedResponse);
         }
 
-        [Test()]
         public void GenericTestParsingOnMessageArrive(object i_Plugin, string i_Message, string i_Expected)
         {
             Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };

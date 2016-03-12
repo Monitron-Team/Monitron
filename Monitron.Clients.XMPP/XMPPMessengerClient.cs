@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 
 using S22.Xmpp;
 using S22.Xmpp.Client;
@@ -6,14 +9,17 @@ using S22.Xmpp.Extensions;
 using S22.Xmpp.Im;
 
 using Monitron.Common;
-using System.Collections.Generic;
-using System.IO;
 
 namespace Monitron.Clients.XMPP
 {
     public sealed class XMPPMessengerClient : IMessengerClient
     {
+        private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
+            (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private static string k_DefaultResource = "Node";
+
+        private static readonly TimeSpan sr_ConnectRetryTimeSpan = TimeSpan.FromSeconds(10);
 
         public event EventHandler<MessageArrivedEventArgs> MessageArrived;
 
@@ -22,6 +28,8 @@ namespace Monitron.Clients.XMPP
         public event EventHandler<BuddySignedOutEventArgs> BuddySignedOut;
 
         public event EventHandler<BuddyListChangedEventArgs> BuddyListChanged;
+
+        public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
 
         public IEnumerable<BuddyListItem> Buddies
         {
@@ -42,6 +50,14 @@ namespace Monitron.Clients.XMPP
             }
         }
 
+        public bool IsConnected
+        {
+            get
+            {
+                return m_Client.Connected;
+            }
+        }
+
         private readonly Account r_Account;
 
         private XmppClient m_Client;
@@ -49,16 +65,68 @@ namespace Monitron.Clients.XMPP
         public XMPPMessengerClient(Account i_Account)
         {
             this.r_Account = i_Account;
-
             m_Client = new XmppClient(
-                hostname: i_Account.Identity.Domain,
-                username: i_Account.Identity.UserName,
-                password: i_Account.Password
+                hostname: r_Account.Identity.Domain,
+                username: r_Account.Identity.UserName,
+                password: r_Account.Password
             );
-            m_Client.Connect(k_DefaultResource);
-            m_Client.Message += m_Client_MessageArrived;
-            m_Client.RosterUpdated += m_Client_RosterUpdated;
-            m_Client.StatusChanged += m_Client_StatusChanged;
+            startConnect();
+        }
+
+        private void startConnect()
+        {
+            Thread t = new Thread(delegate ()
+                {
+                    while (!m_Client.Connected)
+                    {
+                        m_Client = new XmppClient(
+                            hostname: r_Account.Identity.Domain,
+                            username: r_Account.Identity.UserName,
+                            password: r_Account.Password
+                        );
+
+                        Jid jid = r_Account.Identity.ToJid();
+                        sr_Log.InfoFormat("Trying to connect to {0} as {1}",
+                            jid.Domain,
+                            jid.ToString()
+                        );
+
+                        try
+                        {
+                            m_Client.Connect(k_DefaultResource);
+                        }
+                        catch (Exception e)
+                        {
+                            sr_Log.Warn("Connect failed", e);
+                            sr_Log.InfoFormat("Could not connect, retrying in {0} seconds",
+                                sr_ConnectRetryTimeSpan.TotalSeconds);
+                            Thread.Sleep(sr_ConnectRetryTimeSpan);
+                        }
+                    }
+
+                    OnConnectionStateChanged(new ConnectionStateChangedEventArgs(m_Client.Connected));
+                    m_Client.Message += m_Client_MessageArrived;
+                    m_Client.RosterUpdated += m_Client_RosterUpdated;
+                    m_Client.StatusChanged += m_Client_StatusChanged;
+                    m_Client.Error += m_Client_Error;
+                });
+            t.IsBackground = true;
+            t.Start();
+        }
+
+        private void m_Client_Error(object i_Sender, S22.Xmpp.Im.ErrorEventArgs i_Args)
+        {
+            sr_Log.WarnFormat("Got an XMPP error '{0}':{1}", i_Args.Reason, i_Args.Exception);
+            if (!m_Client.Connected)
+            {
+                sr_Log.Info("Got disconnected, reconnecting");
+            }
+
+            if (!m_Client.Connected)
+            {
+                OnConnectionStateChanged(new ConnectionStateChangedEventArgs(m_Client.Connected));
+                startConnect();
+            }
         }
 
         private void m_Client_StatusChanged(object i_Sender, StatusEventArgs i_Args)
@@ -82,6 +150,11 @@ namespace Monitron.Clients.XMPP
         public void OnBuddySignedOut(BuddySignedOutEventArgs i_BuddySignedOutEventArgs)
         {
             BuddySignedOut?.Invoke(this, i_BuddySignedOutEventArgs);
+        }
+
+        public void OnConnectionStateChanged(ConnectionStateChangedEventArgs i_Args)
+        {
+            ConnectionStateChanged?.Invoke(this, i_Args);
         }
 
         private void m_Client_MessageArrived(object i_Sender, MessageEventArgs i_Args)

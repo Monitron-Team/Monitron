@@ -34,9 +34,12 @@ namespace Monitron.Clients.XMPP.Tests
         [TearDown()]
         public void TearDown()
         {
-            AdminClient client = getAdminClient();
-            client.DeleteUser(r_testAccounts.Select(account => account.Identity.ToJid()).ToArray());
-            r_testAccounts.Clear();
+            if (r_testAccounts.Count > 0)
+            {
+                AdminClient client = getAdminClient();
+                client.DeleteUser(r_testAccounts.Select(account => account.Identity.ToJid()).ToArray());
+                r_testAccounts.Clear();
+            }
         }
 
         private Jid getUniqueJid()

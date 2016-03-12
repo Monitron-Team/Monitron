@@ -34,6 +34,16 @@ namespace Monitron.Node.Tests
 
 		public event EventHandler<BuddyListChangedEventArgs> BuddyListChanged;
 
+        public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
+
+        public bool IsConnected
+        {
+            get
+            {
+                return true;
+            }
+        }
+
 		public void SendMessage(Identity i_Buddy, string i_Message)
 		{
 			throw new NotImplementedException();

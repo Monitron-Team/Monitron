@@ -30,14 +30,11 @@ namespace Monitron.ImRpc
             Command cmd = Command.Parse(i_EventArgs.Message);
             string retuenedValue;
             bool wasSuccess = ParseExecute(cmd, out retuenedValue);
-            if (wasSuccess)
-            {
-                this.m_MessangerClient.SendMessage(i_EventArgs.Buddy, retuenedValue);
-            }
-            else
+            if (!wasSuccess)
             {
                 retuenedValue = string.Format("Error executing: \"{0}\"", i_EventArgs.Message);
             }
+
             try
             {
                 m_MessangerClient.SendMessage(i_EventArgs.Buddy, retuenedValue);

@@ -32,6 +32,9 @@
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Test.cs" />
@@ -52,6 +55,10 @@
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
       <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
       <Name>Monitron.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.ImRpc\Monitron.ImRpc.csproj">
+      <Project>{50D209C8-C9F4-4690-8D3C-558B592EC80B}</Project>
+      <Name>Monitron.ImRpc</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

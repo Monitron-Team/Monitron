@@ -42,6 +42,7 @@
     <Compile Include="BuddyListChangedEventArgs.cs" />
     <Compile Include="BuddyListCache.cs" />
     <Compile Include="INodePlugin.cs" />
+    <Compile Include="ConnectionStateChangedEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

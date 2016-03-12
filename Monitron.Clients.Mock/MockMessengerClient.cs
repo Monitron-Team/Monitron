@@ -16,6 +16,16 @@ namespace Monitron.Clients.Mock
 
         public event EventHandler<BuddyListChangedEventArgs> BuddyListChanged;
 
+        public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
+
+        public bool IsConnected
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public readonly Dictionary<Identity, string[]> BuddyDictionary = new Dictionary<Identity, string[]>();
 
         public readonly Queue<Tuple<Identity, string>> SentMessageQueue = new Queue<Tuple<Identity, string>>();
