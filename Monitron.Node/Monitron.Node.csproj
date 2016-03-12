@@ -46,9 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="node.config.example">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="node.config.example" />
     <None Include="packages.config" />
   </ItemGroup>
 </Project>

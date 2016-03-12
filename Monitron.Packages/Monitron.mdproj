@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ItemType>PackagingProject</ItemType>
+    <ProjectGuid>{7E5A0C63-F2F9-4404-98ED-664014933AC5}</ProjectGuid>
+    <Packages>
+      <Packages>
+        <Package name="Monitron Management Linux Binaries (Release)">
+          <Builder targetFile="..\DeploymentScripts\MonitronManagement.tar.gz" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
+            <ChildEntries>
+              <SolutionItemReference path="..\Monitron.Plugins.Management\Monitron.Plugins.Management.csproj" />
+              <SolutionItemReference path="..\Monitron.ImRpc\Monitron.ImRpc.csproj" />
+              <SolutionItemReference path="..\S22.Xmpp\S22.Xmpp.csproj" />
+              <SolutionItemReference path="..\Monitron.Management.AdminClient\Monitron.Management.AdminClient.csproj" />
+              <SolutionItemReference path="..\Monitron.Node\Monitron.Node.csproj" />
+              <SolutionItemReference path="..\Monitron.Common\Monitron.Common.csproj" />
+              <SolutionItemReference path="..\Monitron.Clients.XMPP\Monitron.Clients.XMPP.csproj" />
+            </ChildEntries>
+            <RootEntry path="..\Monitron.sln" id=":root:" />
+          </Builder>
+        </Package>
+      </Packages>
+    </Packages>
+  </PropertyGroup>
+</Project>

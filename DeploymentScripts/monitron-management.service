@@ -1,0 +1,16 @@
+[Unit]
+Description=Monitron Management Service
+
+[Service]
+ExecStart=/usr/bin/mono /opt/MonitronManagement/Monitron.Node.exe --conf /etc/monitron/management.conf
+WorkingDirectory=/opt/MonitronManagement/
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=monitron-management
+User=monitron
+Group=monitron
+
+[Install]
+WantedBy=multi-user.target
+

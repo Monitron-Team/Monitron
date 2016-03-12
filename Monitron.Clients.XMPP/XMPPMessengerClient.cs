@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Net;
 
 using S22.Xmpp;
 using S22.Xmpp.Client;
@@ -17,7 +18,7 @@ namespace Monitron.Clients.XMPP
         private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
             (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static string k_DefaultResource = "Node";
+        private static readonly string sr_DefaultResource = Dns.GetHostName();
 
         private static readonly TimeSpan sr_ConnectRetryTimeSpan = TimeSpan.FromSeconds(10);
 
@@ -109,7 +110,7 @@ namespace Monitron.Clients.XMPP
 
                         try
                         {
-                            m_Client.Connect(k_DefaultResource);
+                            m_Client.Connect(sr_DefaultResource);
                         }
                         catch (Exception e)
                         {

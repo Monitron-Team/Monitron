@@ -22,6 +22,7 @@ Vagrant.configure(2) do |config|
 	 ansible.groups = {
 		 "messenger_servers" => ["host"],
 		 "database_servers" => ["host"],
+		 "management_servers" => ["host"],
 	 }
   end
 

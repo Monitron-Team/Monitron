@@ -2,7 +2,7 @@
 - hosts: all
   gather_facts: true
   tasks:
-   - name: Install IPTables Services
+   - name: Install IPTables services
      dnf: name=iptables-services state=latest
      notify:
       - Enable IPTables

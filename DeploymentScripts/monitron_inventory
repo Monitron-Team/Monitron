@@ -1,2 +1,6 @@
 [messenger_servers]
 monitron.ddns.net
+[database_servers]
+monitron.ddns.net
+[management_servers]
+monitron.ddns.net

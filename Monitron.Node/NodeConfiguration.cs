@@ -38,7 +38,7 @@ namespace Monitron.Node
 			
         public static NodeConfiguration Load(string i_Path)
         {
-            using (FileStream file = new FileStream(i_Path, FileMode.Open))
+            using (FileStream file = new FileStream(i_Path, FileMode.Open, FileAccess.Read))
             {
                 return Load(file);
             }

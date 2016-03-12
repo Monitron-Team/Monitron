@@ -21,5 +21,17 @@
     <None Include="passwords_vault.yml" />
     <None Include="prosody.cfg.lua" />
     <None Include="master_playbook.yml" />
+    <None Include="database_server_playbook.yml" />
+    <None Include="db_init.sh" />
+    <None Include="deploy.sh" />
+    <None Include="DeploymentScripts.mdproj" />
+    <None Include="firewall_playbook.yml" />
+    <None Include="iptables.j2" />
+    <None Include="management.conf" />
+    <None Include="management_server_playbook.yml" />
+    <None Include="messenger_server_playbook.yml" />
+    <None Include="mongod.conf" />
+    <None Include="monitron-management.service" />
+    <None Include="Vagrantfile" />
   </ItemGroup>
 </Project>

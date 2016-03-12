@@ -26,7 +26,8 @@
      meta: flush_handlers
 
    - name: Run DB Initialization script
-     remote_user: mongodb
+     become: yes
+     become_user: mongodb
      script: "./db_init.sh '{{monitron_admin_password}}'"
 
   handlers:

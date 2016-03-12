@@ -1,0 +1,43 @@
+---
+- hosts: management_servers
+  vars_files:
+   - passwords_vault.yml
+  tasks:
+   - name: Install Mono repository keys
+     raw: rpm --import "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
+
+   - name: Install Mono repository
+     raw: dnf config-manager --add-repo http://download.mono-project.com/repo/centos/
+
+   - name: Install Mono
+     dnf: name=mono-complete state=latest
+
+   - name: Upload Management service
+     unarchive: src=MonitronManagement.tar.gz dest=/opt
+     notify:
+      - Restart Management Server
+
+   - name: Create Management user
+     user: name=monitron system=yes createhome=no home=/opt/MonitronManagement shell=/sbin/nologin comment="Monitron Management"
+
+   - name: Install Service File
+     copy: src=monitron-management.service dest=/etc/systemd/system/
+     notify:
+      - Enable Management Server
+      - Start Management Server
+
+   - name: Creates configuration directory
+     file: path=/etc/monitron state=directory group=monitron mode=0755
+
+   - name: Copy Configuration
+     template: src=management.conf dest=/etc/monitron/ group=monitron mode=0640
+     notify:
+      - Restart Management Server
+
+  handlers:
+   - name: Enable Management Server
+     service: name=monitron-management enabled=yes
+   - name: Start Management Server
+     service: name=monitron-management state=started
+   - name: Restart Management Server
+     service: name=monitron-management state=restarted
