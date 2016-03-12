@@ -1,0 +1,20 @@
+---
+- hosts: all
+  gather_facts: true
+  tasks:
+   - name: Install IPTables Services
+     dnf: name=iptables-services state=latest
+     notify:
+      - Enable IPTables
+      - Start IPTables
+   - name: Configure IPTables
+     template: src=iptables.j2 dest=/etc/sysconfig/iptables
+     notify: Restart IPTables
+
+  handlers:
+   - name: Enable IPTables
+     service: name=iptables enabled=yes
+   - name: Start IPTables
+     service: name=iptables state=started
+   - name: Restart IPTables
+     service: name=iptables state=restarted

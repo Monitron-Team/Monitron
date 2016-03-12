@@ -1,16 +1,4 @@
 ---
-- hosts: all
-  gather_facts: false
-  tasks:
-   - name: install packages for ansible support
-     raw: dnf -y install python python-dnf
-
-- hosts: all
-  gather_facts: false
-  tasks:
-   - name: Install Ansible dependencies
-     dnf: name=libselinux-python state=latest
-
 - hosts: messenger_servers
   vars_files:
    - cert_vault.yml

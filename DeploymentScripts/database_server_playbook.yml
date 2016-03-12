@@ -1,0 +1,38 @@
+---
+- hosts: database_servers
+  vars_files:
+   - passwords_vault.yml
+  tasks:
+   - name: Install MongoDB Server
+     dnf: name=mongodb-server state=latest
+     notify:
+      - Enable MongoDB Server
+      - Start MongoDB Server
+
+   - name: Configure MongoDB Server
+     copy:
+      src: "mongod.conf"
+      dest: "/etc/mongod.conf"
+      mode: 0644
+      owner: root
+      group: root
+     notify:
+      - Restart MongoDB Server
+
+   - name: Install MongoDB Client
+     dnf: name=mongodb state=latest
+
+   - name: Force Service Restart
+     meta: flush_handlers
+
+   - name: Run DB Initialization script
+     remote_user: mongodb
+     script: "./db_init.sh '{{monitron_admin_password}}'"
+
+  handlers:
+   - name: Enable MongoDB Server
+     service: name=mongod enabled=yes
+   - name: Start MongoDB Server
+     service: name=mongod state=started
+   - name: Restart MongoDB Server
+     service: name=mongod state=restarted

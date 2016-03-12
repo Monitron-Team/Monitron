@@ -16,11 +16,10 @@
     <None Include="mod_monitron_adhoc.lua" />
     <None Include="boostrap.yml" />
     <None Include="cert_vault.yml" />
-    <None Include="deploy.sh" />
     <None Include="monitron.ddns.net.cfg.lua" />
     <None Include="monitron_inventory" />
     <None Include="passwords_vault.yml" />
     <None Include="prosody.cfg.lua" />
-    <None Include="deploy.yml" />
+    <None Include="master_playbook.yml" />
   </ItemGroup>
 </Project>

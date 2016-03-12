@@ -1,0 +1,16 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+   - name: install packages for ansible support
+     raw: dnf -y install python python-dnf
+
+- hosts: all
+  gather_facts: false
+  tasks:
+   - name: Install Ansible dependencies
+     dnf: name=libselinux-python state=latest
+
+- include: firewall_playbook.yml
+- include: messenger_server_playbook.yml
+- include: database_server_playbook.yml
