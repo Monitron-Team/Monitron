@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Common.Tests", "Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Node", "Monitron.Node\Monitron.Node.csproj", "{E02F1A0F-AF66-47B8-BD17-498540CC17C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.PluginDataStore.Local", "Monitron.PluginDataStore.Local\Monitron.PluginDataStore.Local.csproj", "{4140B458-B63E-4D0E-AC79-462B99BAE930}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.PluginDataStore.Cloud", "Monitron.PluginDataStore.Cloud\Monitron.PluginDataStore.Cloud.csproj", "{FEDF6E7E-C6F5-47A5-B517-E24C4AC472EC}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Management.AdminClient.Tests", "Monitron.Management.AdminClient.Tests\Monitron.Management.AdminClient.Tests.csproj", "{9BBD22E2-54A4-4D13-A4CF-627D310CBED3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Node.Tests", "Monitron.Node.Tests\Monitron.Node.Tests.csproj", "{C4974800-90A6-4691-8202-5EC0199EDB8D}"
