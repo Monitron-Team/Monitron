@@ -12,7 +12,7 @@ using Monitron.Common;
 
 namespace Monitron.Clients.XMPP
 {
-    public sealed class XMPPMessengerClient : IMessengerClient
+    public sealed class XMPPMessengerClient : IMessengerClient, IDisposable
     {
         private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
             (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -20,6 +20,10 @@ namespace Monitron.Clients.XMPP
         private static string k_DefaultResource = "Node";
 
         private static readonly TimeSpan sr_ConnectRetryTimeSpan = TimeSpan.FromSeconds(10);
+
+        private static readonly TimeSpan sr_PingDelayTimeSpan = TimeSpan.FromSeconds(30);
+
+        private Timer m_PingTimer;
 
         public event EventHandler<MessageArrivedEventArgs> MessageArrived;
 
@@ -71,6 +75,18 @@ namespace Monitron.Clients.XMPP
                 password: r_Account.Password
             );
             startConnect();
+            m_PingTimer = new Timer(delegate
+                {
+                    if (IsConnected)
+                    {
+                        Jid jid = new Jid(r_Account.Identity.Domain, null);
+                        m_Client.Ping(jid);
+                    }
+                },
+                null,
+                sr_PingDelayTimeSpan,
+                sr_PingDelayTimeSpan
+            );
         }
 
         private void startConnect()
@@ -201,6 +217,11 @@ namespace Monitron.Clients.XMPP
         public void SetAvatar(Stream i_Stream)
         {
             m_Client.SetAvatar(i_Stream);
+        }
+
+        public void Dispose()
+        {
+            m_PingTimer.Dispose();
         }
     }
 }
