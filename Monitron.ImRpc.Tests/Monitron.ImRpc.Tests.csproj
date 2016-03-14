@@ -32,7 +32,9 @@
   <ItemGroup>
     <Compile Include="ImRpcTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestClasses.cs" />
+    <Compile Include="TestClass.cs" />
+    <Compile Include="ConvertableType.cs" />
+    <Compile Include="ConvertableTypeConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">

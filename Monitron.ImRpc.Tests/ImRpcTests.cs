@@ -9,29 +9,39 @@ namespace Monitron.ImRpc.Tests
 {    public class ImRpcTests
     {
         [Test()]
-        public void TestParsingOnMessageArrive()
-        {
-            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
-            Identity friendIdentity = new Identity() { UserName = "friend", Domain = "test" };
-            MockMessengerClient client = new MockMessengerClient(clientIdnetity);
-            TestClass demoPlugInObj = new TestClass(3, "SampleText");
-            new RpcAdapter(demoPlugInObj, client);
-            client.PushMessage(friendIdentity, "print_with_Args_Parser    texty 22  4.234 113.5  aaa_TextToBePasedByArgumentParser_aaa");
-            string ExpectedResponse =
-                "Parsed arg number: 99 parsed arg text: 999_TextToBeP9sedByArgumentP9rser_999 string: textyint: 22 float: 4.234 double: 113.5";
-            Thread.Sleep(500);
-            Assert.AreEqual(client.SentMessageQueue.Dequeue().Item2, ExpectedResponse);
-        }
-
-        public void GenericTestParsingOnMessageArrive(object i_Plugin, string i_Message, string i_Expected)
+        public void TestParantesis()
         {
             Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
             Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
             MockMessengerClient client = new MockMessengerClient(clientIdnetity);
-            new RpcAdapter(i_Plugin, client);
-            client.PushMessage(friendIdentity, i_Message);
-            Thread.Sleep(500);
-            Assert.AreEqual(client.SentMessageQueue.Dequeue().Item2, i_Expected);
+            new RpcAdapter(new TestClass(), client);
+            string expectedResponse = "Hello World!";
+            client.PushMessage(friendIdentity, string.Format("echo  \"{0}\"", expectedResponse));
+            Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
+        }
+
+        [Test()]
+        public void TestCustomConversion()
+        {
+            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
+            Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
+            MockMessengerClient client = new MockMessengerClient(clientIdnetity);
+            new RpcAdapter(new TestClass(), client);
+            string expectedResult = "Hello World;-13";
+            client.PushMessage(friendIdentity, string.Format("convert_echo  \"{0}\"", expectedResult));
+            Assert.AreEqual(expectedResult, client.SentMessageQueue.Dequeue().Item2);
+        }
+
+        [Test()]
+        public void TestComplexCommand()
+        {
+            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
+            Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
+            MockMessengerClient client = new MockMessengerClient(clientIdnetity);
+            new RpcAdapter(new TestClass(), client);
+            string expectedResult = "word 3 1.5 \"multiple words\"";
+            client.PushMessage(friendIdentity, string.Format("complex_cmd  {0}", expectedResult));
+            Assert.AreEqual(expectedResult, client.SentMessageQueue.Dequeue().Item2);
         }
     }
 }
