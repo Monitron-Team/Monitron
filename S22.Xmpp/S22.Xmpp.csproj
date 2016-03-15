@@ -208,7 +208,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Folder Include="Extensions\XEP-0050\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>
