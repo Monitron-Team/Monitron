@@ -19,6 +19,8 @@ namespace S22.Xmpp.Core {
 	/// </summary>
 	/// <remarks>For implementation details, refer to RFC 3920.</remarks>
 	public class XmppCore : IDisposable {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger
+            (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		/// <summary>
 		/// The TCP connection to the XMPP server.
 		/// </summary>
@@ -503,14 +505,25 @@ namespace S22.Xmpp.Core {
 			// Generate a unique ID for the IQ request.
 			request.Id = GetId();
 			AutoResetEvent ev = new AutoResetEvent(false);
-			Send(request);
-			// Wait for event to be signaled by task that processes the incoming
-			// XML stream.
-			waitHandles[request.Id] = ev;
-			int index = WaitHandle.WaitAny(new WaitHandle[] { ev, cancelIq.Token.WaitHandle },
-				millisecondsTimeout);
-			if (index == WaitHandle.WaitTimeout)
-				throw new TimeoutException();
+            // Wait for event to be signaled by task that processes the incoming
+            // XML stream.
+            waitHandles[request.Id] = ev;
+            try
+            {
+                Send(request);
+            }
+            catch
+            {
+                // We had an error, clear registration.
+                AutoResetEvent tmp;
+                waitHandles.TryRemove(request.Id, out tmp);
+                throw;
+            }
+
+            int index = WaitHandle.WaitAny(new WaitHandle[] { ev, cancelIq.Token.WaitHandle },
+                millisecondsTimeout);
+            if (index == WaitHandle.WaitTimeout)
+                throw new TimeoutException();
 			// Reader task errored out.
 			if (index == 1)
 				throw new IOException("The incoming XML stream could not read.");
@@ -920,6 +933,7 @@ namespace S22.Xmpp.Core {
 		/// the network.</exception>
 		void Send(string xml) {
 			xml.ThrowIfNull("xml");
+            log.DebugFormat("Sending stanza: {0}", xml);
 			// XMPP is guaranteed to be UTF-8.
 			byte[] buf = Encoding.UTF8.GetBytes(xml);
 			lock (writeLock) {
@@ -968,6 +982,7 @@ namespace S22.Xmpp.Core {
 			try {
 				while (true) {
 					XmlElement elem = parser.NextElement("iq", "message", "presence");
+                    log.DebugFormat("Got stanza: {0}", elem.ToXmlString());
 					// Parse element and dispatch.
 					switch (elem.Name) {
 						case "iq":
@@ -1034,8 +1049,8 @@ namespace S22.Xmpp.Core {
 			Action<string, Iq> cb;
 			iqResponses[id] = iq;
 			// Signal the event if it's a blocking call.
-			if (waitHandles.TryRemove(id, out ev))
-				ev.Set();
+            if (waitHandles.TryRemove(id, out ev))
+                ev.Set();
 			// Call the callback if it's an asynchronous call.
 			else if (iqCallbacks.TryRemove(id, out cb))
 				Task.Factory.StartNew(() => { cb(id, iq); });

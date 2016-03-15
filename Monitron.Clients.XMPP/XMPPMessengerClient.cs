@@ -76,18 +76,6 @@ namespace Monitron.Clients.XMPP
                 password: r_Account.Password
             );
             startConnect();
-            m_PingTimer = new Timer(delegate
-                {
-                    if (IsConnected)
-                    {
-                        Jid jid = new Jid(r_Account.Identity.Domain, null);
-                        m_Client.Ping(jid);
-                    }
-                },
-                null,
-                sr_PingDelayTimeSpan,
-                sr_PingDelayTimeSpan
-            );
         }
 
         private void startConnect()
@@ -96,6 +84,20 @@ namespace Monitron.Clients.XMPP
                 {
                     while (!m_Client.Connected)
                     {
+                        try
+                        {
+                            if (m_PingTimer != null)
+                            {
+                                m_PingTimer.Dispose();
+                            }
+
+                            m_Client.Dispose();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // We are not connected
+                        }
+
                         m_Client = new XmppClient(
                             hostname: r_Account.Identity.Domain,
                             username: r_Account.Identity.UserName,
@@ -126,6 +128,18 @@ namespace Monitron.Clients.XMPP
                     m_Client.RosterUpdated += m_Client_RosterUpdated;
                     m_Client.StatusChanged += m_Client_StatusChanged;
                     m_Client.Error += m_Client_Error;
+                    m_PingTimer = new Timer(delegate
+                        {
+                            if (IsConnected)
+                            {
+                                Jid jid = new Jid(r_Account.Identity.Domain, null);
+                                m_Client.Ping(jid);
+                            }
+                        },
+                        null,
+                        sr_PingDelayTimeSpan,
+                        sr_PingDelayTimeSpan
+                    );
                 });
             t.IsBackground = true;
             t.Start();

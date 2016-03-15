@@ -32,7 +32,7 @@ namespace Monitron.Node
             Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository();
 
             PatternLayout patternLayout = new PatternLayout();
-            patternLayout.ConversionPattern = "%date [%thread] %-5level %logger - %message%newline";
+            patternLayout.ConversionPattern = "[%thread] %-5level %logger - %message%newline";
             patternLayout.ActivateOptions();
 
             ConsoleAppender appender = new ConsoleAppender();

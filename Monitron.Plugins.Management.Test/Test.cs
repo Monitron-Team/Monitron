@@ -1,9 +1,11 @@
 ﻿using System;
 
 using NUnit.Framework;
+using DigitalOcean.API;
 
 using Monitron.Clients.Mock;
 using Monitron.Common;
+using DigitalOcean.API.Models.Requests;
 
 namespace Monitron.Plugins.Management.Test
 {

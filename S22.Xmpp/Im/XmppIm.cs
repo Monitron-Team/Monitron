@@ -16,6 +16,8 @@ namespace S22.Xmpp.Im {
 	/// </summary>
 	/// <remarks>For implementation details, refer to RFC 3921.</remarks>
 	public class XmppIm : IDisposable {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger
+            (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		/// <summary>
 		/// Provides access to the core facilities of XMPP.
 		/// </summary>
@@ -277,15 +279,19 @@ namespace S22.Xmpp.Im {
 				}
 			}
 			try {
+                log.Debug("Esablishing connection...");
 				core.Connect(resource);
 				// If no username has been providd, don't establish a session.
 				if (Username == null)
 					return null;
 				// Establish a session (Refer to RFC 3921, Section 3. Session Establishment).
+                log.Debug("Esablishing session...");
 				EstablishSession();
 				// Retrieve user's roster as recommended (Refer to RFC 3921, Section 7.3).
+                log.Debug("Fetching roster...");
 				Roster roster = GetRoster();
 				// Send initial presence.
+                log.Debug("Sending presence...");
 				SendPresence(new Presence());
 				return roster;
 			} catch (SocketException e) {
