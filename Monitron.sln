@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Management.AdminCl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S22.Xmpp", "S22.Xmpp\S22.Xmpp.csproj", "{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}"
 EndProject
+Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "ProsodyExtension", "ProsodyExtension\ProsodyExtension.mdproj", "{E297C441-9FF1-4882-9FEE-8C8903CAE94A}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.ImRpc", "Monitron.ImRpc\Monitron.ImRpc.csproj", "{50D209C8-C9F4-4690-8D3C-558B592EC80B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.ImRpc.Tests", "Monitron.ImRpc.Tests\Monitron.ImRpc.Tests.csproj", "{DB21DEA2-97A5-4B1A-8D28-466CEB35F660}"
@@ -37,7 +39,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.Management
 EndProject
 Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "DeploymentScripts", "DeploymentScripts\DeploymentScripts.mdproj", "{E297C441-9FF1-4882-9FEE-8C8903CAE94A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.VmManagment", "Monitron.VmManagment\Monitron.VmManagment.csproj", "{618E4E14-B9D3-4796-8C9A-3A9FC1BE1914}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.DigitalOceanVmManagment", "Monitron.DigitalOceanVmManagment\Monitron.DigitalOceanVmManagment.csproj", "{334282CE-688C-433C-8434-E23123B1CC5E}"
+EndProject
 Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Monitron", "Monitron.Packages\Monitron.mdproj", "{7E5A0C63-F2F9-4404-98ED-664014933AC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.DigitalOceanVmManagment.Test", "Monitron.DigitalOceanVmManagment.Test\Monitron.DigitalOceanVmManagment.Test.csproj", "{66706170-1B2D-42D7-ADF9-62C913FD855E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalOcean.API", "DigitalOcean.API\DigitalOcean.API\DigitalOcean.API.csproj", "{501971B1-C59F-4583-A4E3-2109C67B644C}"
 EndProject
