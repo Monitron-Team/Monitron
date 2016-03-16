@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DigitalOcean.API;
-using DigitalOcean.API.Models.Requests;
 using Monitron.VmManagment;
 using DigitalOcean.API.Models.Requests;
+using DigitalOcean.API.Models.Responses;
 
-using Action = System.Action;
+using Action = DigitalOcean.API.Models.Responses.Action;
+
+///using Action = System.Action;
 
 namespace Monitron.DigitalOceanVmManagment
 {
@@ -38,8 +40,8 @@ namespace Monitron.DigitalOceanVmManagment
         public IVirtualMachine CreateVM(VmCreationParams i_Params)
         {
 
-            var pp = new Droplet
-                         {
+            var droplet = new DigitalOcean.API.Models.Requests.Droplet
+            {
                              Name = i_Params.Name,
                              SizeSlug = i_Params.SizeSlug,
                              Ipv6 = i_Params.Ipv6,
@@ -50,10 +52,10 @@ namespace Monitron.DigitalOceanVmManagment
                              SshIdsOrFingerprints = i_Params.SshIdsOrFingerprints,
                          };
 
-            var droplets = this.m_DoClient.Droplets.GetAll();
+            //var droplets = this.m_DoClient.Droplets.GetAll();
             this.m_DoClient.Images.GetAll();
             this.m_DoClient.Sizes.GetAll();
-            var Response = this.m_DoClient.Droplets.Create(pp);
+            var Response = this.m_DoClient.Droplets.Create(droplet);
 
             for (int i = 0; i < 5000; i++)
             {
@@ -77,49 +79,64 @@ namespace Monitron.DigitalOceanVmManagment
             {
                 //canceled
             }
+
             return newDeoplet;  //should i return status by params?
         }
 
         public bool DeleteVm(int i_VmId)
         {
             var Response = m_DoClient.Droplets.Delete(i_VmId);
+            Response.Wait();
             return (Response.Status == TaskStatus.RanToCompletion);
         }
 
         public bool StartVm(int i_VmId)
         {
             var Response = m_DoClient.DropletActions.PowerOn(i_VmId);
+            Response.Wait();
             return (Response.Status == TaskStatus.RanToCompletion);
         }
 
         public bool StopVm(int i_VmId)
         {
-            var Response = m_DoClient.DropletActions.PowerOff(i_VmId);
+            var Response = m_DoClient.DropletActions.Reboot(i_VmId);
+            Response.Wait();
             return (Response.Status == TaskStatus.RanToCompletion);
         }
 
-      
+        public bool RebuildVm(int i_VmId, string i_Image)
+        {
+            var Response = m_DoClient.DropletActions.Rebuild(i_VmId, i_Image);
+            Response.Wait();
+            return (Response.Status == TaskStatus.RanToCompletion);
+        }
 
         public bool RebootVm(int i_VmId)
         {
-            bool result = false;
-            var Response = m_DoClient.DropletActions.PowerOn(i_VmId);
+            var Response = m_DoClient.DropletActions.Reboot(i_VmId);
+            Response.Wait();
             return (Response.Status == TaskStatus.RanToCompletion);   
         }
 
         public bool PowerCycleVm(int i_VmId)
         {
-            throw new NotImplementedException();
+            var Response = m_DoClient.DropletActions.PowerCycle(i_VmId);
+            Response.Wait();
+            return (Response.Status == TaskStatus.RanToCompletion);
         }
 
         public bool ResetPasswordVm(int i_VmId)
         {
-            throw new NotImplementedException();
+            var Response = m_DoClient.DropletActions.ResetPassword(i_VmId);
+            Response.Wait();
+            return (Response.Status == TaskStatus.RanToCompletion);
         }
 
         public bool ShutdownVm(int i_VmId)
         {
-            throw new NotImplementedException();
+            var Response = m_DoClient.DropletActions.PowerOff(i_VmId);
+            Response.Wait();
+            return (Response.Status == TaskStatus.RanToCompletion);
         }
 
         public bool DisableBackups(int i_VmId)
@@ -129,12 +146,33 @@ namespace Monitron.DigitalOceanVmManagment
 
         public bool EnableIpv6(int i_VmId)
         {
-            throw new NotImplementedException();
+            var Response = m_DoClient.DropletActions.EnableIpv6(i_VmId);
+            Response.Wait();
+            return (Response.Status == TaskStatus.RanToCompletion);
         }
 
-        public Task<Action> EnablePrivateNetworking(int dropletId)
+        public bool EnablePrivateNetworking(int i_VmId)
         {
-            throw new NotImplementedException();
+            var Response = m_DoClient.DropletActions.EnablePrivateNetworking(i_VmId);
+            Response.Wait();
+            //var Response = m_DoClient.DropletActions.EnablePrivateNetworking(i_VmId);
+            return (Response.Status == TaskStatus.RanToCompletion);
+        }
+
+        public int GetVmIdByName(string i_Name, out bool o_Success)
+        {
+            int result = -1;
+            var Droplet = this.m_DoClient.Droplets.GetAll().Result.Where(item => item.Name == i_Name).First();
+            if (Droplet != null)
+            {
+                result = Droplet.Id;
+                o_Success = true;
+            }
+            else
+            {
+                o_Success = false;
+            }
+            return result;
         }
     }
 }

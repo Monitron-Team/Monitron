@@ -18,7 +18,7 @@ namespace Monitron.VmManagment
         bool ShutdownVm(int i_VmId);
         bool DisableBackups(int i_VmId);
         bool EnableIpv6(int i_VmId);
-        Task<Action> EnablePrivateNetworking(int dropletId);
+        bool EnablePrivateNetworking(int dropletId);
         
         
         //bool ChangeKernel(int dropletId, int kernelId);
