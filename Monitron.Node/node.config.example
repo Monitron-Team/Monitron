@@ -15,5 +15,8 @@
 		<DllName>Monitron.Node.Tests.dll</DllName>
 		<Type>Monitron.Node.Tests.TestNodePlugin</Type>
 	 </Plugin>
+	 <DataStore>
+	 	<Location>C:\Users\danielk\AppData\Roaming\Monitron\LocalDataStore.json</Location>
+	 </DataStore>
  </NodeConfiguration>
 

@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{E02F1A0F-AF66-47B8-BD17-498540CC17C5}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Monitron.Node</RootNamespace>
-    <AssemblyName>Monitron.Node</AssemblyName>
+    <ProjectGuid>{FCF0A5FE-63F9-4C74-A7C4-30CBEFA6939B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Monitron.Plugins.LocalMonitorPlugin</RootNamespace>
+    <AssemblyName>Monitron.Plugins.LocalMonitorPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -23,32 +23,33 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="Node.cs" />
-    <Compile Include="NodeConfiguration.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="ProcessMonitor.cs" />
+    <Compile Include="MonitoringPolicy.cs" />
+    <Compile Include="IMonitorConstraint.cs" />
+    <Compile Include="MemoryMonitorConstraint.cs" />
+    <Compile Include="CPUMonitorConstraint.cs" />
+    <Compile Include="LocalMonitorPlugin.cs" />
+    <Compile Include="PolicyViolatedEventArgs.cs" />
+    <Compile Include="MemoryStatus.cs" />
+    <Compile Include="ProcessStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
       <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
       <Name>Monitron.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Monitron.PluginDataStore.Local\Monitron.PluginDataStore.Local.csproj">
-      <Project>{4140B458-B63E-4D0E-AC79-462B99BAE930}</Project>
-      <Name>Monitron.PluginDataStore.Local</Name>
+    <ProjectReference Include="..\Monitron.ImRpc\Monitron.ImRpc.csproj">
+      <Project>{50D209C8-C9F4-4690-8D3C-558B592EC80B}</Project>
+      <Name>Monitron.ImRpc</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System.Xml" />
-    <Reference Include="Mono.Options">
-      <HintPath>..\packages\Mono.Options.4.2.2.0\lib\net4\Mono.Options.dll</HintPath>
-    </Reference>
+    <Reference Include="System" />
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="node.config.example" />
     <None Include="packages.config" />
-    <None Include="LocalDataStore.json.example" />
   </ItemGroup>
 </Project>

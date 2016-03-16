@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C4974800-90A6-4691-8202-5EC0199EDB8D}</ProjectGuid>
+    <ProjectGuid>{B70F8B3C-AF1E-4539-9893-077F111EC4B6}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Monitron.Node.Tests</RootNamespace>
-    <AssemblyName>Monitron.Node.Tests</AssemblyName>
+    <RootNamespace>Monitron.Plugins.LocalMonitorPlugin.Tests</RootNamespace>
+    <AssemblyName>Monitron.Plugins.LocalMonitorPlugin.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,24 +32,22 @@
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="log4net">
-      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestNodePlugin.cs" />
-    <Compile Include="NodeConfigurationTests.cs" />
-    <Compile Include="TestClientMessanger.cs" />
+    <Compile Include="Test.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Monitron.Node\Monitron.Node.csproj">
-      <Project>{E02F1A0F-AF66-47B8-BD17-498540CC17C5}</Project>
-      <Name>Monitron.Node</Name>
+    <ProjectReference Include="..\Monitron.Plugins.LocalMonitorPlugin\Monitron.Plugins.LocalMonitorPlugin.csproj">
+      <Project>{FCF0A5FE-63F9-4C74-A7C4-30CBEFA6939B}</Project>
+      <Name>Monitron.Plugins.LocalMonitorPlugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.Clients.Mock\Monitron.Clients.Mock.csproj">
+      <Project>{FEBBB41F-7A01-485E-9936-5207FF5BADF3}</Project>
+      <Name>Monitron.Clients.Mock</Name>
     </ProjectReference>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
       <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>

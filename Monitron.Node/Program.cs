@@ -108,7 +108,7 @@ namespace Monitron.Node
                 {
                     node = new Node(nodeConfig);
                 }
-                catch (TypeLoadException e)
+				catch (Exception e)
                 {
                     //couldn't create node due to failing in loading the plugin
                     sr_Log.ErrorFormat("Could not start node: {0}", e.Message);
@@ -121,7 +121,6 @@ namespace Monitron.Node
             {
                 sr_Log.ErrorFormat("Could not find configuration");
             }
-
         }
 	}
 }
