@@ -4,9 +4,10 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Reflection;
 using NUnit.Framework;
+using System.Text;
 
 using Monitron.Node;
-using System.Text;
+using Monitron.PluginDataStore.Local;
 
 namespace Monitron.Node.Tests
 {
@@ -18,7 +19,8 @@ namespace Monitron.Node.Tests
             string assemblyLocation = Assembly.GetCallingAssembly().Location;
             string assemblyDirectory = Path.GetDirectoryName(assemblyLocation);
             string assemblyFileName = Path.GetFileName(assemblyLocation);
-            return string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
+			string dataStorePath = Path.Combine(assemblyDirectory, "TestLocalDataStore.json");
+			return string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
 <NodeConfiguration>
   <MessangerClient>
 	<DllPath>{0}</DllPath>
@@ -35,9 +37,12 @@ namespace Monitron.Node.Tests
     <DllName>{1}</DllName>
     <Type>Monitron.Node.Tests.TestNodePlugin</Type>
   </Plugin>
+  <DataStore>
+	<Location>localdatastorelocation</Location>
+  </DataStore>
 </NodeConfiguration>",
-            assemblyDirectory,
-            assemblyFileName);
+				assemblyDirectory,
+				assemblyFileName);
         }
         
 		[Test()]
@@ -54,6 +59,7 @@ namespace Monitron.Node.Tests
 			nodeTestConfig.MessageClient.DllPath = "MessageClientPath";
 			nodeTestConfig.MessageClient.DllName = "MessageClientTest";
 			nodeTestConfig.MessageClient.Type = "MessageClientType";
+			nodeTestConfig.DataStore = new LocalPluginDataStore("TestLocalDataStore.json");
             nodeTestConfig.Save(stream);
             //Deserialize
             stream.SetLength(stream.Position);
@@ -68,6 +74,7 @@ namespace Monitron.Node.Tests
 			Assert.AreEqual("MessageClientPath", nodeLoadFromConfig.MessageClient.DllPath);
 			Assert.AreEqual("MessageClientTest", nodeLoadFromConfig.MessageClient.DllName);
 			Assert.AreEqual("MessageClientType", nodeLoadFromConfig.MessageClient.Type);
+			Assert.AreEqual(typeof(LocalPluginDataStore).ToString(), "Monitron.PluginDataStore.Local.LocalPluginDataStore");
 		}
 
 		[Test()]
@@ -78,6 +85,7 @@ namespace Monitron.Node.Tests
             Node node = new Node(nodeConfig);
 			Assert.AreEqual(typeof(Monitron.Node.Tests.TestNodePlugin).ToString(), node.Plugin.ToString());
 			Assert.AreEqual(typeof(Monitron.Node.Tests.TestClientMessanger).ToString(), node.MessangerClient.ToString());
+			Assert.AreEqual(typeof(LocalPluginDataStore).ToString(), "Monitron.PluginDataStore.Local.LocalPluginDataStore");
 		}
 	}
 }

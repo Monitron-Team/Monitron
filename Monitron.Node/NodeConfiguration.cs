@@ -1,8 +1,10 @@
 ﻿using System;
-using Monitron.Common;
 using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
+
+using Monitron.Common;
+using Monitron.PluginDataStore.Local;
 
 namespace Monitron.Node
 {
@@ -11,6 +13,7 @@ namespace Monitron.Node
 		public Account Account { get; set; }
 		public NodePlugin Plugin { get; set; }
 		public MessangerClient MessageClient { get; set; }
+		public IPluginDataStore DataStore { get; set; }
 
 		public class NodePlugin
 		{
@@ -135,6 +138,23 @@ namespace Monitron.Node
                         }
                     }
                     break;
+				case "DataStore":
+					string location = string.Empty;
+					reader.ReadStartElement();
+					while(reader.IsStartElement()) 
+					{
+						switch(reader.Name) 
+						{
+						case "Location":
+							location = reader.ReadElementContentAsString();
+							break;
+						}
+					}
+					if(File.Exists(location)) 
+					{
+						DataStore = new LocalPluginDataStore(location);
+					}
+					break;
             	}
 
                 reader.ReadEndElement();
@@ -164,6 +184,10 @@ namespace Monitron.Node
 			writer.WriteElementString("DllName", Plugin.DllName);
 			writer.WriteElementString("Type", Plugin.Type);
 			//end of Plugin Element
+			writer.WriteEndElement();
+			writer.WriteStartElement("DataStore");
+			writer.WriteElementString("Location", "TBD");
+			//end of DataStore Element
 			writer.WriteEndElement();
 		}
 	}

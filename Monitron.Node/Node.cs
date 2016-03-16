@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 
 using Monitron.Common;
+using Monitron.PluginDataStore.Local;
 
 namespace Monitron.Node
 {
@@ -15,6 +16,7 @@ namespace Monitron.Node
         
 		private Account m_Account;
 		private NodeConfiguration m_NodeConfig;
+		private IPluginDataStore m_LocalDataStore;
 		private readonly EventWaitHandle r_StopWaitHandle = new EventWaitHandle(initialState: false, mode: EventResetMode.ManualReset);
 		public IMessengerClient MessangerClient { get; private set; }
 		public INodePlugin Plugin { get; private set;}
@@ -23,7 +25,7 @@ namespace Monitron.Node
 		{
 			m_NodeConfig = i_NodeConfig;
 			m_Account = i_NodeConfig.Account;
-
+			m_LocalDataStore = i_NodeConfig.DataStore;
             loadMessangerClient();
             loadPlugin();
         }
@@ -42,7 +44,7 @@ namespace Monitron.Node
             sr_Log.Info("Loading plugin client...");
 			Type type = loadDll(m_NodeConfig.Plugin.DllPath, m_NodeConfig.Plugin.DllName, m_NodeConfig.Plugin.Type);
             sr_Log.DebugFormat("Plugin client is {0}", type.FullName);
-		    Plugin = (INodePlugin)Activator.CreateInstance(type, MessangerClient);
+			Plugin = (INodePlugin)Activator.CreateInstance(type, MessangerClient, m_LocalDataStore);
 		}
 
 		private Type loadDll(string i_DllPath, string i_DllName, string i_ClassType)
@@ -52,7 +54,7 @@ namespace Monitron.Node
 
 			if (File.Exists(fullDllPath))
 			{
-				var Dll = Assembly.LoadFile(fullDllPath);
+				var Dll = Assembly.LoadFrom(fullDllPath);
 				type = Dll.GetType(i_ClassType);
 			}
 
