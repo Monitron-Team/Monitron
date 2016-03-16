@@ -95,7 +95,7 @@ namespace S22.Xmpp {
 					if (child is XmlElement)
 						b.Append(((XmlElement) child).ToXmlString());
 					else if (child is XmlText)
-						b.Append(((XmlText) child).InnerText);
+                        b.Append(SecurityElement.Escape(((XmlText) child).InnerText));
 				}
 				b.Append("</" + e.Name + ">");
 			}

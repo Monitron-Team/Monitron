@@ -24,7 +24,6 @@
     <None Include="database_server_playbook.yml" />
     <None Include="db_init.sh" />
     <None Include="deploy.sh" />
-    <None Include="DeploymentScripts.mdproj" />
     <None Include="firewall_playbook.yml" />
     <None Include="iptables.j2" />
     <None Include="management.conf" />
@@ -33,5 +32,9 @@
     <None Include="mongod.conf" />
     <None Include="monitron-management.service" />
     <None Include="Vagrantfile" />
+    <None Include="node-container\Dockerfile" />
+    <None Include="node-container\build.sh" />
+    <None Include="worker_server_playbook.yml" />
+    <None Include="node-container\wait_for_config.sh" />
   </ItemGroup>
 </Project>

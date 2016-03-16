@@ -2,21 +2,18 @@
 using System.Linq;
 using System.Reflection;
 
-using MongoDB.Driver;
-using MongoDB.Driver.GridFS;
-
 using Monitron.Common;
 using Monitron.ImRpc;
 
-namespace Monitron.Plugins.Management
+namespace Monitron.Plugins.KatyPerry
 {
-    public class ManagementPlugin : INodePlugin
+    public class KatyPerry : INodePlugin
     {
         private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
             (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        
+
         private readonly IMessengerClient r_Client;
-        
+
         public IMessengerClient MessangerClient
         {
             get
@@ -27,7 +24,7 @@ namespace Monitron.Plugins.Management
 
         private readonly RpcAdapter r_Adapter;
 
-        public ManagementPlugin(IMessengerClient i_MessangerClient)
+        public KatyPerry(IMessengerClient i_MessangerClient)
         {
             i_MessangerClient.ConnectionStateChanged += r_Client_ConnectionStateChanged;
             sr_Log.Info("Management Plugin starting");
@@ -42,19 +39,21 @@ namespace Monitron.Plugins.Management
             if (r_Client.IsConnected)
             {
                 sr_Log.Debug("Setting up avatar");
-                r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.Management.MonitronAvatar.png"));
-                sr_Log.Debug("Notifying masters I'm up");
-                foreach (var buddy in r_Client.Buddies.Where(item => item.Groups.Contains("admin")))
+                r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.KatyPerry.KatyPerryAvatar.png"));
+                sr_Log.Debug("Notifying buddies how I feel about them");
+                foreach (var buddy in r_Client.Buddies)
                 {
-                    r_Client.SendMessage(buddy.Identity, "Hello master");
+                    r_Client.SendMessage(buddy.Identity, "You make me feel like I'm living a teenage dream");
                 }
             }
         }
 
-        [RemoteCommand(MethodName="echo")]
-        public string Echo(string i_Text)
+        [RemoteCommand(MethodName="sing")]
+        public string Sing()
         {
-            return i_Text;
+            return @"You think I'm pretty without any make-up on
+You think I'm funny when I tell the punch line wrong
+I know you get me, so I let my walls come down, down";
         }
     }
 }

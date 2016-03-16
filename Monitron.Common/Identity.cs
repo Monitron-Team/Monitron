@@ -6,6 +6,7 @@ namespace Monitron.Common
     {
         public string UserName { get; set; }
         public string Domain { get; set; }
+        public string Resource { get; set; }
 
         public override bool Equals(object i_Obj)
         {
@@ -24,7 +25,12 @@ namespace Monitron.Common
 
         public override int GetHashCode()
         {
-            return (UserName + "@" + Domain).GetHashCode();
+            return ToString().GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}@{1}/{2}", UserName, Domain, Resource);
         }
     }
 }
