@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -16,8 +17,10 @@ namespace Monitron.DigitalOceanVmManagment.Test
     {
         static readonly string sr_Token = "da8beb13c138f71fee27747f75150c4e848b0e3d1d98a0af86b463219c4eaeb4";
 
-        private static readonly string sr_VmName = "blach";
+        private static readonly string sr_VmName = "maorico";
         private static readonly string sr_ImageIdOrSlug = "fedora-23-x64";
+        private static readonly string sr_NewSize = "1gb";
+        private static readonly string sr_NewName = "blach";
         [Test()]
         public void CreateVm()
         {
@@ -31,60 +34,124 @@ namespace Monitron.DigitalOceanVmManagment.Test
             reqParam.ImageIdOrSlug = sr_ImageIdOrSlug;
             reqParam.SizeSlug = "512mb";
             reqParam.PrivateNetworking = true;   
-            var NewDroplet = vmManager.CreateVM(reqParam);
-            /*
-            Thread.Sleep(20000);
-            bool res_StopVm = vmManager.StopVm(NewDroplet.Id);
-            Thread.Sleep(60000);
-            bool res_StartVm = vmManager.StartVm(NewDroplet.Id);
-            Thread.Sleep(60000);
-            bool res_EnablePrivateNetworking = vmManager.EnablePrivateNetworking(NewDroplet.Id);
-            Thread.Sleep(60000);
-            bool res_DeleteVm = vmManager.DeleteVm(NewDroplet.Id);
-            */
-
+            var NewDroplet = vmManager.CreateVM(reqParam); //q for saggi - is it ok that the convention is different?
+            Assert.IsTrue(NewDroplet.Name == reqParam.Name);
         }
 
         [Test()]
         public void Delete()
         {
-            DigitalOceanVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            vmManager.DeleteVm(vmManager.GetVmIdByName(sr_VmName));
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName , out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.DeleteVm(VmId).Succeded);
         }
 
         [Test()]
         public void PowerOff()
         {
-            DigitalOceanVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            Assert.IsTrue(vmManager.ShutdownVm(vmManager.GetVmIdByName(sr_VmName)));
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.PowerOffVm(VmId).Succeded);
         }
 
         [Test()]
         public void PowerOn()
         {
-            DigitalOceanVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            Assert.IsTrue(vmManager.StartVm(vmManager.GetVmIdByName(sr_VmName)));
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.PowerOnVm(VmId).Succeded);
         }
 
         [Test()]
         public void EnableIpv6()
         {
-            DigitalOceanVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            Assert.IsTrue(vmManager.EnableIpv6(vmManager.GetVmIdByName(sr_VmName)));
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.EnableIpv6(VmId).Succeded);
         }
 
         [Test()]
         public void RebootVm()
         {
-            DigitalOceanVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            Assert.IsTrue(vmManager.RebootVm(vmManager.GetVmIdByName(sr_VmName)));
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.RebootVm(VmId).Succeded);
         }
+
+        [Test()]
+        public void DisableBackupsVm()
+        {
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.DisableBackups(VmId).Succeded);
+        }
+
         [Test()]
         public void RebuildVm()
         {
-            bool successGettingId;
-            DigitalOceanVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            Assert.IsTrue(vmManager.RebuildVm(vmManager.GetVmIdByName(sr_VmName),sr_ImageIdOrSlug));
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.RebuildVm(VmId, sr_ImageIdOrSlug).Succeded);
+        }
+
+        [Test()]
+        public void EnablePrivateNetworkingVm()
+        {
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.EnablePrivateNetworking(VmId).Succeded);
+        }
+
+        [Test()]
+        public void ResetPasswordVm()
+        {
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.ResetPasswordVm(VmId).Succeded);
+        }
+
+        [Test()]
+        public void ShutdownVm()
+        {
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.ShutdownVm(VmId).Succeded);
+        }
+        [Test()]
+        public void DisableBackups()
+        {
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.DisableBackups(VmId).Succeded);
+        }
+
+        [Test()]  // NOT WORKING!
+        public void ReziseVm()
+        {
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.ResizeVm(VmId, sr_NewSize).Succeded);
+        }
+
+        [Test()]
+        public void RenameVm()
+        {
+            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
+            bool ParseSucceded;
+            int VmId = vmManager.GetVmIdByName(sr_VmName, out ParseSucceded);
+            Assert.IsTrue(ParseSucceded && vmManager.RenameVm(VmId, sr_NewName).Succeded);
         }
     }
 }

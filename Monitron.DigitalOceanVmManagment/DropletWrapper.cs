@@ -39,5 +39,6 @@ namespace Monitron.DigitalOceanVmManagment
         {
             m_VM = i_VM;
         }
+        
     }
 }

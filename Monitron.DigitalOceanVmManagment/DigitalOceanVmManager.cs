@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ using DigitalOcean.API.Models.Requests;
 using DigitalOcean.API.Models.Responses;
 
 using Action = DigitalOcean.API.Models.Responses.Action;
-
+using Image = DigitalOcean.API.Models.Responses.Action;
 ///using Action = System.Action;
 
 namespace Monitron.DigitalOceanVmManagment
@@ -39,7 +40,6 @@ namespace Monitron.DigitalOceanVmManagment
 
         public IVirtualMachine CreateVM(VmCreationParams i_Params)
         {
-
             var droplet = new DigitalOcean.API.Models.Requests.Droplet
             {
                              Name = i_Params.Name,
@@ -51,127 +51,204 @@ namespace Monitron.DigitalOceanVmManagment
                              ImageIdOrSlug = i_Params.ImageIdOrSlug,
                              SshIdsOrFingerprints = i_Params.SshIdsOrFingerprints,
                          };
-
-            //var droplets = this.m_DoClient.Droplets.GetAll();
-            this.m_DoClient.Images.GetAll();
-            this.m_DoClient.Sizes.GetAll();
+            this.m_DoClient.Images.GetAll(); //todo: check if needed
+            this.m_DoClient.Sizes.GetAll();  //todo: check if needed
             var Response = this.m_DoClient.Droplets.Create(droplet);
-
-            for (int i = 0; i < 5000; i++)
-            {
-                debug.Add(Response.Status.ToString());
-               // Console.WriteLine(Response.Status.ToString());
-            }
-            
+            Response Result = ExProccesResponse(Response);
             IVirtualMachine newDeoplet = null;
-            Thread.Sleep(10000);  //maybe not nessecary
-            if (Response.IsCompleted)
-                if (!Response.IsFaulted)
-                {
-                    newDeoplet = new DropletWrapper(Response.Result);
-                    //m_VMInventory.Add(Response.Result.Id, newDeoplet);
-                }
-                else
-                {
-                    //falted
-                }
-            else if (Response.IsCanceled)
+            if (Result.Succeded)
             {
-                //canceled
+                newDeoplet = new DropletWrapper(Response.Result);
             }
-
             return newDeoplet;  //should i return status by params?
         }
 
-        public bool DeleteVm(int i_VmId)
+        public Response DeleteVm(int i_VmId)
         {
+            Response Result = new Response ();
             var Response = m_DoClient.Droplets.Delete(i_VmId);
             Response.Wait();
-            return (Response.Status == TaskStatus.RanToCompletion);
+            ExProccesResponse(Response);
+            if ((Response.Status == TaskStatus.RanToCompletion))
+            {
+                Result.Succeded = true;
+            }
+            else
+            {
+                Result.Message = "Error";
+            }
+            return Result;
         }
 
-        public bool StartVm(int i_VmId)
+        public Response PowerOnVm(int i_VmId)
         {
             var Response = m_DoClient.DropletActions.PowerOn(i_VmId);
-            Response.Wait();
-            return (Response.Status == TaskStatus.RanToCompletion);
+            return ExProccesResponse(Response);
         }
 
-        public bool StopVm(int i_VmId)
-        {
-            var Response = m_DoClient.DropletActions.Reboot(i_VmId);
-            Response.Wait();
-            return (Response.Status == TaskStatus.RanToCompletion);
-        }
-
-        public bool RebuildVm(int i_VmId, string i_Image)
-        {
-            var Response = m_DoClient.DropletActions.Rebuild(i_VmId, i_Image);
-            Response.Wait();
-            return (Response.Status == TaskStatus.RanToCompletion);
-        }
-
-        public bool RebootVm(int i_VmId)
-        {
-            var Response = m_DoClient.DropletActions.Reboot(i_VmId);
-            Response.Wait();
-            return (Response.Status == TaskStatus.RanToCompletion);   
-        }
-
-        public bool PowerCycleVm(int i_VmId)
-        {
-            var Response = m_DoClient.DropletActions.PowerCycle(i_VmId);
-            Response.Wait();
-            return (Response.Status == TaskStatus.RanToCompletion);
-        }
-
-        public bool ResetPasswordVm(int i_VmId)
-        {
-            var Response = m_DoClient.DropletActions.ResetPassword(i_VmId);
-            Response.Wait();
-            return (Response.Status == TaskStatus.RanToCompletion);
-        }
-
-        public bool ShutdownVm(int i_VmId)
+        public Response PowerOffVm(int i_VmId)
         {
             var Response = m_DoClient.DropletActions.PowerOff(i_VmId);
             Response.Wait();
-            return (Response.Status == TaskStatus.RanToCompletion);
+            return ExProccesResponse(Response);
         }
 
-        public bool DisableBackups(int i_VmId)
+        public Response RebuildVm(int i_VmId, string i_Image)
         {
-            throw new NotImplementedException();
+            Response result;
+            var image = this.m_DoClient.Images.GetAll().Result.Where(item => item.Slug == i_Image).First();
+            if (image != null)
+            {
+                Task<Action> Response = m_DoClient.DropletActions.Rebuild(i_VmId, i_Image);
+                result = ExProccesResponse(Response);
+            }
+            else
+            {
+                result = new Response {Message = "Unknown Imamge",  Succeded = false};
+            }
+
+            return result;
         }
 
-        public bool EnableIpv6(int i_VmId)
+        public Response RebootVm(int i_VmId)
+        {
+            string status = "";
+            Response Response;
+            try
+            {
+                status = this.m_DoClient.Droplets.Get(i_VmId).Result.Status;
+            }
+            catch (Exception)
+            {
+                Response = new Response { Message = "Invalid Id", Succeded = false };
+            }
+            if (status != "" && status != "off")
+            {
+                Response = ExProccesResponse(m_DoClient.DropletActions.Reboot(i_VmId));
+            }
+            else
+            {
+                Response = new Response { Message = "Requst Failed because VM is off", Succeded = false };
+            }
+           
+            return (Response);
+        }
+
+        public Response PowerCycleVm(int i_VmId)
+        {
+            var Response = m_DoClient.DropletActions.PowerCycle(i_VmId);
+            return ExProccesResponse(Response);
+        }
+
+        public Response ResetPasswordVm(int i_VmId)
+        {
+            var Response = m_DoClient.DropletActions.ResetPassword(i_VmId);
+            return ExProccesResponse(Response);
+        }
+
+        public Response ShutdownVm(int i_VmId)
+        {
+            var Response = m_DoClient.DropletActions.Shutdown(i_VmId);
+            return ExProccesResponse(Response);
+        }
+
+        public Response DisableBackups(int i_VmId)
+        {
+            var Response = m_DoClient.DropletActions.DisableBackups(i_VmId);
+            return ExProccesResponse(Response);
+        }
+
+        public Response RenameVm(int i_VmId, string i_NewName)
+        {
+            var Response = m_DoClient.DropletActions.Rename(i_VmId,i_NewName);
+            return ExProccesResponse(Response);
+        }
+
+        public Response EnableIpv6(int i_VmId)
         {
             var Response = m_DoClient.DropletActions.EnableIpv6(i_VmId);
-            Response.Wait();
-            return (Response.Status == TaskStatus.RanToCompletion);
+            return ExProccesResponse(Response);
         }
 
-        public bool EnablePrivateNetworking(int i_VmId)
+        public Response EnablePrivateNetworking(int i_VmId)
         {
             var Response = m_DoClient.DropletActions.EnablePrivateNetworking(i_VmId);
-            Response.Wait();
-            //var Response = m_DoClient.DropletActions.EnablePrivateNetworking(i_VmId);
-            return (Response.Status == TaskStatus.RanToCompletion);
+            return ExProccesResponse(Response);
         }
 
-        public int GetVmIdByName(string i_Name, out bool o_Success)
+        public int GetVmIdByName(string i_VmName, out bool o_Success)
         {
             int result = -1;
-            var Droplet = this.m_DoClient.Droplets.GetAll().Result.Where(item => item.Name == i_Name).First();
-            if (Droplet != null)
+            var Droplet = m_DoClient.Droplets.GetAll().Result.Where(item => item.Name == i_VmName);
+            if (Droplet.Count() != 0)
             {
-                result = Droplet.Id;
+                result = Droplet.First().Id;
                 o_Success = true;
             }
             else
             {
                 o_Success = false;
             }
+            return result;
+        }
+
+        public Response ExProccesResponse(Task i_ActionServerResponse)
+        {
+            i_ActionServerResponse.Wait();
+            Response Result = new Response();
+            if ((i_ActionServerResponse.Status == TaskStatus.RanToCompletion))
+            {
+                Result.Succeded = true;
+            }
+            else
+            {
+                Result.Message = "Error";
+            }
+            return Result;
+        }
+
+        public IList<string> GetSupportedImages()
+        {
+            List<string> result = new List<string>();
+            var AllImages = m_DoClient.Images.GetAll().Result;
+            foreach (var image in AllImages)
+            {
+                result.Add(image.Slug);
+            }
+
+            return result;
+        }
+
+        public IList<string> GetSupportedSizes()
+        {
+            List<string> result = new List<string>();
+            var sizes = m_DoClient.Sizes.GetAll().Result;
+            foreach (var size in sizes)
+            {
+                result.Add(size.Slug);
+            }
+
+            return result;
+        }
+
+        public Response ResizeVm(int i_VmId, string i_NewSize)
+        {
+            Response result;
+            var sizes = this.GetSupportedSizes();
+
+            if (sizes.Contains(i_NewSize))
+            {
+                //Task<Action> response = m_DoClient.DropletActions.Resize(i_VmId, i_NewSize);
+                var response = m_DoClient.DropletActions.Resize(i_VmId, i_NewSize).Result;
+                var dd = response.Status;
+                result = null;
+                //result = ExProccesResponse(response);
+            }
+            else
+            {
+                result = new Response { Message = "Unsupported size", Succeded = false };
+            }
+
             return result;
         }
     }
