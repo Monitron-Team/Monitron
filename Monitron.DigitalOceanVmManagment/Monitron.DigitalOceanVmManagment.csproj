@@ -52,7 +52,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionType.cs" />
     <Compile Include="DigitalOceanVmManager.cs" />
     <Compile Include="DropletWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

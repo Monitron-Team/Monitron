@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+
 namespace Monitron.VmManagment
 {
     public interface IVmManager
     {
-        IVirtualMachine CreateVM(VmCreationParams i_Params);
+        IVirtualMachine CreateVm(VmCreationParams i_Params);
         Response PowerOnVm(int i_VmId);
         Response PowerOffVm(int i_VmId);
         Response DeleteVm(int i_VmId);
@@ -17,13 +14,14 @@ namespace Monitron.VmManagment
         Response ShutdownVm(int i_VmId);
         Response DisableBackups(int i_VmId);
         Response EnableIpv6(int i_VmId);
-        Response EnablePrivateNetworking(int dropletId);
+        Response EnablePrivateNetworking(int i_VmId);
         Response RebuildVm(int i_VmId, string i_Image);
         Response ResizeVm(int i_VmName, string i_NewSize);
         int GetVmIdByName(string i_VmName, out bool o_Success);
         Response RenameVm(int i_VmId, string i_NewName);
         IList<string> GetSupportedImages();
         IList<string> GetSupportedSizes();
+        IVirtualMachine GetVmById(int i_VmId);
 
         //More possebilities:
         //bool ChangeKernel(int dropletId, int kernelId);

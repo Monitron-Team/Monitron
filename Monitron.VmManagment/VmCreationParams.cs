@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Monitron.VmManagment
 {
@@ -15,11 +11,5 @@ namespace Monitron.VmManagment
         public bool PrivateNetworking { get; set; }
         public string RegionSlug { get; set; }
         public string SizeSlug { get; set; }
-        public List<object> SshIdsOrFingerprints { get; set; }
-
-        public VmCreationParams()
-        {
-            SshIdsOrFingerprints = new List<object>();
-        }
     }
 }

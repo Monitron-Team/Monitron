@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Monitron.VmManagment
 {
     public interface IVirtualMachine
     {
-        string Name { get;  }
-
+        string Name { get; }
         int Id { get; }
         string Status { get; }
         bool Locked { get; }
@@ -19,8 +12,10 @@ namespace Monitron.VmManagment
         int KernelId { get; }
         string KernelName { get; }
         string KernelVersion { get; }
-
-
+        IList<Ip> IpV4 { get; }
+        IList<Ip> IpV6 { get; }
+        bool Ipv6Enabled { get; }
+        bool PrivateNetworkingEnabled { get; }
 
     }
 }

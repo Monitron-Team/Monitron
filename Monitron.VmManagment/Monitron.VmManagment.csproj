@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionStatus.cs" />
+    <Compile Include="Ip.cs" />
     <Compile Include="IVirtualMachine.cs" />
     <Compile Include="IVmManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
