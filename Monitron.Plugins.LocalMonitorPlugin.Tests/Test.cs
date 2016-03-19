@@ -36,7 +36,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin.Tests
 			MockMessengerClient client = new MockMessengerClient(new Identity());
 			new LocalMonitorPlugin(client, dataStore);
 			client.PushMessage(friend, "get_process_status TestProcess");
-			Assert.AreEqual(client.SentMessageQueue.Dequeue().Item2, expectedText);
+            Assert.AreEqual(expectedText, client.SentMessageQueue.Dequeue().Item2);
 		}
 
 		[Test()]
@@ -48,21 +48,20 @@ namespace Monitron.Plugins.LocalMonitorPlugin.Tests
 			MockMessengerClient client = new MockMessengerClient(new Identity());
 			new LocalMonitorPlugin(client, dataStore);
 			client.PushMessage(friend, "list_monitored_processes");
-			Assert.AreEqual(client.SentMessageQueue.Dequeue().Item2, expectedText);
+            Assert.AreEqual(expectedText, client.SentMessageQueue.Dequeue().Item2);
 		}
 
 		[Test()]
 		public void TestMonitoProcessStart()
 		{
-			Process[] processes = Process.GetProcesses();
-			int PID = processes[0].Id;
+            int PID = Process.GetCurrentProcess().Id;
 			string expectedText = "Started monitoring process PID " + PID;
 			Identity friend = new Identity { UserName = "friend", Domain = "test.com" };
 			IPluginDataStore dataStore = new LocalPluginDataStore("localdatastore.json");
 			MockMessengerClient client = new MockMessengerClient(new Identity());
 			new LocalMonitorPlugin(client, dataStore);
 			client.PushMessage(friend, "monitor_process_start " + PID);
-			Assert.AreEqual(client.SentMessageQueue.Dequeue().Item2, expectedText);
+            Assert.AreEqual(expectedText, client.SentMessageQueue.Dequeue().Item2);
 		}
 	}
 }

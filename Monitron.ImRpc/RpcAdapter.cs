@@ -48,6 +48,10 @@ namespace Monitron.ImRpc
             {
                 retuenedValue = ExecuteCommand(arguments);
             }
+            catch(TargetInvocationException e)
+            {
+                retuenedValue = string.Format(e.InnerException.Message);
+            }
             catch (Exception e)
             {
                 retuenedValue = string.Format("Error executing: \"{0}\": ", i_EventArgs.Message, e.Message);
