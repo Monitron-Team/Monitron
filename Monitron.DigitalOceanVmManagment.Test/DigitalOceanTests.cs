@@ -9,148 +9,143 @@ namespace Monitron.DigitalOceanVmManagment.Test
     class DigitalOceanTests
     {
         static readonly string sr_Token = "da8beb13c138f71fee27747f75150c4e848b0e3d1d98a0af86b463219c4eaeb4";
-
         private static string s_vmName = "nomnomnom";
         private static readonly string sr_ImageIdOrSlug = "fedora-23-x64";
         private static readonly string sr_NewSize = "1gb";
-        private static string NewName = "booom";
+        private static string s_newName = "booom";
+        private static IVirtualMachine s_vm = null;
+        private static IVmManager s_vmManager = new DigitalOceanVmManager(sr_Token);
+
+
         [Test()]
         public void CreateVm()
         {
             DigitalOceanVmManager vmManager = new DigitalOceanVmManager(sr_Token);
             var reqParam = new VmCreationParams();
-            reqParam.Ipv6 = false;
+            reqParam.Ipv6Enabled = false;
             reqParam.Name = s_vmName;
-            reqParam.Backups = true;
+            reqParam.BackupsEnabled = true;
             reqParam.RegionSlug = "nyc2";
             reqParam.ImageIdOrSlug = sr_ImageIdOrSlug;
             reqParam.SizeSlug = "512mb";
-            reqParam.PrivateNetworking = false;
-            var newDroplet = vmManager.CreateVm(reqParam); //q for saggi - is it ok that the convention is different?
-            Assert.IsTrue(newDroplet.Name == reqParam.Name);
+            reqParam.PrivateNetworkingEnabled = false;
+            s_vm = vmManager.CreateVm(reqParam); 
+            Assert.IsTrue(s_vm.Name == reqParam.Name);
         }
 
         [Test()]
-        public void Delete()
+        public void DeleteVm()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.DeleteVm(vmId).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.DeleteVm(s_vm.Id).Succeded);
         }
+
+
 
         [Test()]
         public void PowerOff()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.PowerOffVm(vmId).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.PowerOffVm(s_vm.Id).Succeded);
         }
 
         [Test()]
         public void PowerOn()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.PowerOnVm(vmId).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.PowerOnVm(s_vm.Id).Succeded);
         }
 
         [Test()]
         public void EnableIpv6()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.EnableIpv6(vmId).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.EnableIpv6(s_vm.Id).Succeded);
         }
 
         [Test()]
         public void RebootVm()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.RebootVm(vmId).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.RebootVm(s_vm.Id).Succeded);
         }
 
         [Test()]
         public void DisableBackupsVm()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.DisableBackups(vmId).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.DisableBackups(s_vm.Id).Succeded);
         }
 
         [Test()]
         public void RebuildVm()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.RebuildVm(vmId, sr_ImageIdOrSlug).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.RebuildVm(s_vm.Id, sr_ImageIdOrSlug).Succeded);
         }
 
         [Test()]
         public void EnablePrivateNetworkingVm()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.EnablePrivateNetworking(vmId).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.EnablePrivateNetworking(s_vm.Id).Succeded);
         }
 
         [Test()]
         public void ResetPasswordVm()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.ResetPasswordVm(vmId).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.ResetPasswordVm(s_vm.Id).Succeded);
         }
 
         [Test()]
         public void ShutdownVm()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.ShutdownVm(vmId).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.ShutdownVm(s_vm.Id).Succeded);
         }
         [Test()]
         public void DisableBackups()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.DisableBackups(vmId).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.DisableBackups(s_vm.Id).Succeded);
         }
 
         [Test()]  // NOT WORKING!
         public void ReziseVm()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.ResizeVm(vmId, sr_NewSize).Succeded);
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.ResizeVm(s_vm.Id, sr_NewSize).Succeded);
         }
 
         [Test()]
         public void RenameVm()
         {
-            IVmManager vmManager = new DigitalOceanVmManager(sr_Token);
-            bool parseSucceded;
-            int vmId = vmManager.GetVmIdByName(s_vmName, out parseSucceded);
-            Assert.IsTrue(parseSucceded && vmManager.RenameVm(vmId, NewName).Succeded);
-            s_vmName = NewName;
+            initDemoVm();
+            Assert.IsTrue(s_vmManager.RenameVm(s_vm.Id, s_newName).Succeded);
+            s_vmName = s_newName;
+            s_newName = s_newName + "0";
+        }
+
+        private void initDemoVm()
+        {
+            if (s_vm == null)
+            {
+                bool vmExist;
+                int id = s_vmManager.GetVmIdByName(s_vmName, out vmExist);
+                if (!vmExist)
+                {
+                    CreateVm();
+                    Thread.Sleep(60000);  //Saggi! I didnt find a way to see if the procces ended before sending other commands)
+                }
+                else s_vm = s_vmManager.GetVmById(id);
+            }
         }
 
         [Test()]
         public void Sanity()
         {
-            int SleepTime = 60000;
+            int SleepTime = 90000;
             this.CreateVm();
             Thread.Sleep(SleepTime);
             try
@@ -180,7 +175,7 @@ namespace Monitron.DigitalOceanVmManagment.Test
                 this.PowerOn();
                 Console.WriteLine("PowerOn(): SUCCESS!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("PowerOn(): FAILIURE!");
             }
@@ -191,7 +186,7 @@ namespace Monitron.DigitalOceanVmManagment.Test
                 this.RenameVm();
                 Console.WriteLine("RenameVm(): SUCCESS!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("RenameVm(): FAILIURE!");
             }
@@ -202,7 +197,7 @@ namespace Monitron.DigitalOceanVmManagment.Test
                 this.RebuildVm();
                 Console.WriteLine("RebuildVm(): SUCCESS!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("RebuildVm(): FAILIURE!");
             }
@@ -213,7 +208,7 @@ namespace Monitron.DigitalOceanVmManagment.Test
                 this.DisableBackups();
                 Console.WriteLine("DisableBackups(): SUCCESS!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("DisableBackups(): FAILIURE!");
             }
@@ -224,7 +219,7 @@ namespace Monitron.DigitalOceanVmManagment.Test
                 this.ResetPasswordVm();
                 Console.WriteLine("ResetPasswordVm(): SUCCESS!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("ResetPasswordVm(): FAILIURE!");
             }
@@ -235,7 +230,7 @@ namespace Monitron.DigitalOceanVmManagment.Test
                 this.EnablePrivateNetworkingVm();
                 Console.WriteLine("EnablePrivateNetworkingVm(): SUCCESS!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("EnablePrivateNetworkingVm(): FAILIURE!");
             }
@@ -246,7 +241,7 @@ namespace Monitron.DigitalOceanVmManagment.Test
                 this.RebootVm();
                 Console.WriteLine("RebootVm(): SUCCESS!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("RebootVm(): FAILIURE!");
             }
@@ -257,7 +252,7 @@ namespace Monitron.DigitalOceanVmManagment.Test
                 this.ShutdownVm();
                 Console.WriteLine("ShutdownVm(): SUCCESS!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("ShutdownVm(): FAILIURE!");
             }
@@ -265,12 +260,12 @@ namespace Monitron.DigitalOceanVmManagment.Test
 
             try
             {
-                this.Delete();
-                Console.WriteLine("Delete(): SUCCESS!");
+                this.DeleteVm();
+                Console.WriteLine("DeleteVm(): SUCCESS!");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine("Delete(): FAILIURE!");
+                Console.WriteLine("DeleteVm(): FAILIURE!");
             }
             Thread.Sleep(SleepTime);
         }

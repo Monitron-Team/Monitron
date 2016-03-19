@@ -22,12 +22,12 @@ namespace Monitron.VmManagment
         IList<string> GetSupportedImages();
         IList<string> GetSupportedSizes();
         IVirtualMachine GetVmById(int i_VmId);
-
         //More possebilities:
         //bool ChangeKernel(int dropletId, int kernelId);
         //bool GetDropletAction(int dropletId, int actionId);
         //bool Restore(int dropletId, int imageId);
         //Task<Action> Snapshot(int dropletId, string name);
+
 
     }
 }

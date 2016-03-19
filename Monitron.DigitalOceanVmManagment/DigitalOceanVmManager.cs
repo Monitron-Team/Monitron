@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using DigitalOcean.API;
 using Monitron.VmManagment;
-
 using Action = DigitalOcean.API.Models.Responses.Action;
 using Image = DigitalOcean.API.Models.Responses.Action;
 
@@ -11,13 +10,11 @@ namespace Monitron.DigitalOceanVmManagment
 {
     public class DigitalOceanVmManager : IVmManager
     {
-        public List<string> m_Debug = new List<string>();
-        private DigitalOceanClient m_DoClient;
+        private readonly DigitalOceanClient r_DoClient;  //DigitalOcean Client
 
         public DigitalOceanVmManager(string i_Token)
         {
-            m_DoClient = new DigitalOceanClient(i_Token);
-            //this.Apitest(m_DoClient); //todo: check if can be removed
+            r_DoClient = new DigitalOceanClient(i_Token);
         }
 
         public IVirtualMachine CreateVm(VmCreationParams i_Params)
@@ -26,26 +23,26 @@ namespace Monitron.DigitalOceanVmManagment
             {
                 Name = i_Params.Name,
                 SizeSlug = i_Params.SizeSlug,
-                Ipv6 = i_Params.Ipv6,
+                Ipv6 = i_Params.Ipv6Enabled,
                 RegionSlug = i_Params.RegionSlug,
-                Backups = i_Params.Backups,
-                PrivateNetworking = i_Params.PrivateNetworking,
+                Backups = i_Params.BackupsEnabled,
+                PrivateNetworking = i_Params.PrivateNetworkingEnabled,
                 ImageIdOrSlug = i_Params.ImageIdOrSlug,
             };
-            var response = this.m_DoClient.Droplets.Create(droplet);
+            var response = this.r_DoClient.Droplets.Create(droplet); //Getting a new droplet from the DO server
             Response result = ExProccesResponse(response);
             IVirtualMachine newDeoplet = null;
             if (result.Succeded)
             {
-                newDeoplet = new DropletWrapper(response.Result);
+                newDeoplet = new DropletWrapper(response.Result);  //creat a Droplet wrapper using the actual droplet
             }
-            return newDeoplet;  //should i return status by params?
+            return newDeoplet;
         }
 
         public Response DeleteVm(int i_VmId)
         {
             Response result = new Response();
-            var response = m_DoClient.Droplets.Delete(i_VmId);
+            var response = r_DoClient.Droplets.Delete(i_VmId); //Delete the droplet
             response.Wait();
             ExProccesResponse(response);
             if ((response.Status == TaskStatus.RanToCompletion))
@@ -54,7 +51,7 @@ namespace Monitron.DigitalOceanVmManagment
             }
             else
             {
-                result.Message = "Error";
+                result.Message = "Error Deleting the VM";
             }
             return result;
         }
@@ -62,9 +59,9 @@ namespace Monitron.DigitalOceanVmManagment
         public Response PowerOnVm(int i_VmId)
         {
             Response response;
-            if (GetVmById(i_VmId).Status != "active")
+            if (GetVmById(i_VmId).Status != "active")       //check if the VM is not On
             {
-                response = ExProccesResponse(m_DoClient.DropletActions.PowerOn(i_VmId));
+                response = ExProccesResponse(this.r_DoClient.DropletActions.PowerOn(i_VmId));
             }
             else
             {
@@ -76,9 +73,9 @@ namespace Monitron.DigitalOceanVmManagment
         public Response PowerOffVm(int i_VmId)
         {
             Response response;
-            if (GetVmById(i_VmId).Status != "off")
+            if (GetVmById(i_VmId).Status != "off")      //check if the VM is not Off
             {
-                var serverResponse = m_DoClient.DropletActions.PowerOff(i_VmId);
+                var serverResponse = this.r_DoClient.DropletActions.PowerOff(i_VmId);
                 serverResponse.Wait();  //to saggi - i didnt work without .Wait()... but why?!
                 response = ExProccesResponse(serverResponse);
             }
@@ -92,15 +89,15 @@ namespace Monitron.DigitalOceanVmManagment
         public Response RebuildVm(int i_VmId, string i_Image)
         {
             Response result;
-            var image = this.m_DoClient.Images.GetAll().Result.First(i_Item => i_Item.Slug == i_Image);
-            if (image != null)
+            var image = this.r_DoClient.Images.GetAll().Result.First(i_Item => i_Item.Slug == i_Image);
+            if (image != null)   //if true then the server has the requsted image
             {
-                Task<Action> response = m_DoClient.DropletActions.Rebuild(i_VmId, i_Image);
+                Task<Action> response = this.r_DoClient.DropletActions.Rebuild(i_VmId, i_Image);
                 result = ExProccesResponse(response);
             }
             else
             {
-                result = new Response { Message = "Unknown Imamge", Succeded = false };
+                result = new Response { Message = "Unknown Image", Succeded = false };
             }
 
             return result;
@@ -110,9 +107,9 @@ namespace Monitron.DigitalOceanVmManagment
         {
             Response response;
             var vm = GetVmById(i_VmId);
-            if (vm.Status != "" && vm.Status != "off")
+            if (vm.Status != "" && vm.Status != "off")          //check if VM is not already off
             {
-                response = ExProccesResponse(m_DoClient.DropletActions.Reboot(i_VmId));
+                response = ExProccesResponse(this.r_DoClient.DropletActions.Reboot(i_VmId));
             }
             else
             {
@@ -124,45 +121,43 @@ namespace Monitron.DigitalOceanVmManagment
 
         public Response PowerCycleVm(int i_VmId)
         {
-            var response = m_DoClient.DropletActions.PowerCycle(i_VmId);
+            var response = this.r_DoClient.DropletActions.PowerCycle(i_VmId);
             return ExProccesResponse(response);
         }
 
         public Response ResetPasswordVm(int i_VmId)
         {
-            var response = m_DoClient.DropletActions.ResetPassword(i_VmId);
+            var response = this.r_DoClient.DropletActions.ResetPassword(i_VmId);
             return ExProccesResponse(response);
         }
 
         public Response ShutdownVm(int i_VmId)
         {
-            var response = m_DoClient.DropletActions.Shutdown(i_VmId);
+            var response = this.r_DoClient.DropletActions.Shutdown(i_VmId);
             return ExProccesResponse(response);
         }
 
         public Response DisableBackups(int i_VmId)
         {
-
-            var response = m_DoClient.DropletActions.DisableBackups(i_VmId);
+            var response = this.r_DoClient.DropletActions.DisableBackups(i_VmId);
             return ExProccesResponse(response);
         }
 
         public Response RenameVm(int i_VmId, string i_NewName)
         {
-            var response = m_DoClient.DropletActions.Rename(i_VmId, i_NewName);
+            var response = this.r_DoClient.DropletActions.Rename(i_VmId, i_NewName);
             return ExProccesResponse(response);
         }
 
         public Response EnableIpv6(int i_VmId)
         {
-            var response = m_DoClient.DropletActions.EnableIpv6(i_VmId);
+            var response = this.r_DoClient.DropletActions.EnableIpv6(i_VmId);
             return ExProccesResponse(response);
         }
 
         public Response EnablePrivateNetworking(int i_VmId)
         {
             IVirtualMachine vm = GetVmById(i_VmId);
-            //check first if not off.
             Response response;
             bool vmIsOff = (vm.Status == "off");
             if (!vmIsOff)
@@ -176,14 +171,14 @@ namespace Monitron.DigitalOceanVmManagment
 
             if (vmIsOff)
             {
-                response = ExProccesResponse(m_DoClient.DropletActions.EnablePrivateNetworking(i_VmId));
+                response = ExProccesResponse(this.r_DoClient.DropletActions.EnablePrivateNetworking(i_VmId));
             }
             else
             {
                 response = new Response
                 {
                     Message =
-                                       "Error executing \"EnablePrivateNetworking\" due to a probllem powering off the VM",
+                               "Error executing \"EnablePrivateNetworking\" due to a probllem powering off the VM",
                     Succeded = false
                 };
             }
@@ -194,7 +189,7 @@ namespace Monitron.DigitalOceanVmManagment
         public int GetVmIdByName(string i_VmName, out bool o_Success)
         {
             int result = -1;
-            var droplet = m_DoClient.Droplets.GetAll().Result.Where(i_Item => i_Item.Name == i_VmName);
+            var droplet = this.r_DoClient.Droplets.GetAll().Result.Where(i_Item => i_Item.Name == i_VmName);
             if (droplet.Count() != 0)
             {
                 result = droplet.First().Id;
@@ -225,7 +220,7 @@ namespace Monitron.DigitalOceanVmManagment
 
         public IList<string> GetSupportedImages()
         {
-            var allImages = m_DoClient.Images.GetAll().Result;
+            var allImages = this.r_DoClient.Images.GetAll().Result;
 
             return allImages.Select(image => image.Slug).ToList();
         }
@@ -233,7 +228,7 @@ namespace Monitron.DigitalOceanVmManagment
         public IList<string> GetSupportedSizes()
         {
             List<string> result = new List<string>();
-            var sizes = m_DoClient.Sizes.GetAll().Result;
+            var sizes = this.r_DoClient.Sizes.GetAll().Result;
             foreach (var size in sizes)
             {
                 result.Add(size.Slug);
@@ -249,7 +244,7 @@ namespace Monitron.DigitalOceanVmManagment
 
             if (sizes.Contains(i_NewSize))
             {
-                Task<Action> response = m_DoClient.DropletActions.Resize(i_VmId, "1gb"/*i_NewSize*/);
+                Task<Action> response = this.r_DoClient.DropletActions.Resize(i_VmId, "1gb"/*i_NewSize*/);
                 result = ExProccesResponse(response);
             }
             else
@@ -263,7 +258,7 @@ namespace Monitron.DigitalOceanVmManagment
         public IVirtualMachine GetVmById(int i_VmId)
         {
             DropletWrapper vm = null;
-            var droplet = m_DoClient.Droplets.Get(i_VmId).Result;
+            var droplet = this.r_DoClient.Droplets.Get(i_VmId).Result;
             /*
             var droplets = m_DoClient.Droplets.GetAll().Result.Where(i_Item => i_Item.Id == i_VmId);
             if (droplets.Count() > 0)
