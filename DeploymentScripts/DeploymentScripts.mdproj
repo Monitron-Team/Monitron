@@ -16,7 +16,6 @@
     <None Include="mod_monitron_adhoc.lua" />
     <None Include="boostrap.yml" />
     <None Include="cert_vault.yml" />
-    <None Include="monitron.ddns.net.cfg.lua" />
     <None Include="monitron_inventory" />
     <None Include="passwords_vault.yml" />
     <None Include="prosody.cfg.lua" />
@@ -36,5 +35,9 @@
     <None Include="node-container\build.sh" />
     <None Include="worker_server_playbook.yml" />
     <None Include="node-container\wait_for_config.sh" />
+    <None Include="prosody_site.cfg.lua" />
+    <None Include="monitron_release_extra_vars.yml" />
+    <None Include="prosody_adduser.sh" />
+    <None Include="vagrant_extra_vars.yml" />
   </ItemGroup>
 </Project>

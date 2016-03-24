@@ -119,6 +119,12 @@ namespace S22.Xmpp.Extensions {
         /// for advertising and executing application-specific commands, such as
         /// those related to a configuration workflow.
         /// </summary>
-        AdHocCommands
+        AdHocCommands,
+        /// <summary>
+        /// for a user to store and retrieve an XML representation of his or her
+        /// vCard using the data storage capabilities native to all existing
+        /// Jabber server implementations
+        /// </summary>
+        VCards
 	}
 }

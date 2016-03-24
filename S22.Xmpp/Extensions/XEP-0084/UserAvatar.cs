@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Security.Cryptography;
 using System.Xml;
+using System.Drawing.Drawing2D;
 
 namespace S22.Xmpp.Extensions {
 	/// <summary>
@@ -91,7 +92,9 @@ namespace S22.Xmpp.Extensions {
 		/// unspecified XMPP error occurred.</exception>
 		public void Publish(Stream stream) {
 			stream.ThrowIfNull("stream");
-			using (Image image = Image.FromStream(stream)) {
+			using (Image fullImage = Image.FromStream(stream))
+            using (Image image = ResizeImage(fullImage, 64, 64))
+            {
 				string mimeType = GetMimeType(image);
 				int width = image.Width;
 				int height = image.Height;
@@ -120,6 +123,35 @@ namespace S22.Xmpp.Extensions {
 				);
 			}
 		}
+
+        private Image ResizeImage(Image image, int width, int height)
+        {
+            var destRect = new Rectangle(0, 0, width, height);
+            using (var destImage = new Bitmap(width, height))
+            {
+
+                destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+                using (var graphics = Graphics.FromImage(destImage))
+                {
+                    graphics.CompositingMode = CompositingMode.SourceCopy;
+                    graphics.CompositingQuality = CompositingQuality.HighQuality;
+                    graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    graphics.SmoothingMode = SmoothingMode.HighQuality;
+                    graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                    using (var wrapMode = new ImageAttributes())
+                    {
+                        wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                        graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                    }
+                }
+
+                MemoryStream ms = new MemoryStream();
+                destImage.Save(ms, ImageFormat.Png);
+                return Image.FromStream(ms);
+            }
+        }
 
 		/// <summary>
 		/// Publishes the image located at the specified path as the user's avatar.

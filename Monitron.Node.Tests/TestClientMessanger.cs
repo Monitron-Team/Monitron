@@ -49,6 +49,11 @@ namespace Monitron.Node.Tests
 			throw new NotImplementedException();
 		}
 
+        public void SetNickname(string i_Nickname)
+        {
+            throw new NotImplementedException();
+        }
+
 		public void AddBuddy(Identity i_Identity, params string[] i_Groups)
 		{
 			throw new NotImplementedException();

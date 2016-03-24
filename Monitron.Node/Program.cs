@@ -95,7 +95,7 @@ namespace Monitron.Node
             {
                 try
                 {
-                    sr_Log.Info("Reading configuration");
+                    sr_Log.InfoFormat("Reading configuration from '{0}'", configFilePath);
                     nodeConfig = NodeConfiguration.Load(configFilePath);
                 }
                 catch (InvalidOperationException e)

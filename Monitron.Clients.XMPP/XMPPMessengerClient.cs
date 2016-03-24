@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Net;
 
@@ -10,6 +11,7 @@ using S22.Xmpp.Extensions;
 using S22.Xmpp.Im;
 
 using Monitron.Common;
+using System.Drawing;
 
 namespace Monitron.Clients.XMPP
 {
@@ -128,6 +130,7 @@ namespace Monitron.Clients.XMPP
                     m_Client.RosterUpdated += m_Client_RosterUpdated;
                     m_Client.StatusChanged += m_Client_StatusChanged;
                     m_Client.Error += m_Client_Error;
+                    m_Client.SubscriptionRequest = m_Client_SubscriptionRequest;
                     m_PingTimer = new Timer(delegate
                         {
                             if (IsConnected)
@@ -143,6 +146,12 @@ namespace Monitron.Clients.XMPP
                 });
             t.IsBackground = true;
             t.Start();
+        }
+
+        private bool m_Client_SubscriptionRequest(Jid i_From)
+        {
+            return m_Client.GetRoster().
+                Any(item => item.Jid.GetBareJid().ToString() == i_From.GetBareJid().ToString());
         }
 
         private void m_Client_Error(object i_Sender, S22.Xmpp.Im.ErrorEventArgs i_Args)
@@ -219,6 +228,14 @@ namespace Monitron.Clients.XMPP
             m_Client.SendMessage(new Message(i_Buddy.ToJid(), i_Message));
         }
 
+        public void SetNickname(string i_Nickname)
+        {
+            m_Client.SetNickname(i_Nickname);
+            VCard vCard = m_Client.GetVCard();
+            vCard.Nickname = i_Nickname;
+            m_Client.SetVCard(vCard);
+        }
+
         public void AddBuddy(Identity i_Identity, params string[] i_Groups)
         {
             m_Client.AddContact(jid: i_Identity.ToJid(), groups: i_Groups);
@@ -232,6 +249,9 @@ namespace Monitron.Clients.XMPP
         public void SetAvatar(Stream i_Stream)
         {
             m_Client.SetAvatar(i_Stream);
+            VCard vCard = m_Client.GetVCard();
+            vCard.Photo = Image.FromStream(i_Stream);
+            m_Client.SetVCard(vCard);
         }
 
         public void Dispose()

@@ -118,6 +118,10 @@ namespace S22.Xmpp.Client {
         /// Provides access to the 'Ad-Hoc Commands' XMPP extension.
         /// </summary>
         AdHocCommands adHocCommands;
+        /// <summary>
+        /// Provides access to the 'VCards' XMPP extension.
+        /// </summary>
+        VCards vCards;
 
 		/// <summary>
 		/// The hostname of the XMPP server to connect to.
@@ -945,6 +949,16 @@ namespace S22.Xmpp.Client {
 			userTune.Publish(title, artist, track, length, rating, source, uri);
 		}
 
+        public void SetNickname(string nickname)
+        {
+            pep.Publish(
+                "http://jabber.org/protocol/nick",
+                null,
+                Xml.Element("nick", "http://jabber.org/protocol/nick")
+                .Text(nickname)
+            );
+        }
+
 		/// <summary>
 		/// Publishes the specified music information to contacts on the user's
 		/// roster.
@@ -1411,6 +1425,24 @@ namespace S22.Xmpp.Client {
             return this.adHocCommands.ExecuteCommand(node);
         }
 
+        /// <summary>
+        /// Gets the users saved vCard.
+        /// </summary>
+        /// <returns>A vCard.</returns>
+        public VCard GetVCard()
+        {
+            return this.vCards.Retrieve();
+        }
+
+        /// <summary>
+        /// Sets the users saved vCard.
+        /// </summary>
+        /// <param name="vCard">The updated vCard to upload to the server.</param>
+        public void SetVCard(VCard vCard)
+        {
+            this.vCards.Update(vCard);
+        }
+
 		/// <summary>
 		/// Closes the connection with the XMPP server. This automatically disposes
 		/// of the object.
@@ -1497,6 +1529,7 @@ namespace S22.Xmpp.Client {
 			chatStateNotifications = im.LoadExtension<ChatStateNotifications>();
 			bitsOfBinary = im.LoadExtension<BitsOfBinary>();
             adHocCommands = im.LoadExtension<AdHocCommands>();
+            vCards = im.LoadExtension<VCards>();
 		}
 	}
 }

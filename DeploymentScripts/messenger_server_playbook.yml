@@ -5,7 +5,7 @@
    - passwords_vault.yml
   vars:
    - prosody_conf_path: /etc/prosody/prosody.cfg.lua
-   - monitron_site_conf_path: /etc/prosody/conf.d/monitron.ddns.net.cfg.lua
+   - monitron_site_conf_path: "/etc/prosody/conf.d/{{domain_name}}.cfg.lua"
    - pki_path: /etc/pki/prosody/
    - prosody_module_path: /usr/lib64/prosody/modules/
   tasks:
@@ -16,19 +16,19 @@
       - Start Prosody
 
    - name: Upload Prosody server configuration
-     copy: src=prosody.cfg.lua dest={{prosody_conf_path}} mode=640 owner=root group=prosody
+     template: src=prosody.cfg.lua dest={{prosody_conf_path}} mode=640 owner=root group=prosody
      notify:
       - Restart Prosody
 
    - name: Upload Monitron site configuration
-     copy: src=monitron.ddns.net.cfg.lua dest={{monitron_site_conf_path}} mode=640 owner=root group=prosody
+     template: src=prosody_site.cfg.lua dest={{monitron_site_conf_path}} mode=640 owner=root group=prosody
      notify:
       - Restart Prosody
 
    - name: Upload Monitron site cert (crt)
      copy:
       content: "{{ monitron_cert_crt }}"
-      dest: "{{pki_path}}/monitron.ddns.net.crt"
+      dest: "{{pki_path}}/{{domain_name}}.crt"
       mode: 0644
       owner: root
       group: root
@@ -38,7 +38,7 @@
    - name: Upload Monitron site cert (key)
      copy:
       content: "{{ monitron_cert_key }}"
-      dest: "{{pki_path}}/monitron.ddns.net.key"
+      dest: "{{pki_path}}/{{domain_name}}.key"
       mode: 0640
       owner: root
       group: prosody
@@ -48,7 +48,7 @@
    - name: Upload Monitron site cert (cnf)
      copy:
       content: "{{ monitron_cert_cnf }}"
-      dest: "{{pki_path}}/monitron.ddns.net.cnf"
+      dest: "{{pki_path}}/{{domain_name}}.cnf"
       mode: 0640
       owner: root
       group: prosody
@@ -61,10 +61,13 @@
       - Restart Prosody
 
    - name: Create Monitron admin
-     raw: prosodyctl deluser monitron_admin@monitron.ddns.net; echo -e {{monitron_admin_password}}\\n{{monitron_admin_password}} | prosodyctl adduser monitron_admin@monitron.ddns.net
+     script: "./prosody_adduser.sh 'monitron_admin@{{domain_name}}' '{{monitron_admin_password}}'"
 
    - name: Create Server admin
-     raw: prosodyctl deluser admin@monitron.ddns.net; echo -e {{admin_password}}\\n{{admin_password}} | prosodyctl adduser admin@monitron.ddns.net
+     script: "./prosody_adduser.sh 'admin@{{domain_name}}' '{{admin_password}}'"
+
+   - name: Create Management user
+     script: "./prosody_adduser.sh 'themanagement@{{domain_name}}' '{{monitron_management_password}}'"
 
   handlers:
    - name: Enable Prosody

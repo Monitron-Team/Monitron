@@ -56,6 +56,13 @@ namespace Monitron.Clients.Mock
             }
         }
 
+        public string Nickname { get; set; }
+
+        public void SetNickname(string i_Nickname)
+        {
+            Nickname = i_Nickname;
+        }
+
         public MockMessengerClient(Identity i_Identity)
         {
             Account account = new Account(

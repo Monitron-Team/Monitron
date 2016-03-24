@@ -35,7 +35,6 @@ namespace Monitron.ImRpc
 
         public void r_MessengerClient_MessageArrived(object i_Sender, MessageArrivedEventArgs i_EventArgs)
         {
-            
             string[] arguments = parseCommand(i_EventArgs.Message);
             if (arguments.Length == 0)
             {

@@ -20,7 +20,7 @@
 -- for the server. Note that you must create the accounts separately
 -- (see http://prosody.im/doc/creating_accounts for info)
 -- Example: admins = { "user1@example.com", "user2@example.net" }
-admins = { "saggi@monitron.ddns.net", "admin@monitron.ddns.net" }
+admins = { "admin@{{domain_name}}" }
 
 -- Enable use of libevent for better performance under high load
 -- For more information see: http://prosody.im/doc/libevent
@@ -86,10 +86,13 @@ allow_registration = false;
 
 -- These are the SSL/TLS-related settings. If you don't want
 -- to use SSL/TLS, you may comment or remove this
+-- {% if prosody_ssl %}
+
 ssl = {
 	key = "/etc/pki/prosody/localhost.key";
 	certificate = "/etc/pki/prosody/localhost.crt";
 }
+-- {% endif %}
 
 -- Force clients to use encrypted connections? This option will
 -- prevent clients from authenticating unless they are using encryption.

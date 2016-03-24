@@ -24,8 +24,9 @@ namespace Monitron.Common
 
         void RemoveBuddy(Identity i_Identity);
 
-        void SetAvatar(Stream i_stream);
+        void SetAvatar(Stream i_Stream);
 
+        void SetNickname(string i_Nickname);
     }
 }
 

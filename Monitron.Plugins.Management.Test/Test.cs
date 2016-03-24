@@ -19,7 +19,7 @@ namespace Monitron.Plugins.Management.Test
             string expectedText = "123";
             Identity friend = new Identity { UserName = "friend", Domain = "test.com" };
             MockMessengerClient client = new MockMessengerClient(new Identity());
-            new ManagementPlugin(client);
+            new ManagementPlugin(client, null);
             client.PushMessage(friend, "echo " + expectedText);
             Assert.AreEqual(client.SentMessageQueue.Dequeue().Item2, expectedText);
         }

@@ -27,7 +27,7 @@ namespace Monitron.Plugins.Management
 
         private readonly RpcAdapter r_Adapter;
 
-        public ManagementPlugin(IMessengerClient i_MessangerClient)
+        public ManagementPlugin(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
         {
             i_MessangerClient.ConnectionStateChanged += r_Client_ConnectionStateChanged;
             sr_Log.Info("Management Plugin starting");
@@ -41,8 +41,15 @@ namespace Monitron.Plugins.Management
         {
             if (r_Client.IsConnected)
             {
+                sr_Log.Debug("Setting up nickname");
+                r_Client.SetNickname("The Management");
                 sr_Log.Debug("Setting up avatar");
                 r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.Management.MonitronAvatar.png"));
+                r_Client.AddBuddy(
+                    new Identity { Domain = this.r_Client.Identity.Domain, UserName = "admin" },
+                    "admin"
+                );
+
                 sr_Log.Debug("Notifying masters I'm up");
                 foreach (var buddy in r_Client.Buddies.Where(item => item.Groups.Contains("admin")))
                 {

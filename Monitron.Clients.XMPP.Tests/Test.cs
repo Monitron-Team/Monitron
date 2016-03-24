@@ -12,12 +12,26 @@ using Monitron.Common;
 using Monitron.Clients.XMPP;
 using Monitron.Management.AdminClient;
 using S22.Xmpp;
+using System.IO;
 
 namespace Monitron.Clients.XMPP.Tests
 {
     [TestFixture()]
     public class Test
     {
+        private static readonly byte[] sr_TinyPng = new byte[] {
+            0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+            0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+            0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+            0x01, 0x00, 0x00, 0x00, 0x00, 0x37, 0x6e, 0xf9,
+            0x24, 0x00, 0x00, 0x00, 0x10, 0x49, 0x44, 0x41,
+            0x54, 0x78, 0x9c, 0x62, 0x60, 0x01, 0x00, 0x00,
+            0x00, 0xff, 0xff, 0x03, 0x00, 0x00, 0x06, 0x00,
+            0x05, 0x57, 0xbf, 0xab, 0xd4, 0x00, 0x00, 0x00,
+            0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60,
+            0x82
+        };
+        
         private readonly List<Account> r_testAccounts = new List<Account>();
         
         private AdminClient getAdminClient()
@@ -67,9 +81,13 @@ namespace Monitron.Clients.XMPP.Tests
 
         private XMPPMessengerClient getTestClient()
         {
-            return new XMPPMessengerClient(
+            AutoResetEvent ev = new AutoResetEvent(false);
+            XMPPMessengerClient client = new XMPPMessengerClient(
                 createTestAccount()
             );
+            client.ConnectionStateChanged += (object sender, ConnectionStateChangedEventArgs e) => ev.Set();
+            ev.WaitOne();
+            return client;
         }
 
         [Test()]
@@ -121,6 +139,24 @@ namespace Monitron.Clients.XMPP.Tests
             }
             Assert.AreEqual(1, client1.Buddies.Count());
             Assert.AreEqual(account2.Identity, client1.Buddies.First().Identity);
+        }
+
+        [Test()]
+        public void SetNicknameTest()
+        {
+            XMPPMessengerClient client1 = getTestClient();
+            client1.SetNickname("Nick Name");
+            client1.SetNickname("Nick Name");
+        }
+
+        [Test()]
+        public void SetPhoto()
+        {
+            XMPPMessengerClient client1 = getTestClient();
+            using(MemoryStream ms = new MemoryStream(sr_TinyPng))
+            {
+                client1.SetAvatar(ms);
+            }
         }
 
         private void clearBuddyList(IMessengerClient i_Client)
