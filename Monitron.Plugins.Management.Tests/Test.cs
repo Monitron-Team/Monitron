@@ -8,7 +8,7 @@ using Monitron.Clients.Mock;
 using Monitron.Common;
 using DigitalOcean.API.Models.Requests;
 
-namespace Monitron.Plugins.Management.Test
+namespace Monitron.Plugins.Management.Tests
 {
     [TestFixture()]
     public class Test

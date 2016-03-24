@@ -1,4 +1,4 @@
-﻿namespace Monitron.VmManagment
+﻿namespace Monitron.CloudManagers
 {
     public class Response
     {

@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{618E4E14-B9D3-4796-8C9A-3A9FC1BE1914}</ProjectGuid>
+    <ProjectGuid>{66706170-1B2D-42D7-ADF9-62C913FD855E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Monitron.VmManagment</RootNamespace>
-    <AssemblyName>Monitron.VmManagment</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>Monitron.CloudManagers.DigitalOcean.Tests</RootNamespace>
+    <AssemblyName>Monitron.CloudManagers.DigitalOcean.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -30,22 +30,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ip.cs" />
-    <Compile Include="IVirtualMachine.cs" />
-    <Compile Include="IVmManager.cs" />
+    <Compile Include="DigitalOceanTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Response.cs" />
-    <Compile Include="VmCreationParams.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -55,4 +48,19 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="app.config" />
+    <None Include="app.config.example" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Monitron.CloudManagers.DigitalOcean\Monitron.CloudManagers.DigitalOcean.csproj">
+      <Project>{334282CE-688C-433C-8434-E23123B1CC5E}</Project>
+      <Name>Monitron.CloudManagers.DigitalOcean</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.CloudManagers\Monitron.CloudManagers.csproj">
+      <Project>{618E4E14-B9D3-4796-8C9A-3A9FC1BE1914}</Project>
+      <Name>Monitron.CloudManagers</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

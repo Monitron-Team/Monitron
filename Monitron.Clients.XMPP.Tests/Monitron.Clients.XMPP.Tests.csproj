@@ -6,7 +6,7 @@
     <ProjectGuid>{5CEAEA81-01F3-4DA9-81C3-150AFF2F93DD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Monitron.Clients.XMPP.Tests</RootNamespace>
-    <AssemblyName>Monitron.XMPPMessengerClientTests</AssemblyName>
+    <AssemblyName>Monitron.Clients.XMPP.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

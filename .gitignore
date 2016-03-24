@@ -41,4 +41,5 @@ Thumbs.db
 
 #other
 Monitron.Clients.XMPP.Tests/app.config
+Monitron.CloudManagers.DigitalOcean.Tests/app.config
 *.swp

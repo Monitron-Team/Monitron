@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 
-namespace Monitron.VmManagment
+namespace Monitron.CloudManagers
 {
     public interface IVirtualMachine
     {
@@ -12,10 +13,8 @@ namespace Monitron.VmManagment
         int KernelId { get; }
         string KernelName { get; }
         string KernelVersion { get; }
-        IList<Ip> IpV4 { get; }
-        IList<Ip> IpV6 { get; }
+        IList<IPAddress> IpV4 { get; }
+        IList<IPAddress> IpV6 { get; }
         bool Ipv6Enabled { get; }
-        bool PrivateNetworkingEnabled { get; }
-
     }
 }

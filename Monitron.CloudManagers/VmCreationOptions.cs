@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
 
-namespace Monitron.VmManagment
+namespace Monitron.CloudManagers
 {
-    public class VmCreationParams
+    public class VmCreationOptions
     {
-        public bool BackupsEnabled { get; set; }
         public object ImageIdOrSlug { get; set; }
         public bool Ipv6Enabled { get; set; }
         public string Name { get; set; }
-        public bool PrivateNetworkingEnabled { get; set; }
-        public string RegionSlug { get; set; }
+        public string Region { get; set; }
         public string SizeSlug { get; set; }
     }
 }

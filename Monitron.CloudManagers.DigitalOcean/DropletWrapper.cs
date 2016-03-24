@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
-using Monitron.VmManagment;
+using Monitron.CloudManagers;
 using DigitalOcean.API.Models.Responses;
+using System.Net;
+using System.Net.NetworkInformation;
 
-namespace Monitron.DigitalOceanVmManagment
+namespace Monitron.CloudManagers.DigitalOcean
 {
     class DropletWrapper : IVirtualMachine
     {
@@ -18,8 +20,7 @@ namespace Monitron.DigitalOceanVmManagment
         public string KernelVersion => this.m_VM.Kernel.Version;
 
         public bool Ipv6Enabled => this.m_VM.Features.Contains("ipv6");
-        public bool PrivateNetworkingEnabled => this.m_VM.Features.Contains("private_networking");
-        public IList<Ip> IpV4
+        public IList<IPAddress> IpV4
         {
             get
             {
@@ -27,7 +28,7 @@ namespace Monitron.DigitalOceanVmManagment
             }
         }
 
-        public IList<Ip> IpV6
+        public IList<IPAddress> IpV6
         {
             get
             {
@@ -40,16 +41,12 @@ namespace Monitron.DigitalOceanVmManagment
             m_VM = i_Vm;
         }
 
-        private List<Ip> GetAllIps(List<Interface> i_Ips)
+        private List<IPAddress> GetAllIps(List<Interface> i_Ips)
         {
-            var result = new List<Ip>();
+            var result = new List<IPAddress>();
             foreach (Interface inter in i_Ips)
             {
-                Ip ip = new Ip();
-                ip.IpAddress = inter.IpAddress;
-                ip.Gateway = inter.Gateway;
-                ip.Netmask = inter.Netmask;
-                ip.IsPrivate = (inter.Type == "private");
+                IPAddress ip = IPAddress.Parse(inter.IpAddress);
                 result.Add(ip);
             }
 

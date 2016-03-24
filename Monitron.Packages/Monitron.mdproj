@@ -6,7 +6,7 @@
     <Packages>
       <Packages>
         <Package name="Monitron Management Linux Binaries (Release)">
-          <Builder targetFile="..\DeploymentScripts\MonitronManagement.tar.gz" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
+          <Builder targetFile="..\Monitron.tar.gz" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
             <ChildEntries>
               <SolutionItemReference path="..\Monitron.Plugins.Management\Monitron.Plugins.Management.csproj" />
               <SolutionItemReference path="..\Monitron.ImRpc\Monitron.ImRpc.csproj" />
