@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{69D618EA-F927-4A8F-B44F-53F6DA6F1890}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SimpleDebug.Management</RootNamespace>
+    <AssemblyName>SimpleDebug.Management</AssemblyName>
+    <StartupObject>SimpleDebug.Management.MainClass</StartupObject>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <Optimize>false</Optimize>
+    <OutputPath>bin\x86\Debug</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG;</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\x86\Release</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Monitron.Node\Monitron.Node.csproj">
+      <Project>{E02F1A0F-AF66-47B8-BD17-498540CC17C5}</Project>
+      <Name>Monitron.Node</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.PluginDataStore.Local\Monitron.PluginDataStore.Local.csproj">
+      <Project>{4140B458-B63E-4D0E-AC79-462B99BAE930}</Project>
+      <Name>Monitron.PluginDataStore.Local</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.Clients.XMPP\Monitron.Clients.XMPP.csproj">
+      <Project>{9531CE9C-0770-47E0-985A-B35701D096B9}</Project>
+      <Name>Monitron.Clients.XMPP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.Plugins.Management\Monitron.Plugins.Management.csproj">
+      <Project>{58199704-1F8F-4268-82CA-456AEE7D010F}</Project>
+      <Name>Monitron.Plugins.Management</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NodeConf.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="DataStore.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>

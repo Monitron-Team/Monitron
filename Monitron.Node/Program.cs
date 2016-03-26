@@ -8,6 +8,7 @@ using log4net;
 using log4net.Layout;
 using log4net.Appender;
 using log4net.Core;
+using System.Reflection;
 
 namespace Monitron.Node
 {
@@ -27,7 +28,7 @@ namespace Monitron.Node
 			i_Options.WriteOptionDescriptions(Console.Out);
 		}
 
-        private static void setUpLogging()
+        public static void setUpLogging()
         {
             Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository();
 
@@ -87,7 +88,7 @@ namespace Monitron.Node
             runNode(configFilePath);
 		}
 
-        static void runNode(string configFilePath)
+        public static void runNode(string configFilePath)
         {
             Node node;
             NodeConfiguration nodeConfig;
@@ -100,7 +101,7 @@ namespace Monitron.Node
                 }
                 catch (InvalidOperationException e)
                 {
-                    sr_Log.ErrorFormat("Could not load node configuration: {0}", e.Message);
+                    sr_Log.ErrorFormat("Could not load node configuration: {0}", e);
                     return;
                 }
 
@@ -108,7 +109,12 @@ namespace Monitron.Node
                 {
                     node = new Node(nodeConfig);
                 }
-				catch (Exception e)
+                catch (TargetInvocationException e)
+                {
+                    sr_Log.Error("Could not start node", e);
+                    return;
+                }
+                catch (Exception e)
                 {
                     //couldn't create node due to failing in loading the plugin
                     sr_Log.ErrorFormat("Could not start node: {0}", e.Message);

@@ -13,7 +13,7 @@ namespace Monitron.Plugins.Management.Tests
     [TestFixture()]
     public class Test
     {
-        [Test()]
+        //[Test()]
         public void TestEcho()
         {
             string expectedText = "123";

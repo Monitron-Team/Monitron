@@ -31,7 +31,7 @@
           </Builder>
         </Package>
         <Package name="Katy Perry Plugin Linux Binaries (Release)">
-          <Builder targetFile="..\DeploymentScripts\node-container\Monitron.Plugins.KatyPerry.tar.gz" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
+          <Builder targetFile="..\DeploymentScripts\node-container\Monitron.Plugins.KatyPerry.zip" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
             <RootEntry path="..\Monitron.Plugins.KatyPerry\Monitron.Plugins.KatyPerry.csproj" />
           </Builder>
         </Package>

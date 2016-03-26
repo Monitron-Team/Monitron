@@ -49,7 +49,7 @@ namespace Monitron.Plugins.KatyPerry
         }
 
         [RemoteCommand(MethodName="sing")]
-        public string Sing()
+        public string Sing(Identity i_Buddy)
         {
             return @"You think I'm pretty without any make-up on
 You think I'm funny when I tell the punch line wrong

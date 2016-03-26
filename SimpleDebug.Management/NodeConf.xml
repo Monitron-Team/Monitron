@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<NodeConfiguration>
+	<Account>
+		<Username>themanagement</Username>
+		<Domain>monitron-boss</Domain>
+		<Password>NoRestForTheWicked</Password>
+	</Account>
+	<MessangerClient>
+		<DllPath>.</DllPath>
+		<DllName>Monitron.Clients.XMPP.dll</DllName>
+		<Type>Monitron.Clients.XMPP.XMPPMessengerClient</Type>
+	</MessangerClient>
+	<Plugin>
+	 	<DllPath>.</DllPath>
+		<DllName>Monitron.Plugins.Management.dll</DllName>
+		<Type>Monitron.Plugins.Management.ManagementPlugin</Type>
+	</Plugin>
+	<DataStore>
+	 	<DllPath>.</DllPath>
+		<DllName>Monitron.PluginDataStore.Local.dll</DllName>
+		<Type>Monitron.PluginDataStore.Local.LocalPluginDataStore</Type>
+		<Location>DataStore.json</Location>
+	</DataStore>
+ </NodeConfiguration>

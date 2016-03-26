@@ -33,6 +33,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteCommandAttribute.cs" />
     <Compile Include="RpcAdapter.cs" />
+    <Compile Include="OptAttribute.cs" />
+    <Compile Include="RpcMethod.cs" />
+    <Compile Include="StringExtenstion.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
@@ -50,5 +53,11 @@
   -->
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="Mono.Options">
+      <HintPath>..\packages\Mono.Options.4.2.2.0\lib\net4\Mono.Options.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

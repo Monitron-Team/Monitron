@@ -1,0 +1,6 @@
+﻿{
+	"mongo_server": "\"monitron-boss\"",
+	"mongo_database": "\"monitron\"",
+	"mongo_password": "\"HellIsForHeroes@!\"",
+	"mongo_user": "\"monitron_mgmt\""
+}

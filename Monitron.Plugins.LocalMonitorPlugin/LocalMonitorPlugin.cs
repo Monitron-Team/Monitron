@@ -82,7 +82,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 		}
 
 		[RemoteCommand(MethodName="get_memory_status")]
-		public string GetMemoryStatus()
+        public string GetMemoryStatus(Identity i_Buddy)
 		{
 			sr_Log.Info("Getting Memory Status"); 
 			string memoryStatus = new MemoryStatus().ToString();
@@ -92,7 +92,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 		}
 
 		[RemoteCommand(MethodName="get_process_status")]
-		public string GetProcessStatus(string i_ProcessName)
+        public string GetProcessStatus(Identity i_Buddy, string i_ProcessName)
 		{
 			string allProccesses = String.Empty;
 			int index = 1;
@@ -114,7 +114,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 		}
 
 		[RemoteCommand(MethodName="monitor_process_start")]
-		public string MonitorProcessStart(int i_ProcessPID)
+        public string MonitorProcessStart(Identity i_Buddy, int i_ProcessPID)
 		{
 			string message = String.Format("Started monitoring process PID {0}", i_ProcessPID.ToString());
 			bool succeeded = m_ProcessMonitor.StartMonitoring(i_ProcessPID);
@@ -128,7 +128,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 		}
 
 		[RemoteCommand(MethodName="monitor_process_stop")]
-		public string MonitorProcessStop(int i_ProcessPID)
+        public string MonitorProcessStop(Identity i_Buddy, int i_ProcessPID)
 		{
 			string message = String.Format("process PID {0} was suspended successfully", i_ProcessPID.ToString());
 			bool succeeded = m_ProcessMonitor.SuspendMonitoringByPID(i_ProcessPID);
@@ -142,7 +142,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 		}
 
 		[RemoteCommand(MethodName="add_policy")]
-		public string MonitorProcessAddPolicy(int i_ProcessPID, string i_PolicyType, int i_Size)
+        public string MonitorProcessAddPolicy(Identity i_Buddy, int i_ProcessPID, string i_PolicyType, int i_Size)
 		{
 			string message = String.Empty;
 
@@ -162,7 +162,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 		}
 
 		[RemoteCommand(MethodName="list_monitored_processes")]
-		public string GetListMonitoringProcesses()
+        public string GetListMonitoringProcesses(Identity i_Buddy)
 		{
 			sr_Log.Debug("Getting list of all monitoring proccesses");
 			string allMonitoringProcessesString = String.Empty;

@@ -59,7 +59,10 @@ namespace Monitron.Node.Tests
 			nodeTestConfig.MessageClient.DllPath = "MessageClientPath";
 			nodeTestConfig.MessageClient.DllName = "MessageClientTest";
 			nodeTestConfig.MessageClient.Type = "MessageClientType";
-			nodeTestConfig.DataStore = new LocalPluginDataStore("TestLocalDataStore.json");
+            nodeTestConfig.DataStore.DllPath = "DataStorePath";
+            nodeTestConfig.DataStore.DllName = "DataStoreName";
+            nodeTestConfig.DataStore.Type = "DataStoreType";
+            nodeTestConfig.DataStore.Location = "DataStoreLocation";
             nodeTestConfig.Save(stream);
             //Deserialize
             stream.SetLength(stream.Position);
@@ -74,7 +77,10 @@ namespace Monitron.Node.Tests
 			Assert.AreEqual("MessageClientPath", nodeLoadFromConfig.MessageClient.DllPath);
 			Assert.AreEqual("MessageClientTest", nodeLoadFromConfig.MessageClient.DllName);
 			Assert.AreEqual("MessageClientType", nodeLoadFromConfig.MessageClient.Type);
-			Assert.AreEqual(typeof(LocalPluginDataStore).ToString(), "Monitron.PluginDataStore.Local.LocalPluginDataStore");
+            Assert.AreEqual("DataStorePath", nodeLoadFromConfig.DataStore.DllPath);
+            Assert.AreEqual("DataStoreName", nodeLoadFromConfig.DataStore.DllName);
+            Assert.AreEqual("DataStoreType", nodeLoadFromConfig.DataStore.Type);
+            Assert.AreEqual("DataStoreLocation", nodeLoadFromConfig.DataStore.Location);
 		}
 
 		[Test()]

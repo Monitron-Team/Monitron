@@ -7,6 +7,7 @@ using Monitron.Common;
 using Monitron.Clients.Mock;
 using Monitron.Plugins.LocalMonitorPlugin;
 using Monitron.PluginDataStore.Local;
+using System.IO;
 
 namespace Monitron.Plugins.LocalMonitorPlugin.Tests
 {

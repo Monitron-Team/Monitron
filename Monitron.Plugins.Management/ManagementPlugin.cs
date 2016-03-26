@@ -4,9 +4,12 @@ using System.Reflection;
 
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using ICSharpCode.SharpZipLib.Zip;
 
 using Monitron.Common;
 using Monitron.ImRpc;
+using System.IO;
+using System.Xml.Serialization;
 
 namespace Monitron.Plugins.Management
 {
@@ -16,6 +19,10 @@ namespace Monitron.Plugins.Management
             (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
         private readonly IMessengerClient r_Client;
+
+        private readonly IPluginDataStore r_DataStore;
+
+        private readonly StoredPluginsManager r_PluginsManager;
         
         public IMessengerClient MessangerClient
         {
@@ -32,9 +39,31 @@ namespace Monitron.Plugins.Management
             i_MessangerClient.ConnectionStateChanged += r_Client_ConnectionStateChanged;
             sr_Log.Info("Management Plugin starting");
             r_Client = i_MessangerClient;
+            r_DataStore = i_DataStore;
             sr_Log.Debug("Setting up RPC");
             r_Adapter = new RpcAdapter(this, r_Client);
             r_Client_ConnectionStateChanged(this, null);
+            r_PluginsManager = loadPluginManager();
+        }
+
+        private StoredPluginsManager loadPluginManager()
+        {
+            return new StoredPluginsManager(
+                new MongoClientSettings
+                {
+                    Server = MongoServerAddress.Parse(r_DataStore.Read<string>("mongo_server")),
+                    Credentials = new MongoCredential[] {
+                        MongoCredential.CreateCredential(
+                            r_DataStore.Read<string>("mongo_database"),
+                            r_DataStore.Read<string>("mongo_user"),
+                            r_DataStore.Read<string>("mongo_password")
+                        )
+                    },
+
+                        
+                },
+                r_DataStore.Read<string>("mongo_database")
+            );
         }
 
         void r_Client_ConnectionStateChanged (object sender, ConnectionStateChangedEventArgs e)
@@ -58,8 +87,43 @@ namespace Monitron.Plugins.Management
             }
         }
 
+        [RemoteCommand(MethodName="upload_plugin")]
+        public string UploadPlugin(
+            Identity buddy,
+            [Opt("path", "p|path=", "{PATH} for the plugin zip")] string i_Path)
+        {
+            r_PluginsManager.UploadPluginAsync(i_Path)
+                .ContinueWith((task) =>
+                {
+                        if (task.IsFaulted)
+                        {
+                            r_Client.SendMessage(buddy, "Error uploading plugin: " + task.Exception.Message);
+                        }
+                        else
+                        {
+                            r_Client.SendMessage(buddy, string.Format("Plugin '{0}' uploaded successfully", task.Result.Name));
+                        }
+                }
+                );
+            return "Uploading...";
+        }
+
+        [RemoteCommand(MethodName="list_plugins")]
+        public string ListPlugins()
+        {
+            string result = "";
+            foreach (PluginManifest manifest in r_PluginsManager.ListPlugins())
+            {
+                result += string.Format("{0} [{1}:{2}]\n", manifest.Name, manifest.Id, manifest.Version);
+            }
+
+            return result;
+        }
+
         [RemoteCommand(MethodName="echo")]
-        public string Echo(string i_Text)
+        public string Echo(
+            Identity buddy,
+            [Opt("text", "t|text=", "{TEXT} to echo back")] string i_Text)
         {
             return i_Text;
         }
