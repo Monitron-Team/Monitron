@@ -64,6 +64,7 @@
     <Compile Include="ManagementPlugin.cs" />
     <Compile Include="PluginManifest.cs" />
     <Compile Include="StoredPluginsManager.cs" />
+    <Compile Include="UserAccountsManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -74,6 +75,18 @@
     <ProjectReference Include="..\Monitron.ImRpc\Monitron.ImRpc.csproj">
       <Project>{50D209C8-C9F4-4690-8D3C-558B592EC80B}</Project>
       <Name>Monitron.ImRpc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.Management.AdminClient\Monitron.Management.AdminClient.csproj">
+      <Project>{922C026D-E653-477E-9F99-F150F6FD4C60}</Project>
+      <Name>Monitron.Management.AdminClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.Clients.XMPP\Monitron.Clients.XMPP.csproj">
+      <Project>{9531CE9C-0770-47E0-985A-B35701D096B9}</Project>
+      <Name>Monitron.Clients.XMPP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\S22.Xmpp\S22.Xmpp.csproj">
+      <Project>{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}</Project>
+      <Name>S22.Xmpp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
