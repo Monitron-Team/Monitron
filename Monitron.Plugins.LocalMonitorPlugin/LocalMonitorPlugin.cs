@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -12,14 +13,6 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 	{
 		private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
 			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-		private List<string> m_AvailableCommandsList = new List<string>(new string[] 
-			{ "get_memory_status",
-				"get_process_status <ProcessName>",
-				"monitor_process_start <ProcessPID>",
-				"monitor_process_stop <ProcessPID>",
-				"add_policy <ProcessPID> <PolicyType> <ConstraintValue>"
-				 });
 
 		private readonly IMessengerClient r_Client;
 
@@ -43,8 +36,8 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 			sr_Log.Debug("Setting up rpc");
 			r_Adapter = new RpcAdapter(this, r_Client);
 			sr_Log.Debug("Setting up Process Monitor");
-			int timeInterval = m_DataStore.Read<int>("TimeInterval");
-			m_ProcessMonitor = new ProcessMonitor(timeInterval);
+			int timeIntervalPolicyCheck = m_DataStore.Read<int>("TimeIntervalPolicyCheck");
+			m_ProcessMonitor = new ProcessMonitor(timeIntervalPolicyCheck);
 			m_ProcessMonitor.PolicyViolated += m_ProcessMonitor_PolicyViolated;
 			r_Client.ConnectionStateChanged += r_Client_ConnectionStateChanged;
 		}
@@ -52,13 +45,18 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 		private void r_Client_ConnectionStateChanged (object sender, ConnectionStateChangedEventArgs e)
 		{
 			sr_Log.Debug("Notifying buddies that I am running");
-			string availableCommands = getAvailableCommands();
 
 			if(e.IsConnected) 
 			{
+				sr_Log.Debug("Setting up nickname");
+				string nickname = "Local_" + r_Client.Identity.UserName;
+				r_Client.SetNickname("Local_" + r_Client.Identity.UserName);
+				sr_Log.Debug("Setting up avatar");
+				r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.LocalMonitorPlugin.LocalAvatar.png"));
+
 				foreach(var buddy in r_Client.Buddies) 
 				{
-					string welcomeMessange = "\nI am running. Waiting for your commands: \n" + availableCommands;
+					string welcomeMessange = "\nI am running. Waiting for your commands:";
 					r_Client.SendMessage(buddy.Identity, welcomeMessange);
 				}
 			}
@@ -74,11 +72,6 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 			{
 				r_Client.SendMessage(buddy.Identity, message);
 			}
-		}
-
-		private string getAvailableCommands()
-		{
-			return string.Join(",\n", m_AvailableCommandsList.ToArray());
 		}
 
 		[RemoteCommand(MethodName="get_memory_status")]

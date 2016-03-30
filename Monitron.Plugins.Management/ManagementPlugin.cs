@@ -8,6 +8,7 @@ using ICSharpCode.SharpZipLib.Zip;
 
 using Monitron.Common;
 using Monitron.ImRpc;
+using Monitron.Management.AdminClient;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -23,6 +24,10 @@ namespace Monitron.Plugins.Management
         private readonly IPluginDataStore r_DataStore;
 
         private readonly StoredPluginsManager r_PluginsManager;
+
+		private readonly IMongoDatabase m_MongoDB;
+
+		private UserAccountsManager m_UserManager;
         
         public IMessengerClient MessangerClient
         {
@@ -42,29 +47,31 @@ namespace Monitron.Plugins.Management
             r_DataStore = i_DataStore;
             sr_Log.Debug("Setting up RPC");
             r_Adapter = new RpcAdapter(this, r_Client);
+			sr_Log.Debug("Setting up Mongo DB");
+			m_MongoDB = createMongoDatabase();
+			sr_Log.Debug("Setting up User Manager");
+			m_UserManager = new UserAccountsManager(m_MongoDB);
             r_Client_ConnectionStateChanged(this, null);
-            r_PluginsManager = loadPluginManager();
+			sr_Log.Debug("Setting up Stored Plugin Manager");
+			r_PluginsManager = new StoredPluginsManager(m_MongoDB);
         }
 
-        private StoredPluginsManager loadPluginManager()
-        {
-            return new StoredPluginsManager(
-                new MongoClientSettings
-                {
-                    Server = MongoServerAddress.Parse(r_DataStore.Read<string>("mongo_server")),
-                    Credentials = new MongoCredential[] {
-                        MongoCredential.CreateCredential(
-                            r_DataStore.Read<string>("mongo_database"),
-                            r_DataStore.Read<string>("mongo_user"),
-                            r_DataStore.Read<string>("mongo_password")
-                        )
-                    },
-
-                        
-                },
-                r_DataStore.Read<string>("mongo_database")
-            );
-        }
+		private IMongoDatabase createMongoDatabase()
+		{
+			return new MongoClient(
+				new MongoClientSettings
+				{
+					Server = MongoServerAddress.Parse(r_DataStore.Read<string>("mongo_server")),
+					Credentials = new MongoCredential[] {
+						MongoCredential.CreateCredential(
+							r_DataStore.Read<string>("mongo_database"),
+							r_DataStore.Read<string>("mongo_user"),
+							r_DataStore.Read<string>("mongo_password")
+						)
+					},
+				}
+			).GetDatabase(r_DataStore.Read<string>("mongo_database"));
+		}
 
         void r_Client_ConnectionStateChanged (object sender, ConnectionStateChangedEventArgs e)
         {
@@ -127,6 +134,44 @@ namespace Monitron.Plugins.Management
         {
             return i_Text;
         }
+
+		[RemoteCommand(MethodName="add_user")]
+		public string AddUser(Identity identity, string i_User)
+		{
+			string rtnString = "Could not add user " + i_User;
+			Identity newIdentity = new Identity();
+			newIdentity.UserName = i_User;
+			newIdentity.Domain = r_Client.Identity.Domain;
+
+			bool succeeded = m_UserManager.AddUser(newIdentity, r_Client.Identity);
+
+			if(succeeded)
+			{
+				r_Client.AddBuddy(newIdentity, new string[] { "Customers" });
+				rtnString = string.Format("Added user {0} successfully", i_User);
+			}
+
+			return rtnString;
+		}
+
+		[RemoteCommand(MethodName="delete_user")]
+		public string DeleteUser(Identity identity, string i_User)
+		{
+			string rtnString = "Could not delete user " + i_User;
+			Identity identityToDelete = new Identity();
+			identityToDelete.UserName = i_User;
+			identityToDelete.Domain = r_Client.Identity.Domain;
+
+			bool succeeded = m_UserManager.DeleteUser(identityToDelete);
+
+			if(succeeded)
+			{
+				r_Client.RemoveBuddy(identityToDelete);
+				rtnString = string.Format("Deleted user {0} successfully", i_User);
+			}
+
+			return rtnString;
+		}
     }
 }
 
