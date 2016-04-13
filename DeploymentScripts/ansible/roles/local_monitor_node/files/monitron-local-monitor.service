@@ -1,0 +1,16 @@
+[Unit]
+Description=Monitron Local Monitor Service
+
+[Service]
+ExecStart=/usr/bin/mono /opt/MonitronLocalMonitor/Monitron.Node.exe --conf /etc/monitron/localmonitor.conf
+WorkingDirectory=/opt/MonitronLocalMonitor/
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=monitron-local-monitor
+User=monitron
+Group=monitron
+
+[Install]
+WantedBy=multi-user.target
+

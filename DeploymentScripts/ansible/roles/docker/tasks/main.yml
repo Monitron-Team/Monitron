@@ -1,10 +1,10 @@
-- name: Install Docker
+- name: install Docker
   dnf: name=docker state=latest
   notify:
-   - Enable Docker Service
-   - Start Docker Service
+   - enable Docker service
+   - start Docker service
 
-- name: Install Docker Client
+- name: install Docker client
   dnf: name=docker-client state=latest
 
 - name: force service restart

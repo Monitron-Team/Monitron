@@ -61,3 +61,6 @@
 
 - name: create Management user
   prosody_adduser: jid=themanagement@{{domain_name}} password={{monitron_management_password}}
+
+- name: create Local Monitor user
+  prosody_adduser: jid=local_monitor@{{domain_name}} password={{local_monitor_password}}

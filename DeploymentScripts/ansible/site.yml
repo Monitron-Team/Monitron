@@ -22,4 +22,5 @@
   remote_user: root
   roles:
     - firewall
+    - local_monitor_node
     - worker_node

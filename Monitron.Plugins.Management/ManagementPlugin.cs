@@ -96,7 +96,10 @@ namespace Monitron.Plugins.Management
                     i_AdminUsername: r_DataStore.Read<string>("admin_user"),
                     i_AdminPassword: r_DataStore.Read<string>("admin_password")
                 );
-
+                Identity adminIdent = new Identity { Domain = this.r_Client.Identity.Domain, UserName = "admin" };
+                Identity localMonitorIdent = new Identity { Domain = this.r_Client.Identity.Domain, UserName = "local_monitor" };
+                m_UserManager.AddRosterItem(adminIdent, localMonitorIdent, "Monitron");
+                m_UserManager.AddRosterItem(localMonitorIdent, adminIdent, "admin");
             }
         }
 

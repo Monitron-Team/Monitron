@@ -1,0 +1,7 @@
+---
+- name: enable local monitor
+  service: name=monitron-local-monitor enabled=yes
+- name: start local monitor
+  service: name=monitron-local-monitor state=started
+- name: restart local monitor
+  service: name=monitron-local-monitor state=restarted

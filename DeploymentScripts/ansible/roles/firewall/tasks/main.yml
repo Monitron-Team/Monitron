@@ -1,9 +1,9 @@
 ---
-- name: Install IPTables services
+- name: install iptables services
   dnf: name=iptables-services state=latest
   notify:
-   - Enable IPTables
-   - Start IPTables
-- name: Configure IPTables
+   - enable iptables
+   - start iptables
+- name: configure iptables
   template: src=iptables.j2 dest=/etc/sysconfig/iptables
-  notify: Restart IPTables
+  notify: restart iptables

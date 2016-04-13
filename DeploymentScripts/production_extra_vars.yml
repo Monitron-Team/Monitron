@@ -1,3 +1,4 @@
 ---
 domain_name: monitron.ddns.net
 prosody_ssl: true
+vagrant_install: false

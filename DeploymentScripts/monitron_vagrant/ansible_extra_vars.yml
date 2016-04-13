@@ -1,3 +1,4 @@
 ---
-domain_name: monitron-boss
+domain_name: boss.monitron.test
 prosody_ssl: false
+vagrant_install: false

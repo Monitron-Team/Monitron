@@ -1,7 +1,7 @@
 ---
-- name: Enable Docker Service
+- name: enable Docker service
   service: name=docker enabled=yes
-- name: Start Docker Service
+- name: start Docker service
   service: name=docker state=started
-- name: Restart Docker Service
+- name: restart Docker service
   service: name=docker state=restarted

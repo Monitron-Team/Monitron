@@ -49,8 +49,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 			if(e.IsConnected) 
 			{
 				sr_Log.Debug("Setting up nickname");
-				string nickname = "Local_" + r_Client.Identity.UserName;
-				r_Client.SetNickname("Local_" + r_Client.Identity.UserName);
+				r_Client.SetNickname("Local Monitor");
 				sr_Log.Debug("Setting up avatar");
 				r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.LocalMonitorPlugin.LocalAvatar.png"));
 

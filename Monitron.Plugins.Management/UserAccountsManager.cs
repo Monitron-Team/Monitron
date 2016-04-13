@@ -75,9 +75,9 @@ namespace Monitron.Plugins.Management
             r_Admin.DeleteUser(i_UserToDelete.ToJid());
         }
 
-        public void AddRosterItem(Jid i_User, Jid i_Buddy, params string[] i_Groups)
+        public void AddRosterItem(Identity i_User, Identity i_Buddy, params string[] i_Groups)
         {
-            r_Admin.AddRosterItem(i_User, i_Buddy, i_Groups);
+            r_Admin.AddRosterItem(i_User.ToJid(), i_Buddy.ToJid(), i_Groups);
         }
 	}
 }

@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <NodeConfiguration>
 	<Account>
-		<Username>themanagement</Username>
-		<Domain>boss.monitron.test</Domain>
-		<Password>NoRestForTheWicked</Password>
+		<Username>local_monitor</Username>
+		<Domain>{{domain_name}}</Domain>
+		<Password>{{local_monitor_password}}</Password>
 	</Account>
 	<MessangerClient>
 		<DllPath>.</DllPath>
@@ -12,13 +12,13 @@
 	</MessangerClient>
 	<Plugin>
 	 	<DllPath>.</DllPath>
-		<DllName>Monitron.Plugins.Management.dll</DllName>
-		<Type>Monitron.Plugins.Management.ManagementPlugin</Type>
+		<DllName>Monitron.Plugins.LocalMonitorPlugin.dll</DllName>
+		<Type>Monitron.Plugins.LocalMonitorPlugin.LocalMonitorPlugin</Type>
 	</Plugin>
 	<DataStore>
 	 	<DllPath>.</DllPath>
 		<DllName>Monitron.PluginDataStore.Local.dll</DllName>
 		<Type>Monitron.PluginDataStore.Local.LocalPluginDataStore</Type>
-		<Location>DataStore.json</Location>
+		<Location>/etc/monitron/localmonitor.ds.json</Location>
 	</DataStore>
  </NodeConfiguration>
