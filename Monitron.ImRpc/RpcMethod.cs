@@ -18,6 +18,7 @@ namespace Monitron.ImRpc
         private readonly string r_HelpString;
         private readonly string r_Name;
         private readonly string r_Description;
+        private readonly string r_ShortDescription;
 
         public string Name
         {
@@ -35,10 +36,23 @@ namespace Monitron.ImRpc
             }
         }
 
+        public string ShortDescription
+        {
+            get
+            {
+                return r_ShortDescription;
+            }
+        }
+
         public RpcMethod(string name, string description, MethodInfo i_MethodInfo, object i_Instance)
         {
             r_Name = name;
             r_Description = description;
+            if (description != null)
+            {
+                r_ShortDescription = description.Split(new [] { '\n' }, 2)[0].Trim();
+            }
+
             r_OptionSet = new OptionSet();
             r_ParameterInfos = i_MethodInfo.GetParameters();
             r_func = fromFunc(i_MethodInfo);
@@ -85,16 +99,19 @@ namespace Monitron.ImRpc
             sw.Write("Usage: ");
             sw.Write(r_Name);
             sw.Write(" ");
-            foreach (ParameterInfo pi in r_ParameterInfos)
+            foreach (ParameterInfo pi in r_ParameterInfos.Skip(1))
             {
                 OptAttribute opt = (OptAttribute) pi.GetCustomAttribute(typeof(OptAttribute));
-                if (opt == null)
+                sw.Write("<");
+                if (opt != null)
                 {
-                    continue;
+                    sw.Write(opt.Name);
+                }
+                else
+                {
+                    sw.Write(pi.Name);
                 }
 
-                sw.Write("<");
-                sw.Write(opt.Name);
                 sw.Write("> ");
             }
 

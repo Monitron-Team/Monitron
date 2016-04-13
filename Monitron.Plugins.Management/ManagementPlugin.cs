@@ -49,9 +49,6 @@ namespace Monitron.Plugins.Management
             r_Adapter = new RpcAdapter(this, r_Client);
 			sr_Log.Debug("Setting up Mongo DB");
 			m_MongoDB = createMongoDatabase();
-			sr_Log.Debug("Setting up User Manager");
-			m_UserManager = new UserAccountsManager(m_MongoDB);
-            r_Client_ConnectionStateChanged(this, null);
 			sr_Log.Debug("Setting up Stored Plugin Manager");
 			r_PluginsManager = new StoredPluginsManager(m_MongoDB);
         }
@@ -91,6 +88,15 @@ namespace Monitron.Plugins.Management
                 {
                     r_Client.SendMessage(buddy.Identity, "Hello master");
                 }
+
+                sr_Log.Debug("Starting accounts manager");
+                m_UserManager = new UserAccountsManager(
+                    i_Database: m_MongoDB,
+                    i_AdminHost: r_Client.Identity.Domain,
+                    i_AdminUsername: r_DataStore.Read<string>("admin_user"),
+                    i_AdminPassword: r_DataStore.Read<string>("admin_password")
+                );
+
             }
         }
 
@@ -135,43 +141,55 @@ namespace Monitron.Plugins.Management
             return i_Text;
         }
 
-		[RemoteCommand(MethodName="add_user")]
-		public string AddUser(Identity identity, string i_User)
-		{
-			string rtnString = "Could not add user " + i_User;
-			Identity newIdentity = new Identity();
-			newIdentity.UserName = i_User;
-			newIdentity.Domain = r_Client.Identity.Domain;
+		[RemoteCommand(
+            MethodName="add_user",
+            Description="Adds a new user"
+        )]
+		public string AddUser(
+            Identity identity,
+            [Opt("user", "u|user=", "{USER} to add")] string i_User)
+        {
+            Identity newIdentity = new Identity();
+            newIdentity.UserName = i_User;
+            newIdentity.Domain = r_Client.Identity.Domain;
+            try
+            {
+                m_UserManager.AddUser(newIdentity, r_Client.Identity);
+            }
+            catch (AdminClientException e)
+            {
+                return e.Message;
+            }
 
-			bool succeeded = m_UserManager.AddUser(newIdentity, r_Client.Identity);
+            return string.Format("Added user {0} successfully", i_User);
+        }
 
-			if(succeeded)
-			{
-				r_Client.AddBuddy(newIdentity, new string[] { "Customers" });
-				rtnString = string.Format("Added user {0} successfully", i_User);
-			}
+		[RemoteCommand(
+            MethodName="delete_user",
+            Description=
+@"Deletes a user
 
-			return rtnString;
-		}
+This action allways succeeds."
+        )]
+		public string DeleteUser(
+            Identity identity,
+            [Opt("user", "u|user=", "{USER} to delete")] string i_User)
+        {
+            Identity identityToDelete = new Identity();
+            identityToDelete.UserName = i_User;
+            identityToDelete.Domain = r_Client.Identity.Domain;
 
-		[RemoteCommand(MethodName="delete_user")]
-		public string DeleteUser(Identity identity, string i_User)
-		{
-			string rtnString = "Could not delete user " + i_User;
-			Identity identityToDelete = new Identity();
-			identityToDelete.UserName = i_User;
-			identityToDelete.Domain = r_Client.Identity.Domain;
+            try
+            {
+                m_UserManager.DeleteUser(identityToDelete);
+            }
+            catch (AdminClientException e)
+            {
+                return e.Message;
+            }
 
-			bool succeeded = m_UserManager.DeleteUser(identityToDelete);
-
-			if(succeeded)
-			{
-				r_Client.RemoveBuddy(identityToDelete);
-				rtnString = string.Format("Deleted user {0} successfully", i_User);
-			}
-
-			return rtnString;
-		}
+            return string.Format("Deleted user {0} successfully", i_User);
+        }
     }
 }
 

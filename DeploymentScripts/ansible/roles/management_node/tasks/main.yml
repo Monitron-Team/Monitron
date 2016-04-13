@@ -19,6 +19,11 @@
   file: path=/etc/monitron state=directory group=monitron mode=0755
 
 - name: copy configuration
-  template: src=management.conf.j2 dest=/etc/monitron/ group=monitron mode=0640
+  template: src=management.conf.j2 dest=/etc/monitron/management.conf group=monitron mode=0640
+  notify:
+   - Restart Management Server
+
+- name: copy initial data store
+  template: src=datastore.json.j2 dest=/etc/monitron/datastore.json group=monitron mode=0640
   notify:
    - Restart Management Server

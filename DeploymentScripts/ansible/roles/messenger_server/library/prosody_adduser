@@ -1,0 +1,94 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
+DOCUMENTATION = '''
+---
+module: prosody_adduser
+short_description: adds a user to installed prosody server.
+description:
+    - Adds a user to a prosody server
+options:
+  jid:
+    required: true
+    default: null
+    description:
+      - The full JID of the user.
+  password:
+    required: true
+    default: null
+    description:
+      - The password of the user.
+author:
+    - "Saggi Mizrahi (@ficoos)"
+'''
+
+EXAMPLES = '''
+# Adds a user name saggi
+- prosody_adduser: jid=saggi@domain password=123456
+'''
+from subprocess import Popen, PIPE
+
+
+def passwd(jid, password):
+    p = Popen(["prosodyctl", "passwd", jid],
+              stdout=PIPE, stdin=PIPE, stderr=PIPE)
+    out, err = p.communicate("%s\n%s\n" % (password, password))
+    return p.returncode, out, err
+
+
+def adduser(jid, password):
+    p = Popen(["prosodyctl", "adduser", jid],
+              stdout=PIPE, stdin=PIPE, stderr=PIPE)
+    out, err = p.communicate("%s\n%s\n" % (password, password))
+    return p.returncode, out, err
+
+
+def main():
+    if get_platform().lower() != 'linux':
+        module.fail_json(msg="The prosody_adduser module is only available for"
+                         " Linux distributions.")
+
+    module = AnsibleModule(
+        argument_spec=dict(
+            jid=dict(required=True, type='str'),
+            password=dict(required=True, type='str'),
+        ),
+        supports_check_mode=True,
+    )
+
+    jid = module.params.get('jid')
+    password = module.params.get('password')
+
+    changed = False
+
+    rc, out, err = passwd(jid, password)
+    if (rc != 0):
+        rc, out, err = adduser(jid, password)
+        if (rc == 0):
+            msg = "User created"
+            changed = True
+        else:
+            msg = err
+    else:
+        msg = "User already existed"
+
+    module.exit_json(changed=changed, msg=msg)
+
+# import module snippets
+from ansible.module_utils.basic import *
+
+main()

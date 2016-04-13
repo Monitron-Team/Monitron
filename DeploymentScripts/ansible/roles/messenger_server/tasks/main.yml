@@ -54,10 +54,10 @@
    - Restart Prosody
 
 - name: create Monitron admin
-  script: "./prosody_adduser.sh 'monitron_admin@{{domain_name}}' '{{monitron_admin_password}}'"
+  prosody_adduser: jid=monitron_admin@{{domain_name}} password={{monitron_admin_password}}
 
 - name: create Server admin
-  script: "./prosody_adduser.sh 'admin@{{domain_name}}' '{{admin_password}}'"
+  prosody_adduser: jid=admin@{{domain_name}} password={{admin_password}}
 
 - name: create Management user
-  script: "./prosody_adduser.sh 'themanagement@{{domain_name}}' '{{monitron_management_password}}'"
+  prosody_adduser: jid=themanagement@{{domain_name}} password={{monitron_management_password}}

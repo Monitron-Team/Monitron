@@ -99,10 +99,10 @@ namespace Monitron.ImRpc
             foreach (var rpcMethod in r_MethodCache.Values)
             {
                 sw.Write(rpcMethod.Name);
-                if (rpcMethod.Description != null)
+                if (rpcMethod.ShortDescription != null)
                 {
                     sw.Write("\n\t");
-                    sw.Write(rpcMethod.Description);
+                    sw.Write(rpcMethod.ShortDescription);
                 }
                 sw.Write("\n");
             }

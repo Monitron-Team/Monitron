@@ -2,5 +2,7 @@
 	"mongo_server": "\"monitron-boss\"",
 	"mongo_database": "\"monitron\"",
 	"mongo_password": "\"HellIsForHeroes@!\"",
-	"mongo_user": "\"monitron_mgmt\""
+	"mongo_user": "\"monitron_mgmt\"",
+	"admin_user": "\"monitron_admin\"",
+	"admin_password": "\"HellIsForHeroes@!\""
 }

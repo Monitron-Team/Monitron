@@ -18,57 +18,30 @@ namespace Monitron.Plugins.Management
 		private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
 			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private AdminClient r_Admin;
-		private IMongoDatabase m_MongoDB;
-		private IDictionary<string, XMPPMessengerClient> m_UsersDictionary;
+        private readonly XmppClient r_Client;
+        private readonly AdminClient r_Admin;
+        private readonly IMongoDatabase m_MongoDB;
 
-		private const string k_AdminHost = "monitron-test";
-		private const string k_AdminUsername = "monitron_admin";
-		private const string k_AdminPassword = "xxx";
 		private const string k_NewUserDefaultPassword = "12356";
 		private const int k_MaxWorkersAllowed = 10;
 		private const string k_UsersDBCollection = "Users";
 
-		public UserAccountsManager(IMongoDatabase i_Database)
+        public UserAccountsManager(IMongoDatabase i_Database, string i_AdminHost, string i_AdminUsername, string i_AdminPassword)
 		{
 			m_MongoDB = i_Database;
-			m_UsersDictionary = loadUsersFromDB().Result;
-			XmppClient adminClient = new XmppClient(k_AdminHost, k_AdminUsername, k_AdminPassword);
-			adminClient.Connect();
-			r_Admin = new AdminClient(adminClient);
+			r_Client = new XmppClient(i_AdminHost, i_AdminUsername, i_AdminPassword);
+            r_Client.Connect();
+            r_Admin = new AdminClient(r_Client);
 		}
 
-		async private Task<Dictionary<string, XMPPMessengerClient>> loadUsersFromDB()
-		{
-			Dictionary <string, XMPPMessengerClient> usersDictionary = new Dictionary<string, XMPPMessengerClient>();
-
-			var collection = m_MongoDB.GetCollection<BsonDocument>(k_UsersDBCollection);
-			var filter = new BsonDocument();
-			using (var cursor = await collection.FindAsync(filter))
-			{
-				while (await cursor.MoveNextAsync())
-				{
-					var batch = cursor.Current;
-					foreach (var document in batch)
-					{
-						string userName = document["UserName"].AsString;
-						string password = document["password"].AsString;
-						usersDictionary.Add(userName, new XMPPMessengerClient(new Account(userName, password, k_AdminHost)));
-					}
-				}
-			}
-
-			return usersDictionary;
-		}
-
-		private BsonDocument createNewUserBsonDocument(Identity i_Identity)
+		private BsonDocument serializeIdentity(Identity i_Identity)
 		{
 			var document = new BsonDocument 
 			{ 
 				{ "Info", new BsonDocument 
-					{
-						{ "UserName", i_Identity.UserName },
-						{ "Password", k_NewUserDefaultPassword }
+                        {
+                            { "username", i_Identity.UserName },
+                            { "host", r_Client.Jid.Domain }
 					}
 				}, 
 				{ "Workers", new BsonDocument 
@@ -84,60 +57,28 @@ namespace Monitron.Plugins.Management
 
 		async void addUserToDB(Identity i_Identity)
 		{
-			BsonDocument newUserBsonDocument = createNewUserBsonDocument(i_Identity);
+			BsonDocument newUserBsonDocument = serializeIdentity(i_Identity);
 
 			var collection = m_MongoDB.GetCollection<BsonDocument>(k_UsersDBCollection);
 			await collection.InsertOneAsync(newUserBsonDocument);
 		}
 
-		public bool AddUser(Identity i_NewUser, Identity i_AssignBuddyTo)
-		{
-			bool succeededToAdd = false;
-			//checking if user already exists
-			if (!m_UsersDictionary.ContainsKey(i_NewUser.ToString()))
-			{
-				try
-				{
-					r_Admin.AddUser(i_NewUser.ToJid() , k_NewUserDefaultPassword);
-					//creating new XMPP Client. adding the caller to it's buddy and adding it to the XMPPMessangerClient list
-					XMPPMessengerClient newXmppMessangerClient = new XMPPMessengerClient(new Account(i_NewUser.UserName, k_NewUserDefaultPassword, i_NewUser.Domain));
-					newXmppMessangerClient.AddBuddy(i_AssignBuddyTo, new string[] {"Monitron"});
-					m_UsersDictionary.Add(i_NewUser.ToString(), newXmppMessangerClient);
+		public void AddUser(Identity i_NewUser, Identity i_AssignBuddyTo)
+        {
+            r_Admin.AddUser(i_NewUser.ToJid(), k_NewUserDefaultPassword);
+            Jid newAccount = new Jid(i_NewUser.Domain, i_NewUser.UserName);
+            r_Admin.AddRosterItem(newAccount, r_Client.Jid, "Monitron");
+        }
 
-					addUserToDB(i_NewUser);
-					succeededToAdd = true;
-				}
-				catch (AdminClientException)
-				{	
-				}	
-			}
+		public void DeleteUser(Identity i_UserToDelete)
+        {
+            r_Admin.DeleteUser(i_UserToDelete.ToJid());
+        }
 
-			return succeededToAdd;
-		}
-
-		public bool DeleteUser(Identity i_UserToDelete)
-		{
-			bool succeededToRemove = false;
-
-			try
-			{
-				//delete only if user exists
-				if (m_UsersDictionary.ContainsKey(i_UserToDelete.ToString()))
-				{
-					XMPPMessengerClient xmppClientToDelete = null;
-
-					m_UsersDictionary.TryGetValue(i_UserToDelete.ToString(), out xmppClientToDelete);
-					xmppClientToDelete.Dispose();
-					m_UsersDictionary.Remove(i_UserToDelete.ToString());
-					r_Admin.DeleteUser(i_UserToDelete.ToJid());
-				}
-			}
-			catch (AdminClientException)
-			{
-			}
-
-			return succeededToRemove;
-		}
+        public void AddRosterItem(Jid i_User, Jid i_Buddy, params string[] i_Groups)
+        {
+            r_Admin.AddRosterItem(i_User, i_Buddy, i_Groups);
+        }
 	}
 }
 

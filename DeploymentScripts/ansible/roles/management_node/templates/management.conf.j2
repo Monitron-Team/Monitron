@@ -3,7 +3,7 @@
 	<Account>
 		<Username>themanagement</Username>
 		<Domain>{{domain_name}}</Domain>
-		<Password>{{ monitron_management_password }}</Password>
+		<Password>{{monitron_management_password}}</Password>
 	</Account>
 	<MessangerClient>
 		<DllPath>.</DllPath>
@@ -15,4 +15,10 @@
 		<DllName>Monitron.Plugins.Management.dll</DllName>
 		<Type>Monitron.Plugins.Management.ManagementPlugin</Type>
 	</Plugin>
+	<DataStore>
+	 	<DllPath>.</DllPath>
+		<DllName>Monitron.PluginDataStore.Local.dll</DllName>
+		<Type>Monitron.PluginDataStore.Local.LocalPluginDataStore</Type>
+		<Location>/etc/monitron/datastore.json</Location>
+	</DataStore>
  </NodeConfiguration>
