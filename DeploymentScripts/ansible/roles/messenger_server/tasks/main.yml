@@ -1,0 +1,63 @@
+---
+- include_vars: cert_vault.yml
+- include_vars: passwords_vault.yml
+
+- name: install Prosody
+  dnf: name=prosody state=latest
+  notify:
+   - Enable Prosody
+   - Start Prosody
+
+- name: upload Prosody server configuration
+  template: src=prosody.cfg.lua.j2 dest={{prosody_conf_path}} mode=640 owner=root group=prosody
+  notify:
+   - Restart Prosody
+
+- name: upload Monitron site configuration
+  template: src=prosody_site.cfg.lua.j2 dest={{monitron_site_conf_path}} mode=640 owner=root group=prosody
+  notify:
+   - Restart Prosody
+
+- name: upload Monitron site cert (crt)
+  copy:
+   content: "{{ monitron_cert_crt }}"
+   dest: "{{pki_path}}/{{domain_name}}.crt"
+   mode: 0644
+   owner: root
+   group: root
+  notify:
+   - Restart Prosody
+
+- name: upload Monitron site cert (key)
+  copy:
+   content: "{{ monitron_cert_key }}"
+   dest: "{{pki_path}}/{{domain_name}}.key"
+   mode: 0640
+   owner: root
+   group: prosody
+  notify:
+   - Restart Prosody
+
+- name: upload Monitron site cert (cnf)
+  copy:
+   content: "{{ monitron_cert_cnf }}"
+   dest: "{{pki_path}}/{{domain_name}}.cnf"
+   mode: 0640
+   owner: root
+   group: prosody
+  notify:
+   - Restart Prosody
+
+- name: upload Monitron Ad-Hoc module
+  copy: src=mod_monitron_adhoc.lua dest={{prosody_module_path}} mode=644 owner=root group=root
+  notify:
+   - Restart Prosody
+
+- name: create Monitron admin
+  script: "./prosody_adduser.sh 'monitron_admin@{{domain_name}}' '{{monitron_admin_password}}'"
+
+- name: create Server admin
+  script: "./prosody_adduser.sh 'admin@{{domain_name}}' '{{admin_password}}'"
+
+- name: create Management user
+  script: "./prosody_adduser.sh 'themanagement@{{domain_name}}' '{{monitron_management_password}}'"

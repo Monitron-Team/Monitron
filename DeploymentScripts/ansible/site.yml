@@ -1,0 +1,25 @@
+---
+- name: apply common configuration to all nodes
+  hosts: all
+  gather_facts: false
+  remote_user: root
+
+  roles:
+    - common
+
+- name: set up boss servers
+  hosts: boss_servers
+  remote_user: root
+
+  roles:
+    - {role: firewall, exported_services: ["database_server", "messenger_server"]}
+    - messenger_server
+    - database_server
+    - management_node
+
+- name: set up worker servers
+  hosts: worker_servers
+  remote_user: root
+  roles:
+    - firewall
+    - worker_node

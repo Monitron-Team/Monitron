@@ -1,1 +1,2 @@
-vault_password
+ansible/vault_password
+monitron_vagrant/.vagrant

@@ -123,8 +123,12 @@ namespace S22.Xmpp.Extensions {
         /// <summary>
         /// for a user to store and retrieve an XML representation of his or her
         /// vCard using the data storage capabilities native to all existing
-        /// Jabber server implementations
+        /// Jabber server implementations.
         /// </summary>
-        VCards
+        VCards,
+        /// <summary>
+        /// for a a method of encoding RPC requests and responses in XML.
+        /// </summary>
+        JabberRpc
 	}
 }

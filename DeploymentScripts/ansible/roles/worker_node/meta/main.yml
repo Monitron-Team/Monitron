@@ -1,0 +1,4 @@
+---
+dependencies:
+  - mono
+  - docker

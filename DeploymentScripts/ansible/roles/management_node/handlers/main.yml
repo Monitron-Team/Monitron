@@ -1,0 +1,7 @@
+---
+- name: Enable Management Server
+  service: name=monitron-management enabled=yes
+- name: Start Management Server
+  service: name=monitron-management state=started
+- name: Restart Management Server
+  service: name=monitron-management state=restarted

@@ -1,0 +1,6 @@
+---
+   - name: install packages for ansible support
+     raw: dnf -y install python python-dnf
+
+   - name: install Ansible dependencies
+     dnf: name=libselinux-python state=latest

@@ -7,11 +7,11 @@
 -A INPUT -p icmp -j ACCEPT
 -A INPUT -i lo -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
-{% if 'database_servers' in groups and inventory_hostname in groups['database_servers'] %}
+{% if 'database_server' in exported_services %}
 # MongoDB
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 27017 -j ACCEPT
 {% endif %}
-{% if 'messenger_servers' in groups and inventory_hostname in groups['messenger_servers'] %}
+{% if 'messenger_server' in exported_services %}
 # Prosody
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 5222 -j ACCEPT
 {% endif %}

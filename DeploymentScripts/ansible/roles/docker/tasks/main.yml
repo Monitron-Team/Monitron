@@ -1,0 +1,11 @@
+- name: Install Docker
+  dnf: name=docker state=latest
+  notify:
+   - Enable Docker Service
+   - Start Docker Service
+
+- name: Install Docker Client
+  dnf: name=docker-client state=latest
+
+- name: force service restart
+  meta: flush_handlers

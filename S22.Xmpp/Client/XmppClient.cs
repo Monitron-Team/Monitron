@@ -122,6 +122,10 @@ namespace S22.Xmpp.Client {
         /// Provides access to the 'VCards' XMPP extension.
         /// </summary>
         VCards vCards;
+        /// <summary>
+        /// Provides access to the 'JabberRpc' XMPP extension.
+        /// </summary>
+        JabberRpc jabberRpc;
 
 		/// <summary>
 		/// The hostname of the XMPP server to connect to.
@@ -1443,6 +1447,26 @@ namespace S22.Xmpp.Client {
             this.vCards.Update(vCard);
         }
 
+        /// <summary>
+        /// Create a Jabber RPC Client for an interface.
+        /// </summary>
+        /// <param name="target">The target that serves the interface.</param>
+        public T CreateJabberRpcClient<T>(Jid target) where T : class
+        {
+            return this.jabberRpc.CreateRpcClient<T>(target);
+        }
+
+        /// <summary>
+        /// Register Rpc Implementation.
+        /// </summary>
+        /// <param name="target">The target that serves the interface.</param>
+        public void RegisterJabberRpcServer<I, T>(T server)
+            where I : class
+            where T : I
+        {
+            this.jabberRpc.RegisterJabberRpcServer<I, T>(server);
+        }
+
 		/// <summary>
 		/// Closes the connection with the XMPP server. This automatically disposes
 		/// of the object.
@@ -1530,6 +1554,7 @@ namespace S22.Xmpp.Client {
 			bitsOfBinary = im.LoadExtension<BitsOfBinary>();
             adHocCommands = im.LoadExtension<AdHocCommands>();
             vCards = im.LoadExtension<VCards>();
+            jabberRpc = im.LoadExtension<JabberRpc>();
 		}
 	}
 }

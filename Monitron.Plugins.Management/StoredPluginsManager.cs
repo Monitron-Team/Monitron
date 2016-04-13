@@ -13,16 +13,13 @@ namespace Monitron.Plugins.Management
 {
     public class StoredPluginsManager
     {
-        private readonly MongoClient r_Client;
-
-        private readonly string r_DatabaseName;
+        private readonly IMongoDatabase r_Database;
 
         private const string k_BucketName = "plugin_store";
         
-        public StoredPluginsManager(MongoClientSettings i_MongoSettings, string i_DatabseName)
+        public StoredPluginsManager(IMongoDatabase i_Database)
         {
-            r_Client = new MongoClient(i_MongoSettings);
-            r_DatabaseName = i_DatabseName;
+            r_Database = i_Database;
         }
 
         private PluginManifest readManifest(ZipFile i_PluginFile)
@@ -51,7 +48,7 @@ namespace Monitron.Plugins.Management
 
         private IMongoDatabase getDatabase()
         {
-            return r_Client.GetDatabase(r_DatabaseName);
+            return r_Database;
         }
 
         private GridFSBucket getBucket()

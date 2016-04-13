@@ -1,0 +1,7 @@
+---
+- name: Enable MongoDB Server
+  service: name=mongod enabled=yes
+- name: Start MongoDB Server
+  service: name=mongod state=started
+- name: Restart MongoDB Server
+  service: name=mongod state=restarted

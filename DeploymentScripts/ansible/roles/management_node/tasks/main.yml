@@ -1,0 +1,24 @@
+---
+- include_vars: passwords_vault.yml
+
+- name: upload management service
+  unarchive: src=MonitronManagement.tar.gz dest=/opt
+  notify:
+   - Restart Management Server
+
+- name: create management user
+  user: name=monitron system=yes createhome=no home=/opt/MonitronManagement shell=/sbin/nologin comment="Monitron Management"
+
+- name: install service file
+  copy: src=monitron-management.service dest=/etc/systemd/system/
+  notify:
+   - Enable Management Server
+   - Start Management Server
+
+- name: creates configuration directory
+  file: path=/etc/monitron state=directory group=monitron mode=0755
+
+- name: copy configuration
+  template: src=management.conf.j2 dest=/etc/monitron/ group=monitron mode=0640
+  notify:
+   - Restart Management Server

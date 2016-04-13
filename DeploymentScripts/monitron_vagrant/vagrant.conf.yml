@@ -1,0 +1,2 @@
+max_worker_num: 10
+ansible_root: ../ansible

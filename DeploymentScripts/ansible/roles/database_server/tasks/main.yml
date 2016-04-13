@@ -1,0 +1,29 @@
+---
+- include_vars: passwords_vault.yml
+
+- name: install MongoDB server
+  dnf: name=mongodb-server state=latest
+  notify:
+   - Enable MongoDB Server
+   - Start MongoDB Server
+
+- name: configure MongoDB server
+  copy:
+   src: "mongod.conf"
+   dest: "/etc/mongod.conf"
+   mode: 0644
+   owner: root
+   group: root
+  notify:
+   - Restart MongoDB Server
+
+- name: install MongoDB client
+  dnf: name=mongodb state=latest
+
+- name: force service restart
+  meta: flush_handlers
+
+- name: run DB initialization script
+  become: yes
+  become_user: mongodb
+  script: "./db_init.sh '{{monitron_admin_password}}'"
