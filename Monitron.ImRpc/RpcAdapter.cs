@@ -4,9 +4,9 @@ using Monitron.Common;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Linq;
-
 using System.ComponentModel;
 using System.IO;
+using Monitron.AI;
 
 namespace Monitron.ImRpc
 {
@@ -16,45 +16,69 @@ namespace Monitron.ImRpc
         private readonly IMessengerClient r_MessangerClient;
         private readonly Dictionary<string, RpcMethod> r_MethodCache = new Dictionary<string, RpcMethod>();
 
+        private AIML AiBot ;
         public RpcAdapter(object i_Obj, IMessengerClient i_MessangerClient)
         {
             r_Obj = i_Obj;
             this.initializeMethodsCache();
             r_MessangerClient = i_MessangerClient;
             r_MessangerClient.MessageArrived += r_MessengerClient_MessageArrived;
-        }
+            AiBot = new AIML(); ///todo: actual parameters
+
+    }
 
         public void r_MessengerClient_MessageArrived(object i_Sender, MessageArrivedEventArgs i_EventArgs)
         {
-            string[] arguments = i_EventArgs.Message.Split(null, 2);
-            if (arguments.Length == 0)
+            string messageToParse = "";
+            bool isMethod = true;
+            string returnedValue = "";
+            if (AiBot != null)
             {
-                // Nothing to do
-                return;
-            }
-                
-            string returnedValue;
-            try
-            {
-                returnedValue = ExecuteCommand(i_EventArgs.Buddy, arguments);
-            }
-            catch(TargetInvocationException e)
-            {
-                AggregateException ag = e.InnerException as AggregateException;
-                if (ag != null)
+                string res = AiBot.Request(i_EventArgs.Message, out isMethod);
+                if (isMethod)
                 {
-                    returnedValue = string.Join("; ", ag.InnerExceptions.Select(x => x.Message));
+                    messageToParse = res;
                 }
                 else
                 {
-                    returnedValue = string.Format(e.InnerException.Message);
+                    returnedValue = res;
                 }
             }
-            catch (Exception e)
+            else
             {
-                returnedValue = string.Format("Error executing: \"{0}\": ", i_EventArgs.Message, e.Message);
+                messageToParse = i_EventArgs.Message;
             }
+            if (isMethod)
+            {
+                string[] arguments = messageToParse.Split(null, 2);
+                if (arguments.Length == 0)
+                {
+                    // Nothing to do
+                    return;
+                }
 
+                
+                try
+                {
+                    returnedValue = ExecuteCommand(i_EventArgs.Buddy, arguments);
+                }
+                catch (TargetInvocationException e)
+                {
+                    AggregateException ag = e.InnerException as AggregateException;
+                    if (ag != null)
+                    {
+                        returnedValue = string.Join("; ", ag.InnerExceptions.Select(x => x.Message));
+                    }
+                    else
+                    {
+                        returnedValue = string.Format(e.InnerException.Message);
+                    }
+                }
+                catch (Exception e)
+                {
+                    returnedValue = string.Format("Error executing: \"{0}\": ", i_EventArgs.Message, e.Message);
+                }
+            }
             try
             {
                 r_MessangerClient.SendMessage(i_EventArgs.Buddy, returnedValue);
