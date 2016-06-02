@@ -104,28 +104,31 @@ namespace Monitron.Plugins.Management
 
         public async Task<PluginManifest> UploadPluginAsync(string i_PluginFilePath)
         {
-            ZipFile pluginFile = new ZipFile(i_PluginFilePath);
-            PluginManifest manifest = readManifest(pluginFile);
+            using (var fs = new FileStream(i_PluginFilePath, FileMode.Open, FileAccess.Read))
             {
-                GridFSBucket bucket = getBucket();
-                await RemovePluginAsync(manifest.Id);
-                using (FileStream fs = new FileStream(i_PluginFilePath, FileMode.Open, FileAccess.Read))
-                await bucket.UploadFromStreamAsync(
-                    manifest.Id,
-                    fs,
-                    new GridFSUploadOptions
-                    {
-                        Metadata = new BsonDocument
+                ZipFile pluginFile = new ZipFile(fs);
+                PluginManifest manifest = readManifest(pluginFile);
+                {
+                    GridFSBucket bucket = getBucket();
+                    await RemovePluginAsync(manifest.Id);
+                    fs.Seek(0, SeekOrigin.Begin);
+                    await bucket.UploadFromStreamAsync(
+                        manifest.Id,
+                        fs,
+                        new GridFSUploadOptions
                         {
-                            { "id", manifest.Id },
-                            { "name", manifest.Name },
-                            { "description", manifest.Description },
-                            { "version", manifest.Version },
-                        },
-                    }
-                );
+                            Metadata = new BsonDocument
+                            {
+                                { "id", manifest.Id },
+                                { "name", manifest.Name },
+                                { "description", manifest.Description },
+                                { "version", manifest.Version },
+                            },
+                        }
+                    );
 
-                return manifest;
+                    return manifest;
+                }
             }
         }
     }

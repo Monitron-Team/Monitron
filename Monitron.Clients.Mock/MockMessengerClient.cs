@@ -18,6 +18,22 @@ namespace Monitron.Clients.Mock
 
         public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
 
+        public event EventHandler<FileTransferProgressEventArgs> FileTransferProgress;
+
+        public event EventHandler<FileTransferAbortedEventArgs> FileTransferAborted;
+
+        public FileTransferRequest FileTransferRequest
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public bool IsConnected
         {
             get

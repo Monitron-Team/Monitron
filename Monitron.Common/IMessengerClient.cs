@@ -11,12 +11,16 @@ namespace Monitron.Common
         event EventHandler<BuddySignedOutEventArgs> BuddySignedOut;
         event EventHandler<BuddyListChangedEventArgs> BuddyListChanged;
         event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
+        event EventHandler<FileTransferProgressEventArgs> FileTransferProgress;
+        event EventHandler<FileTransferAbortedEventArgs> FileTransferAborted;
 
         IEnumerable<BuddyListItem> Buddies { get; }
 
         Identity Identity { get; }
 
         bool IsConnected { get; }
+
+        FileTransferRequest FileTransferRequest {get; set;}
 
         void SendMessage(Identity i_Buddy, string i_Message);
 

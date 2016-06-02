@@ -230,6 +230,7 @@ namespace S22.Xmpp.Extensions {
 				stanza.From, stanza.To);
 			// We don't allow the other site to close a session that we opened.
 			if (session != null) {
+                session.Stream.Close();
 				siFileTransfer.InvalidateSession(sessionId);
 				// Had all bytes been received when we got the 'close' request?
 				// Otherwise, the other site cancelled the transfer prematurely.
@@ -273,6 +274,10 @@ namespace S22.Xmpp.Extensions {
 			}
 			// Update the byte count and raise the 'BytesTransferred' event.
 			session.Count = session.Count + bytes.Length;
+            if (session.Count == session.Size)
+            {
+                session.Stream.Close();
+            }
 			BytesTransferred.Raise(this, new BytesTransferredEventArgs(session));
 		}
 

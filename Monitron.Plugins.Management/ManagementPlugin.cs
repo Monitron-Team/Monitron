@@ -11,11 +11,16 @@ using Monitron.ImRpc;
 using Monitron.Management.AdminClient;
 using System.IO;
 using System.Xml.Serialization;
+using System.Collections.Generic;
 
 namespace Monitron.Plugins.Management
 {
     public class ManagementPlugin : INodePlugin
     {
+        private const long k_MaxPluginSize = 20 * (1<<20); //20M
+
+        private readonly string k_WorkerUserName = "local_monitor";
+
         private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
             (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -39,9 +44,26 @@ namespace Monitron.Plugins.Management
 
         private readonly RpcAdapter r_Adapter;
 
+        private readonly SortedSet<string> r_AvailableWorkers = new SortedSet<string>();
+
         public ManagementPlugin(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
         {
             i_MessangerClient.ConnectionStateChanged += r_Client_ConnectionStateChanged;
+            i_MessangerClient.FileTransferRequest = r_Client_FileTransferRequest;
+            i_MessangerClient.FileTransferProgress += i_MessangerClient_FileTransferProgress;
+            i_MessangerClient.FileTransferAborted += i_MessangerClient_FileTransferAborted;
+            i_MessangerClient.BuddySignedIn += (sender, e) => {
+                if (e.Buddy.UserName == k_WorkerUserName)
+                {
+                    r_AvailableWorkers.Add(e.Buddy.Resource);
+                }
+            };
+            i_MessangerClient.BuddySignedOut += (sender, e) => {
+                if (e.Buddy.UserName == k_WorkerUserName)
+                {
+                    r_AvailableWorkers.Remove(e.Buddy.Resource);
+                }
+            };
             sr_Log.Info("Management Plugin starting");
             r_Client = i_MessangerClient;
             r_DataStore = i_DataStore;
@@ -51,6 +73,36 @@ namespace Monitron.Plugins.Management
 			m_MongoDB = createMongoDatabase();
 			sr_Log.Debug("Setting up Stored Plugin Manager");
 			r_PluginsManager = new StoredPluginsManager(m_MongoDB);
+        }
+        private void i_MessangerClient_FileTransferAborted (object sender, FileTransferAbortedEventArgs e)
+        {
+            string path = getFileTransferTmpPath(e.FileTransfer);
+            File.Delete(path);
+        }
+
+        private void i_MessangerClient_FileTransferProgress (object sender, FileTransferProgressEventArgs e)
+        {
+            bool transferFinished = e.FileTransfer.Transferred == e.FileTransfer.Size;
+            Identity buddy = e.FileTransfer.From;
+            if (transferFinished)
+            {
+                string path = getFileTransferTmpPath(e.FileTransfer);
+                r_PluginsManager.UploadPluginAsync(path)
+                    .ContinueWith((task) =>
+                        {
+                            if (task.IsFaulted)
+                            {
+                                r_Client.SendMessage(buddy, "Error uploading plugin: " + task.Exception.InnerException.Message);
+                            }
+                            else
+                            {
+                                r_Client.SendMessage(buddy, string.Format("Plugin '{0}' uploaded successfully", task.Result.Name));
+                            }
+
+                            File.Delete(path);
+                        }
+                    );
+            }
         }
 
 		private IMongoDatabase createMongoDatabase()
@@ -70,7 +122,24 @@ namespace Monitron.Plugins.Management
 			).GetDatabase(r_DataStore.Read<string>("mongo_database"));
 		}
 
-        void r_Client_ConnectionStateChanged (object sender, ConnectionStateChangedEventArgs e)
+        private string r_Client_FileTransferRequest(IFileTransfer i_FileTransfer) {
+            if (i_FileTransfer.Size > k_MaxPluginSize)
+            {
+                this.r_Client.SendMessage(i_FileTransfer.From, "Refusing upload, file to large");
+                return null;
+            }
+                
+            //this.r_Client.SendMessage(i_FileTransfer.From,
+            //    string.Format("File transfer for {} initiated", i_FileTransfer.Name));
+            return getFileTransferTmpPath(i_FileTransfer);
+        }
+
+        private static string getFileTransferTmpPath(IFileTransfer i_FileTransfer)
+        {
+            return string.Join(Path.DirectorySeparatorChar.ToString(), Path.GetTempPath(), i_FileTransfer.Id);
+        }
+
+        private void r_Client_ConnectionStateChanged (object sender, ConnectionStateChangedEventArgs e)
         {
             if (r_Client.IsConnected)
             {
@@ -100,32 +169,13 @@ namespace Monitron.Plugins.Management
                 Identity localMonitorIdent = new Identity { Domain = this.r_Client.Identity.Domain, UserName = "local_monitor" };
                 m_UserManager.AddRosterItem(adminIdent, localMonitorIdent, "Monitron");
                 m_UserManager.AddRosterItem(localMonitorIdent, adminIdent, "admin");
+                m_UserManager.AddRosterItem(r_Client.Identity, localMonitorIdent, "Workers");
+                m_UserManager.AddRosterItem(localMonitorIdent, r_Client.Identity, "Management");
             }
         }
 
-        [RemoteCommand(MethodName="upload_plugin")]
-        public string UploadPlugin(
-            Identity buddy,
-            [Opt("path", "p|path=", "{PATH} for the plugin zip")] string i_Path)
-        {
-            r_PluginsManager.UploadPluginAsync(i_Path)
-                .ContinueWith((task) =>
-                {
-                        if (task.IsFaulted)
-                        {
-                            r_Client.SendMessage(buddy, "Error uploading plugin: " + task.Exception.Message);
-                        }
-                        else
-                        {
-                            r_Client.SendMessage(buddy, string.Format("Plugin '{0}' uploaded successfully", task.Result.Name));
-                        }
-                }
-                );
-            return "Uploading...";
-        }
-
         [RemoteCommand(MethodName="list_plugins")]
-        public string ListPlugins()
+        public string ListPlugins(Identity buddy)
         {
             string result = "";
             foreach (PluginManifest manifest in r_PluginsManager.ListPlugins())
@@ -133,7 +183,32 @@ namespace Monitron.Plugins.Management
                 result += string.Format("{0} [{1}:{2}]\n", manifest.Name, manifest.Id, manifest.Version);
             }
 
+            if (result == string.Empty)
+            {
+                result = "No plugins available";
+            }
+
             return result;
+        }
+
+        [RemoteCommand(MethodName="delete_plugin")]
+        public string DeletePlugin(
+            Identity buddy,
+            [Opt("plugin_id", "p|plugin_id=", "{PLUGIN} to delete")] string i_PluginId)
+        {
+            r_PluginsManager.RemovePluginAsync(i_PluginId).ContinueWith((task) =>
+                {
+                        if (task.IsFaulted)
+                        {
+                            r_Client.SendMessage(buddy, "Error deleting plugin: " + task.Exception.Message);
+                        }
+                        else
+                        {
+                            r_Client.SendMessage(buddy, string.Format("Plugin '{0}' deleted successfully", i_PluginId));
+                        }
+                }
+            );
+            return "Trying to delete plugin";
         }
 
         [RemoteCommand(MethodName="echo")]
@@ -165,6 +240,33 @@ namespace Monitron.Plugins.Management
             }
 
             return string.Format("Added user {0} successfully", i_User);
+        }
+
+        [RemoteCommand(
+            MethodName="get_workers",
+            Description="gets the list of all active worker hosts"
+        )]
+        public string GetWorkers(Identity identity)
+        {
+            return "\n" + string.Join("\n", r_AvailableWorkers);
+        }
+
+        [RemoteCommand(
+            MethodName="list_instances",
+            Description="lists all currently running instances"
+        )]
+        public string ListInstances(Identity identity)
+        {
+        }
+
+        [RemoteCommand(
+            MethodName="\ud83d\udca9\ud83d\udca9\ud83d\udca9",
+            Description=
+            @"That's not very nice!"
+        )]
+        public string Poop(Identity identity)
+        {
+            return "\ud83d\udca9\ud83d\udca9\ud83d\udca9";
         }
 
 		[RemoteCommand(

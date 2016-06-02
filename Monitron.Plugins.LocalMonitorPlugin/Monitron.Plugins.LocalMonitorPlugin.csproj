@@ -32,6 +32,7 @@
     <Compile Include="PolicyViolatedEventArgs.cs" />
     <Compile Include="MemoryStatus.cs" />
     <Compile Include="ProcessStatus.cs" />
+    <Compile Include="WorkerManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
@@ -42,11 +43,39 @@
       <Project>{50D209C8-C9F4-4690-8D3C-558B592EC80B}</Project>
       <Name>Monitron.ImRpc</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Monitron.Plugins.LocalMonitorPlugin.Common\Monitron.Plugins.LocalMonitorPlugin.Common.csproj">
+      <Project>{52426FCE-4261-40F3-91B9-20F9DE60FCEE}</Project>
+      <Name>Monitron.Plugins.LocalMonitorPlugin.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.28\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Extensions">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.28\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="Microsoft.Threading.Tasks">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="Docker.DotNet">
+      <HintPath>..\packages\Docker.DotNet.1.2.2\lib\portable-net45+sl5+wp8+win8\Docker.DotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -414,6 +414,11 @@ namespace S22.Xmpp.Extensions {
 					session.Stream.Write(buffer, 0, read);
 					// Update the byte count and raise the 'BytesTransferred' event.
 					session.Count = session.Count + read;
+                    if (session.Count == session.Size)
+                    {
+                        session.Stream.Close();
+                    }
+
 					BytesTransferred.Raise(this, new BytesTransferredEventArgs(session));
 				}
 			} catch (ObjectDisposedException) {

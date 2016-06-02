@@ -51,9 +51,19 @@
     <Compile Include="BuddyListCache.cs" />
     <Compile Include="INodePlugin.cs" />
     <Compile Include="ConnectionStateChangedEventArgs.cs" />
+    <Compile Include="IFileTransfer.cs" />
+    <Compile Include="FileTransferRequest.cs" />
+    <Compile Include="FileTransferProgressEventArgs.cs" />
+    <Compile Include="FileTransferAbortedEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\S22.Xmpp\S22.Xmpp.csproj">
+      <Project>{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}</Project>
+      <Name>S22.Xmpp</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

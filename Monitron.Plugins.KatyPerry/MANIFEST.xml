@@ -3,7 +3,7 @@
 	<Id>katy-perry</Id>
 	<Name>Katy Perry</Name>
 	<Description>Launches your very own Katy to sing for you.</Description>
-	<Version>1.0.0</Version>
+	<Version>1.2.0</Version>
 	<DllName>Monitron.Plugins.Management.dll</DllName>
 	<Type>Monitron.Plugins.Management.ManagementPlugin</Type>
 </PluginManifest>

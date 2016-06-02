@@ -28,6 +28,8 @@ namespace Monitron.Clients.XMPP
 
         private Timer m_PingTimer;
 
+        public Monitron.Common.FileTransferRequest FileTransferRequest { get; set; }
+
         public event EventHandler<MessageArrivedEventArgs> MessageArrived;
 
         public event EventHandler<BuddySignedInEventArgs> BuddySignedIn;
@@ -37,6 +39,10 @@ namespace Monitron.Clients.XMPP
         public event EventHandler<BuddyListChangedEventArgs> BuddyListChanged;
 
         public event EventHandler<ConnectionStateChangedEventArgs> ConnectionStateChanged;
+
+        public event EventHandler<Monitron.Common.FileTransferProgressEventArgs> FileTransferProgress;
+
+        public event EventHandler<Monitron.Common.FileTransferAbortedEventArgs> FileTransferAborted;
 
         public IEnumerable<BuddyListItem> Buddies
         {
@@ -112,6 +118,8 @@ namespace Monitron.Clients.XMPP
                             jid.ToString()
                         );
 
+                        m_Client.StatusChanged += m_Client_StatusChanged;
+
                         try
                         {
                             m_Client.Connect(sr_DefaultResource);
@@ -128,9 +136,11 @@ namespace Monitron.Clients.XMPP
                     OnConnectionStateChanged(new ConnectionStateChangedEventArgs(m_Client.Connected));
                     m_Client.Message += m_Client_MessageArrived;
                     m_Client.RosterUpdated += m_Client_RosterUpdated;
-                    m_Client.StatusChanged += m_Client_StatusChanged;
                     m_Client.Error += m_Client_Error;
                     m_Client.SubscriptionRequest = m_Client_SubscriptionRequest;
+                    m_Client.FileTransferRequest = m_Client_FileTransferRequest;
+                    m_Client.FileTransferProgress += m_Client_FileTransferProgress;
+                    m_Client.FileTransferAborted += m_Client_FileTransferAborted;
                     m_PingTimer = new Timer(delegate
                         {
                             if (IsConnected)
@@ -146,6 +156,29 @@ namespace Monitron.Clients.XMPP
                 });
             t.IsBackground = true;
             t.Start();
+        }
+
+        private void m_Client_FileTransferAborted(object sender, S22.Xmpp.Extensions.FileTransferAbortedEventArgs e)
+        {
+            this.FileTransferAborted?.Invoke(this,
+                new Monitron.Common.FileTransferAbortedEventArgs(new FileTransferAdapter(e.Transfer)));
+        }
+
+        void m_Client_FileTransferProgress (object sender, S22.Xmpp.Extensions.FileTransferProgressEventArgs e)
+        {
+            this.FileTransferProgress?.Invoke(this,
+                new Monitron.Common.FileTransferProgressEventArgs(new FileTransferAdapter(e.Transfer)));
+            
+        }
+
+        private string m_Client_FileTransferRequest(FileTransfer transfer)
+        {
+            if (this.FileTransferRequest == null)
+            {
+                return null;
+            }
+
+            return this.FileTransferRequest?.Invoke(new FileTransferAdapter(transfer));
         }
 
         private bool m_Client_SubscriptionRequest(Jid i_From)
@@ -252,6 +285,11 @@ namespace Monitron.Clients.XMPP
             VCard vCard = m_Client.GetVCard();
             vCard.Photo = Image.FromStream(i_Stream);
             m_Client.SetVCard(vCard);
+        }
+
+        public void CancelFileTransfer(IFileTransfer i_FileTransfer)
+        {
+            m_Client.CancelFileTransfer((i_FileTransfer as FileTransferAdapter).InternalFileTransfer);
         }
 
         public void Dispose()

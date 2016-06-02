@@ -88,6 +88,10 @@
       <Project>{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}</Project>
       <Name>S22.Xmpp</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Monitron.Plugins.LocalMonitorPlugin.Common\Monitron.Plugins.LocalMonitorPlugin.Common.csproj">
+      <Project>{52426FCE-4261-40F3-91B9-20F9DE60FCEE}</Project>
+      <Name>Monitron.Plugins.LocalMonitorPlugin.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MonitronAvatar.png" />
