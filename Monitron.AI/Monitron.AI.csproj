@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AIMLbot">
-      <HintPath>AI\AIMLbot.dll</HintPath>
+      <HintPath>.\AIMLbot.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="AIML.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RemoteCommandAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AI\" />

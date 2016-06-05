@@ -78,22 +78,28 @@ namespace Monitron.AI
 
         }
 
-
-
         private void initializeMethodsCache(object i_Obj)
         {
             MethodInfo[] myArrayMethodInfo =
-                i_Obj.GetType().GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+                i_Obj.GetType().GetMethods( BindingFlags.Public | 
+                                            BindingFlags.Static |
+                                            BindingFlags.DeclaredOnly);
 
-            foreach (MethodInfo metod in myArrayMethodInfo)
+            foreach (MethodInfo meth in myArrayMethodInfo)
             {
-                this.r_MethodCache.Add(metod.Name, metod);
+                var attr = meth.GetCustomAttribute<RemoteCommandAttribute>();
+                if (attr != null)
+                {
+                    r_MethodCache.Add(attr.MethodName, meth);
+                }
             }
 
+            //foreach (MethodInfo metod in myArrayMethodInfo)
+            //{
+            //    this.r_MethodCache.Add(metod.Name, metod);
+            //}
+
         }
-
-
-
 
         private XmlDocument CreateXml( List<Tuple<string, int>> i_methodsToAiml)
         {
