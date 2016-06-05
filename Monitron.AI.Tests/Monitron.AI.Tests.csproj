@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4B194316-8C5E-497B-82D0-3940577255DC}</ProjectGuid>
+    <ProjectGuid>{886BE5C5-D976-4BDC-BB1F-AF1B6812CD7D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Monitron.AI</RootNamespace>
-    <AssemblyName>Monitron.AI</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>Monitron.AI.Tests</RootNamespace>
+    <AssemblyName>Monitron.AI.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,8 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AIMLbot">
-      <HintPath>AI\AIMLbot.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -44,17 +44,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AIML.cs" />
+    <Compile Include="AI.Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestMethodsClass.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="AI\" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\Monitron.AI\Monitron.AI.csproj">
+      <Project>{4b194316-8c5e-497b-82d0-3940577255dc}</Project>
+      <Name>Monitron.AI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.Clients.Mock\Monitron.Clients.Mock.csproj">
+      <Project>{febbb41f-7a01-485e-9936-5207ff5badf3}</Project>
+      <Name>Monitron.Clients.Mock</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
       <Project>{f6c59df6-5c97-4b51-925c-dbd8dc245779}</Project>
       <Name>Monitron.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

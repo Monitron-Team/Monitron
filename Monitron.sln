@@ -61,6 +61,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S22.Xmpp.Tests", "S22.Xmpp.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.AI", "Monitron.AI\Monitron.AI.csproj", "{4B194316-8C5E-497B-82D0-3940577255DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.AI.Tests", "Monitron.AI.Tests\Monitron.AI.Tests.csproj", "{886BE5C5-D976-4BDC-BB1F-AF1B6812CD7D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,10 @@ Global
 		{4B194316-8C5E-497B-82D0-3940577255DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B194316-8C5E-497B-82D0-3940577255DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B194316-8C5E-497B-82D0-3940577255DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{886BE5C5-D976-4BDC-BB1F-AF1B6812CD7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{886BE5C5-D976-4BDC-BB1F-AF1B6812CD7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{886BE5C5-D976-4BDC-BB1F-AF1B6812CD7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{886BE5C5-D976-4BDC-BB1F-AF1B6812CD7D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

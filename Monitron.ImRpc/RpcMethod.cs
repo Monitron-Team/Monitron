@@ -203,6 +203,11 @@ namespace Monitron.ImRpc
                 return (string)i_MethodInfo.Invoke(i_Instance, parameters);
             };
         }
+
+        public int GetParametersCount()
+        {
+            return this.r_ParameterInfos.Length;
+        }
     }
 }
 
