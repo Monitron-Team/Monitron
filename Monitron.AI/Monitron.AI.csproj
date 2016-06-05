@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AIMLbot">
-      <HintPath>.\AIMLbot.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,6 +49,10 @@
     <Folder Include="AI\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AIMLbot\AIMLbot\AIMLbot.csproj">
+      <Project>{9c87d82c-0e27-4995-a2cb-72bcb84ef2e2}</Project>
+      <Name>AIMLbot</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
       <Project>{f6c59df6-5c97-4b51-925c-dbd8dc245779}</Project>
       <Name>Monitron.Common</Name>
