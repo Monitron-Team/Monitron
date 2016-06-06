@@ -2,6 +2,7 @@
 using Monitron.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -13,9 +14,12 @@ namespace Monitron.AI
         private Bot m_bot;
         private readonly Dictionary<string, MethodInfo> r_MethodCache = new Dictionary<string, MethodInfo>();
         private Dictionary<Identity, User> m_Users;
-        
-        public AIML(object i_Object , XmlDocument i_Doc = null)
+        private readonly IMessengerClient r_MessangerClient;
+
+        public AIML(object i_Object, IMessengerClient i_MessangerClient, XmlDocument i_Doc = null)
         {
+            r_MessangerClient = i_MessangerClient;
+            r_MessangerClient.MessageArrived += r_MessengerClient_MessageArrived;
             m_bot = new Bot();
             Console.WriteLine(this.m_bot.PathToAIML);
             Console.WriteLine(this.m_bot.PathToConfigFiles);
@@ -30,7 +34,6 @@ namespace Monitron.AI
 
         public string Request(string i_message, Identity i_Buddy)
         {
-            //todo: in threads
             User user = this.getUserFromBuddy(i_Buddy);
             Request r = new Request(i_message, user, this.m_bot);
             Result res = this.m_bot.Chat(r);
@@ -38,6 +41,7 @@ namespace Monitron.AI
             int paramCountInt;
             List<object> parameters =  new List<object>();
             parameters.Add(i_Buddy);
+            parameters.Add(new State(user.Predicates));
             if (int.TryParse(paramCountStr, out paramCountInt))
             {
                 for (int i = 1; i <= paramCountInt; i++)
@@ -61,6 +65,7 @@ namespace Monitron.AI
             else
             {
                 result = new User(i_Buddy.UserName,this.m_bot);  //TODO: generate default user
+                m_Users.Add(i_Buddy,result);
             }
             return result;
         }
@@ -68,9 +73,7 @@ namespace Monitron.AI
         public void UpdateAiml(string i_fullNameSpace, List<Tuple<string, int>> i_methodsToAiml)
         {
             XmlDocument doc = this.CreateXml(i_methodsToAiml);
-            
             this.m_bot.loadAIMLFromXML(doc,i_fullNameSpace+ ".aiml");
-
         }
 
         private void initializeMethodsCache(object i_Obj)
@@ -95,6 +98,55 @@ namespace Monitron.AI
             //}
 
         }
+
+
+
+        public void r_MessengerClient_MessageArrived(object i_Sender, MessageArrivedEventArgs i_EventArgs)
+        {
+            string messageToParse = "";
+            bool isMethod = true;
+            string returnedValue = "";
+            messageToParse = i_EventArgs.Message;
+            string[] arguments = messageToParse.Split(null, 2);
+            if (arguments.Length == 0)
+            {
+                // Nothing to do
+                return;
+            }
+
+
+            try
+            {
+                returnedValue = this.Request(i_EventArgs.Message, i_EventArgs.Buddy);// ExecuteCommand(i_EventArgs.Buddy, arguments);
+            }
+            catch (TargetInvocationException e)
+            {
+                AggregateException ag = e.InnerException as AggregateException;
+                if (ag != null)
+                {
+                    returnedValue = string.Join("; ", ag.InnerExceptions.Select(x => x.Message));
+                }
+                else
+                {
+                    returnedValue = string.Format(e.InnerException.Message);
+                }
+            }
+            catch (Exception e)
+            {
+                returnedValue = string.Format("Error executing: \"{0}\": ", i_EventArgs.Message, e.Message);
+            }
+            try
+            {
+                r_MessangerClient.SendMessage(i_EventArgs.Buddy, returnedValue);
+            }
+            catch
+            {
+                // Server is down. Nothing we can do about it.
+            }
+        }
+
+
+
 
         private XmlDocument CreateXml( List<Tuple<string, int>> i_methodsToAiml)
         {
