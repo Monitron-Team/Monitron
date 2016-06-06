@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6FB74285-3300-4A0D-B441-367F4C66BCA8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Monitron.Plugins.MPD</RootNamespace>
+    <AssemblyName>Monitron.Plugins.MPD</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="MPDPlugin.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Monitron.ImRpc\Monitron.ImRpc.csproj">
+      <Project>{50D209C8-C9F4-4690-8D3C-558B592EC80B}</Project>
+      <Name>Monitron.ImRpc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
+      <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
+      <Name>Monitron.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MPD.API\MPD.API.csproj">
+      <Project>{320A28BD-0436-4507-9F22-F5EA33B04C9D}</Project>
+      <Name>MPD.API</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="node.config.exmple" />
+  </ItemGroup>
+</Project>
