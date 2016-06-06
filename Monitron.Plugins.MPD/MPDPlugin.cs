@@ -2,6 +2,7 @@
 using System.Net;
 using System.Collections.Generic;
 using System.Threading;
+using System.Reflection;
 
 using Monitron.Common;
 using Monitron.ImRpc;
@@ -40,8 +41,11 @@ namespace Monitron.Plugins.MPD
 
 		private void connectMPDServer()
 		{
-			IPAddress[] address = Dns.GetHostAddresses("10.0.0.8");
-			IPEndPoint ie = new IPEndPoint(address[0], 6600);
+			string IP = m_DataStore.Read<string>("IP");
+			int port = m_DataStore.Read<int>("port");
+
+			IPAddress[] address = Dns.GetHostAddresses(IP);
+			IPEndPoint ie = new IPEndPoint(address[0], port);
 			m_Mpc = new Mpc();
 			m_Mpc.Connection = new MpcConnection(ie);
 		}
@@ -54,6 +58,8 @@ namespace Monitron.Plugins.MPD
 				{
 					string welcomeMessange = "\nHi, I am a MPD bot";
 					r_Client.SendMessage(buddy.Identity, welcomeMessange);
+					r_Client.SetNickname("BoomBox Bot");
+					r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.MPD.Boombox.png"));
 				}
 			}
 		}
@@ -91,6 +97,13 @@ namespace Monitron.Plugins.MPD
 		public string PlaySong(Identity i_Buddy)
 		{
 			m_Mpc.Play();
+			return "start playing " + m_Mpc.CurrentSong().Title;
+		}
+
+		[RemoteCommand(MethodName="next")]
+		public string NextSong(Identity i_Buddy)
+		{
+			m_Mpc.Next();
 			return "start playing " + m_Mpc.CurrentSong().Title;
 		}
 			
