@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<NodeConfiguration>
+	<MessangerClient>
+		<DllPath>C:\Users\danielk\Documents\Monitron-Team\Monitron.git\Monitron.Clients.XMPP\bin\Debug</DllPath>
+		<DllName>Monitron.Clients.XMPP.dll</DllName>
+		<Type>Monitron.Clients.XMPP.XMPPMessengerClient</Type>
+	</MessangerClient>
+	<Account>
+		<Username>daniel_local</Username>
+		<Domain>monitron.ddns.net</Domain>
+		<Password>XXXXXX</Password>
+	 </Account>
+	 <Plugin>
+	 	<DllPath>C:\Users\danielk\Documents\Monitron-Team\Monitron.git\Monitron.Plugins.MPD\bin\Debug</DllPath>
+		<DllName>Monitron.Plugins.MPD.dll</DllName>
+		<Type>Monitron.Plugins.MPD.MPDPlugin</Type>
+	 </Plugin>
+	 <DataStore>
+		<DllPath>C:\Users\danielk\Documents\Monitron-Team\Monitron.git\Monitron.PluginDataStore.Local\bin\Debug</DllPath>
+		<DllName>Monitron.PluginDataStore.Local.dll</DllName>
+		<Type>Monitron.PluginDataStore.Local.LocalPluginDataStore</Type>
+	 	<Location>C:\Users\danielk\AppData\Roaming\Monitron\LocalDataStore.json</Location>
+	 </DataStore>
+ </NodeConfiguration>
+

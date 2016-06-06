@@ -49,6 +49,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="node.config.exmple" />
+    <None Include="MANIFEST.xml" />
+    <None Include="LocalDataStore.json.example" />
+    <None Include="node.config.example" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Boombox.png" />
   </ItemGroup>
 </Project>
