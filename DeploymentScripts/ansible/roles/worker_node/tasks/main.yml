@@ -4,6 +4,3 @@
 
 - name: load image into docker
   raw: docker load -i /node-container-image.tar
-
-- name: delete image tar
-  file: path=/node-container-image.tar state=absent

@@ -3,9 +3,13 @@ using System.Reflection;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Linq;
 
 using Monitron.Common;
 using Monitron.ImRpc;
+using Monitron.Plugins.LocalMonitorPlugin.Common;
+using Monitron;
+using MongoDB.Driver;
 
 namespace Monitron.Plugins.LocalMonitorPlugin
 {
@@ -15,6 +19,8 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 		private readonly IMessengerClient r_Client;
+
+        private readonly Monitron.StoredPluginsManager r_PluginsManager;
 
 		public IMessengerClient MessangerClient
 		{
@@ -26,20 +32,24 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 
 		private readonly RpcAdapter r_Adapter;
 		private ProcessMonitor m_ProcessMonitor;
-		private IPluginDataStore m_DataStore;
+        private readonly IPluginDataStore r_DataStore;
+        private readonly WorkerManager r_WorkerManager;
 
 		public LocalMonitorPlugin(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
 		{
-			sr_Log.Info("Local Plugin Starting");
-			r_Client = i_MessangerClient;
-			m_DataStore = i_DataStore;
-			sr_Log.Debug("Setting up rpc");
-			r_Adapter = new RpcAdapter(this, r_Client);
-			sr_Log.Debug("Setting up Process Monitor");
-			int timeIntervalPolicyCheck = m_DataStore.Read<int>("TimeIntervalPolicyCheck");
-			m_ProcessMonitor = new ProcessMonitor(timeIntervalPolicyCheck);
-			m_ProcessMonitor.PolicyViolated += m_ProcessMonitor_PolicyViolated;
-			r_Client.ConnectionStateChanged += r_Client_ConnectionStateChanged;
+            sr_Log.Info("Local Plugin Starting");
+            r_Client = i_MessangerClient;
+            r_DataStore = i_DataStore;
+            sr_Log.Debug("Setting up rpc");
+            r_Adapter = new RpcAdapter(this, r_Client);
+            r_PluginsManager = new Monitron.StoredPluginsManager(createMongoDatabase());
+            r_WorkerManager = new WorkerManager(r_PluginsManager);
+            sr_Log.Debug("Setting up Process Monitor");
+            int timeIntervalPolicyCheck = r_DataStore.Read<int>("TimeIntervalPolicyCheck");
+            m_ProcessMonitor = new ProcessMonitor(timeIntervalPolicyCheck);
+            m_ProcessMonitor.PolicyViolated += m_ProcessMonitor_PolicyViolated;
+            r_Client.ConnectionStateChanged += r_Client_ConnectionStateChanged;
+            r_Client_ConnectionStateChanged(r_Client, new ConnectionStateChangedEventArgs(r_Client.IsConnected));
 		}
 
 		private void r_Client_ConnectionStateChanged (object sender, ConnectionStateChangedEventArgs e)
@@ -55,11 +65,42 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 
 				foreach(var buddy in r_Client.Buddies) 
 				{
-					string welcomeMessange = "\nI am running. Waiting for your commands:";
-					r_Client.SendMessage(buddy.Identity, welcomeMessange);
+                    if (!buddy.Groups.Contains("Management"))
+                    {
+                        string welcomeMessange = "\nI am running. Waiting for your commands:";
+                        r_Client.SendMessage(buddy.Identity, welcomeMessange);
+                    }
 				}
+
+                IMessengerRpc rpc = r_Client as IMessengerRpc;
+                if (rpc != null)
+                {
+                    sr_Log.Debug("Setting up worker manager");
+                    rpc.RegisterRpcServer<IWorkerManager, WorkerManager>(r_WorkerManager);
+                }
+                else
+                {
+                    sr_Log.Warn("Client doesn't support in-band RPC");
+                }
 			}
 		}
+
+        private IMongoDatabase createMongoDatabase()
+        {
+            return new MongoClient(
+                new MongoClientSettings
+                {
+                    Server = MongoServerAddress.Parse(r_DataStore.Read<string>("mongo_server")),
+                    Credentials = new MongoCredential[] {
+                        MongoCredential.CreateCredential(
+                            r_DataStore.Read<string>("mongo_database"),
+                            r_DataStore.Read<string>("mongo_user"),
+                            r_DataStore.Read<string>("mongo_password")
+                        )
+                    },
+                }
+            ).GetDatabase(r_DataStore.Read<string>("mongo_database"));
+        }
 
 		private void m_ProcessMonitor_PolicyViolated(object sender, PolicyViolatedEventArgs e)
 		{

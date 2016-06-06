@@ -1,19 +1,24 @@
 ---
 - include_vars: passwords_vault.yml
 
+- name: delete old serivce files
+  file: path=/opt/MonitronLocalMonitor state=absent
+
 - name: upload local monitor service
   unarchive: src=MonitronLocalMonitor.tar.gz dest=/opt
   notify:
    - restart local monitor
 
 - name: create management user
-  user: name=monitron system=yes createhome=no home=/opt/MonitronManagement shell=/sbin/nologin comment="Monitron Management"
+  user: name=monitron system=yes createhome=no home=/opt/MonitronLocalMonitor shell=/sbin/nologin comment="Monitron Local Monitor"
 
 - name: install service file
-  copy: src=monitron-local-monitor.service dest=/etc/systemd/system/
+  template: src=monitron-local-monitor.service.j2 dest=/etc/systemd/system/monitron-local-monitor.service
   notify:
-   - enable local monitor
    - start local monitor
+
+- name: enable local monitor
+  service: name=monitron-local-monitor enabled=yes
 
 - name: creates configuration directory
   file: path=/etc/monitron state=directory group=monitron mode=0755

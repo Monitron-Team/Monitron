@@ -1,8 +1,21 @@
 - name: install Docker
   dnf: name=docker state=latest
   notify:
-   - enable Docker service
    - start Docker service
+
+- name: enable Docker service
+  service: name=docker enabled=yes
+
+- name: install docker conf
+  copy:
+   src: "docker"
+   dest: "/etc/sysconfig/docker"
+   mode: 0644
+   owner: root
+   group: root
+  notify:
+   - daemon reload
+   - restart Docker service
 
 - name: install Docker client
   dnf: name=docker-client state=latest

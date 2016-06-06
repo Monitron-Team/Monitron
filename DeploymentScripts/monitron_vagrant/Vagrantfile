@@ -43,6 +43,7 @@ Vagrant.configure(2) do |config|
 	       ansible.playbook = ANSIBLE_ROOT + "/site.yml"
 	       ansible.vault_password_file = ANSIBLE_ROOT + "/vault_password"
 	       ansible.force_remote_user = true
+	       #ansible.verbose = true
 	       ansible.groups = {
 	               "boss_servers" => ["boss"],
 	               "worker_servers" => (0..MAX_WORKER_NUM).map { |i| "worker-#{i}" }

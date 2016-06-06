@@ -59,6 +59,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S22.Xmpp.Tests", "S22.Xmpp.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.LocalMonitorPlugin.Common", "Monitron.Plugins.LocalMonitorPlugin.Common\Monitron.Plugins.LocalMonitorPlugin.Common.csproj", "{52426FCE-4261-40F3-91B9-20F9DE60FCEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.StoredPluginsManager", "Monitron.StoredPluginsManager\Monitron.StoredPluginsManager.csproj", "{3E3B5B38-C9DD-423C-A25A-751D125A0381}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{334282CE-688C-433C-8434-E23123B1CC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{334282CE-688C-433C-8434-E23123B1CC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{334282CE-688C-433C-8434-E23123B1CC5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E3B5B38-C9DD-423C-A25A-751D125A0381}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E3B5B38-C9DD-423C-A25A-751D125A0381}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E3B5B38-C9DD-423C-A25A-751D125A0381}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E3B5B38-C9DD-423C-A25A-751D125A0381}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4140B458-B63E-4D0E-AC79-462B99BAE930}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4140B458-B63E-4D0E-AC79-462B99BAE930}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4140B458-B63E-4D0E-AC79-462B99BAE930}.Release|Any CPU.ActiveCfg = Release|Any CPU

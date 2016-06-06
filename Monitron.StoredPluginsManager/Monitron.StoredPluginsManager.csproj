@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{52426FCE-4261-40F3-91B9-20F9DE60FCEE}</ProjectGuid>
+    <ProjectGuid>{3E3B5B38-C9DD-423C-A25A-751D125A0381}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Monitron.Plugins.LocalMonitorPlugin.Common</RootNamespace>
-    <AssemblyName>Monitron.Plugins.LocalMonitorPlugin.Common</AssemblyName>
+    <RootNamespace>Monitron.StoredPluginsManager</RootNamespace>
+    <AssemblyName>Monitron.StoredPluginsManager</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -29,12 +29,31 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\packages\MongoDB.Bson.2.2.3\lib\net45\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core">
+      <HintPath>..\packages\MongoDB.Driver.Core.2.2.3\lib\net45\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\packages\MongoDB.Driver.2.2.3\lib\net45\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Serialization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="MongoDB.Driver.GridFS">
+      <HintPath>..\packages\MongoDB.Driver.GridFS.2.2.3\lib\net45\MongoDB.Driver.GridFS.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IWorkerManager.cs" />
-    <Compile Include="CreateInstanceResult.cs" />
-    <Compile Include="RemoveInstanceResult.cs" />
+    <Compile Include="StoredPluginsManager.cs" />
+    <Compile Include="PluginManifest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

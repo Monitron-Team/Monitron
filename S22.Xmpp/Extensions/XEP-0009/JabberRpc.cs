@@ -14,6 +14,9 @@ namespace S22.Xmpp
 {
     internal class JabberRpc : XmppExtension, IInputFilter<Iq>
     {
+        private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
+            (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
         private readonly Dictionary<string, object> rpcServers = new Dictionary<string, object>();
         public JabberRpc(XmppIm im): base (im)
         {
@@ -91,7 +94,8 @@ namespace S22.Xmpp
                     )
                 );
             }
-            catch {
+            catch (Exception e){
+                sr_Log.Warn("Problem during RPC", e);
                 im.IqResponse(
                     type: IqType.Error,
                     id: stanza.Id,

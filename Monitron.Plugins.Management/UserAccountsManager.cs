@@ -22,7 +22,6 @@ namespace Monitron.Plugins.Management
         private readonly AdminClient r_Admin;
         private readonly IMongoDatabase m_MongoDB;
 
-		private const string k_NewUserDefaultPassword = "12356";
 		private const int k_MaxWorkersAllowed = 10;
 		private const string k_UsersDBCollection = "Users";
 
@@ -63,11 +62,9 @@ namespace Monitron.Plugins.Management
 			await collection.InsertOneAsync(newUserBsonDocument);
 		}
 
-		public void AddUser(Identity i_NewUser, Identity i_AssignBuddyTo)
+        public void AddUser(Identity i_NewUser, string i_Password)
         {
-            r_Admin.AddUser(i_NewUser.ToJid(), k_NewUserDefaultPassword);
-            Jid newAccount = new Jid(i_NewUser.Domain, i_NewUser.UserName);
-            r_Admin.AddRosterItem(newAccount, r_Client.Jid, "Monitron");
+            r_Admin.AddUser(i_NewUser.ToJid(), i_Password);
         }
 
 		public void DeleteUser(Identity i_UserToDelete)

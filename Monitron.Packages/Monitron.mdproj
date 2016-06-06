@@ -21,18 +21,19 @@
           </Builder>
         </Package>
         <Package name="Pluginless Node Linux Binaries (Release)">
-          <Builder targetFile="..\DeploymentScripts\node-container\Node.tar.gz" platform="Linux" configuration="Debug" ctype="BinariesZipPackageBuilder">
+          <Builder targetFile="..\Monitron.tar.gz" platform="Linux" configuration="Debug" ctype="BinariesZipPackageBuilder">
             <ChildEntries>
               <SolutionItemReference path="..\S22.Xmpp\S22.Xmpp.csproj" />
               <SolutionItemReference path="..\Monitron.Node\Monitron.Node.csproj" />
               <SolutionItemReference path="..\Monitron.Common\Monitron.Common.csproj" />
               <SolutionItemReference path="..\Monitron.Clients.XMPP\Monitron.Clients.XMPP.csproj" />
+              <SolutionItemReference path="..\Monitron.PluginDataStore.Cloud\Monitron.PluginDataStore.Cloud.csproj" />
             </ChildEntries>
             <RootEntry path="..\Monitron.sln" id=":root:" />
           </Builder>
         </Package>
         <Package name="Katy Perry Plugin Linux Binaries (Release)">
-          <Builder targetFile="..\DeploymentScripts\node-container\Monitron.Plugins.KatyPerry.zip" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
+          <Builder targetFile="..\DeploymentScripts\node-container\Monitron.Plugins.KatyPerry.tar" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
             <RootEntry path="..\Monitron.Plugins.KatyPerry\Monitron.Plugins.KatyPerry.csproj" />
           </Builder>
         </Package>
@@ -46,6 +47,7 @@
               <SolutionItemReference path="..\Monitron.Node\Monitron.Node.csproj" />
               <SolutionItemReference path="..\Monitron.Clients.XMPP\Monitron.Clients.XMPP.csproj" />
               <SolutionItemReference path="..\Monitron.Common\Monitron.Common.csproj" />
+              <SolutionItemReference path="..\Monitron.Plugins.LocalMonitorPlugin.Common\Monitron.Plugins.LocalMonitorPlugin.Common.csproj" />
             </ChildEntries>
             <RootEntry path="..\Monitron.sln" id=":root:" />
           </Builder>

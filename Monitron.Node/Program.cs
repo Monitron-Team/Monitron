@@ -117,7 +117,7 @@ namespace Monitron.Node
                 catch (Exception e)
                 {
                     //couldn't create node due to failing in loading the plugin
-                    sr_Log.ErrorFormat("Could not start node: {0}", e.Message);
+                    sr_Log.Error("Could not start node", e);
                     return;
                 }
 

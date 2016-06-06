@@ -2,14 +2,14 @@
 using System.Linq;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
-using ICSharpCode.SharpZipLib.Zip;
+using ICSharpCode.SharpZipLib.Tar;
 using System.IO;
 using MongoDB.Bson;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Monitron.Plugins.Management
+namespace Monitron
 {
     public class StoredPluginsManager
     {
@@ -22,27 +22,28 @@ namespace Monitron.Plugins.Management
             r_Database = i_Database;
         }
 
-        private PluginManifest readManifest(ZipFile i_PluginFile)
+        private PluginManifest readManifest(string i_PluginFile)
         {
-            ZipEntry manifestEntry = null;
-            foreach (ZipEntry entry in i_PluginFile)
+            using (var fs = new FileStream(i_PluginFile, FileMode.Open, FileAccess.Read))
             {
-                if (entry.IsFile && entry.Name.EndsWith("/MANIFEST.xml"))
+                TarInputStream archive = new TarInputStream(fs);
+                TarEntry entry;
+                TarEntry manifestEntry = null;
+                while ((entry = archive.GetNextEntry()) != null)
                 {
-                    manifestEntry = entry;
-                    break;
+                    if (!entry.IsDirectory && entry.Name.EndsWith("MANIFEST.xml"))
+                    {
+                        manifestEntry = entry;
+                        break;
+                    }
                 }
-            }
+                if (manifestEntry == null)
+                {
+                    throw new FileNotFoundException("Could not find plugin manifest");
+                }
 
-            if (manifestEntry == null)
-            {
-                throw new FileNotFoundException("Could not find plugin manifest");
-            }
-
-            using (Stream manifest_file = i_PluginFile.GetInputStream(manifestEntry))
-            {
                 XmlSerializer serializer = new XmlSerializer(typeof(PluginManifest));
-                return (PluginManifest) serializer.Deserialize(manifest_file);
+                return (PluginManifest)serializer.Deserialize(archive);
             }
         }
 
@@ -74,6 +75,13 @@ namespace Monitron.Plugins.Management
             }
         }
 
+        public Stream OpenPluginDownloadStream(string i_PluginId)
+        {
+            GridFSBucket bucket = getBucket();
+            return bucket.OpenDownloadStreamByName(i_PluginId);
+        }
+
+
         public IEnumerable<PluginManifest> ListPlugins()
         {
             // FIXME: This is ugly and slow
@@ -102,33 +110,54 @@ namespace Monitron.Plugins.Management
             );
         }
 
+        public async Task<PluginManifest> GetManifest(string i_PluginId)
+        {
+            GridFSBucket bucket = getBucket();
+            BsonDocument metadata = bucket
+                .Find(Builders<GridFSFileInfo>.Filter.Eq("filename", i_PluginId))
+                .First()
+                .Metadata;
+
+            return new PluginManifest
+            {
+                Description = metadata["description"].AsString,
+                DllName = metadata["dll_name"].AsString,
+                Id = metadata["id"].AsString,
+                Name = metadata["name"].AsString,
+                @Type = metadata["type"].AsString,
+                Version = metadata["version"].AsString,
+                DllPath = metadata["dll_path"].AsString,
+            };
+        }
+
         public async Task<PluginManifest> UploadPluginAsync(string i_PluginFilePath)
         {
+            PluginManifest manifest = readManifest(i_PluginFilePath);
+
             using (var fs = new FileStream(i_PluginFilePath, FileMode.Open, FileAccess.Read))
             {
-                ZipFile pluginFile = new ZipFile(fs);
-                PluginManifest manifest = readManifest(pluginFile);
-                {
-                    GridFSBucket bucket = getBucket();
-                    await RemovePluginAsync(manifest.Id);
-                    fs.Seek(0, SeekOrigin.Begin);
-                    await bucket.UploadFromStreamAsync(
-                        manifest.Id,
-                        fs,
-                        new GridFSUploadOptions
-                        {
-                            Metadata = new BsonDocument
+                GridFSBucket bucket = getBucket();
+                await RemovePluginAsync(manifest.Id);
+                fs.Seek(0, SeekOrigin.Begin);
+                await bucket.UploadFromStreamAsync(
+                    manifest.Id,
+                    fs,
+                    new GridFSUploadOptions
+                    {
+                        Metadata = new BsonDocument
                             {
                                 { "id", manifest.Id },
                                 { "name", manifest.Name },
                                 { "description", manifest.Description },
                                 { "version", manifest.Version },
+                                { "dll_name", manifest.DllName },
+                                { "dll_path", manifest.DllPath },
+                                { "type", manifest.Type },
                             },
-                        }
-                    );
+                    }
+                );
 
-                    return manifest;
-                }
+                return manifest;
             }
         }
     }

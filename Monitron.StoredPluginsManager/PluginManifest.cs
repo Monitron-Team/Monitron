@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Monitron.Plugins.Management
+namespace Monitron
 {
     public class PluginManifest
     {
@@ -10,6 +10,7 @@ namespace Monitron.Plugins.Management
         public string Version { get; set; }
         public string Type { get; set; }
         public string DllName { get; set; }
+        public string DllPath { get; set; }
     }
 }
 

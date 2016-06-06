@@ -15,7 +15,7 @@ using System.Drawing;
 
 namespace Monitron.Clients.XMPP
 {
-    public sealed class XMPPMessengerClient : IMessengerClient, IDisposable
+    public sealed class XMPPMessengerClient : IMessengerClient, IMessengerRpc , IDisposable
     {
         private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
             (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -295,6 +295,16 @@ namespace Monitron.Clients.XMPP
         public void Dispose()
         {
             m_PingTimer.Dispose();
+        }
+
+        public T CreateRpcClient<T>(Identity target) where T : class
+        {
+            return m_Client.CreateJabberRpcClient<T>(target.ToJid());
+        }
+
+        public void RegisterRpcServer<I, T>(T server) where I : class where T : I
+        {
+            m_Client.RegisterJabberRpcServer<I, T>(server);
         }
     }
 }

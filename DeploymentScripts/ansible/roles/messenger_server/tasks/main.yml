@@ -5,18 +5,20 @@
 - name: install Prosody
   dnf: name=prosody state=latest
   notify:
-   - Enable Prosody
-   - Start Prosody
+   - start Prosody
+
+- name: enable Prosody
+  service: name=prosody enabled=yes
 
 - name: upload Prosody server configuration
   template: src=prosody.cfg.lua.j2 dest={{prosody_conf_path}} mode=640 owner=root group=prosody
   notify:
-   - Restart Prosody
+   - restart Prosody
 
 - name: upload Monitron site configuration
   template: src=prosody_site.cfg.lua.j2 dest={{monitron_site_conf_path}} mode=640 owner=root group=prosody
   notify:
-   - Restart Prosody
+   - restart Prosody
 
 - name: upload Monitron site cert (crt)
   copy:
@@ -26,7 +28,7 @@
    owner: root
    group: root
   notify:
-   - Restart Prosody
+   - restart Prosody
 
 - name: upload Monitron site cert (key)
   copy:
@@ -36,7 +38,7 @@
    owner: root
    group: prosody
   notify:
-   - Restart Prosody
+   - restart Prosody
 
 - name: upload Monitron site cert (cnf)
   copy:
@@ -46,12 +48,12 @@
    owner: root
    group: prosody
   notify:
-   - Restart Prosody
+   - restart Prosody
 
 - name: upload Monitron Ad-Hoc module
   copy: src=mod_monitron_adhoc.lua dest={{prosody_module_path}} mode=644 owner=root group=root
   notify:
-   - Restart Prosody
+   - restart Prosody
 
 - name: create Monitron admin
   prosody_adduser: jid=monitron_admin@{{domain_name}} password={{monitron_admin_password}}

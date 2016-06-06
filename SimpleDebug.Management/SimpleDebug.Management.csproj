@@ -52,6 +52,10 @@
       <Project>{58199704-1F8F-4268-82CA-456AEE7D010F}</Project>
       <Name>Monitron.Plugins.Management</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Monitron.StoredPluginsManager\Monitron.StoredPluginsManager.csproj">
+      <Project>{3E3B5B38-C9DD-423C-A25A-751D125A0381}</Project>
+      <Name>Monitron.StoredPluginsManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="NodeConf.xml">

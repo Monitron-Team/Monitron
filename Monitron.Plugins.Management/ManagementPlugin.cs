@@ -12,6 +12,8 @@ using Monitron.Management.AdminClient;
 using System.IO;
 using System.Xml.Serialization;
 using System.Collections.Generic;
+using Monitron.Plugins.LocalMonitorPlugin.Common;
+using System.Text;
 
 namespace Monitron.Plugins.Management
 {
@@ -44,7 +46,7 @@ namespace Monitron.Plugins.Management
 
         private readonly RpcAdapter r_Adapter;
 
-        private readonly SortedSet<string> r_AvailableWorkers = new SortedSet<string>();
+        private readonly Dictionary<string, IWorkerManager> r_AvailableWorkers = new Dictionary<string, IWorkerManager>();
 
         public ManagementPlugin(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
         {
@@ -55,7 +57,9 @@ namespace Monitron.Plugins.Management
             i_MessangerClient.BuddySignedIn += (sender, e) => {
                 if (e.Buddy.UserName == k_WorkerUserName)
                 {
-                    r_AvailableWorkers.Add(e.Buddy.Resource);
+                    IMessengerRpc rpc = (r_Client as IMessengerRpc);
+                    IWorkerManager wm = rpc.CreateRpcClient<IWorkerManager>(e.Buddy);
+                    r_AvailableWorkers.Add(e.Buddy.Resource, wm);
                 }
             };
             i_MessangerClient.BuddySignedOut += (sender, e) => {
@@ -166,7 +170,7 @@ namespace Monitron.Plugins.Management
                     i_AdminPassword: r_DataStore.Read<string>("admin_password")
                 );
                 Identity adminIdent = new Identity { Domain = this.r_Client.Identity.Domain, UserName = "admin" };
-                Identity localMonitorIdent = new Identity { Domain = this.r_Client.Identity.Domain, UserName = "local_monitor" };
+                Identity localMonitorIdent = new Identity { Domain = this.r_Client.Identity.Domain, UserName = k_WorkerUserName };
                 m_UserManager.AddRosterItem(adminIdent, localMonitorIdent, "Monitron");
                 m_UserManager.AddRosterItem(localMonitorIdent, adminIdent, "admin");
                 m_UserManager.AddRosterItem(r_Client.Identity, localMonitorIdent, "Workers");
@@ -232,7 +236,9 @@ namespace Monitron.Plugins.Management
             newIdentity.Domain = r_Client.Identity.Domain;
             try
             {
-                m_UserManager.AddUser(newIdentity, r_Client.Identity);
+                m_UserManager.AddUser(newIdentity, "123456");
+                m_UserManager.AddRosterItem(newIdentity, r_Client.Identity, "Monitron");
+                m_UserManager.AddRosterItem(r_Client.Identity, newIdentity, "Users");
             }
             catch (AdminClientException e)
             {
@@ -243,12 +249,128 @@ namespace Monitron.Plugins.Management
         }
 
         [RemoteCommand(
-            MethodName="get_workers",
+            MethodName="list_worker_hosts",
             Description="gets the list of all active worker hosts"
         )]
         public string GetWorkers(Identity identity)
         {
-            return "\n" + string.Join("\n", r_AvailableWorkers);
+            return "\n" + string.Join("\n", r_AvailableWorkers.Keys);
+        }
+
+        [RemoteCommand(
+            MethodName="create_instance",
+            Description="create a new instance of a plugin"
+        )]
+        public string CreateInstance(
+            Identity identity,
+            [Opt("name", "n|name=", "{NAME} of the instance")] string i_Name,
+            [Opt("plugin_id", "p|plugin-id=", "{PLUGIN_ID} of the instance")] string i_PluginId,
+            [Opt("worker_id", "w|worker-id", "{WORKER_ID} of the worker you want to use")] string i_WorkerId)
+        {
+            IWorkerManager workerManager;
+            if (!r_AvailableWorkers.TryGetValue(i_WorkerId, out workerManager))
+            {
+                return string.Format("Inavlid worker id '{0}'", i_WorkerId);
+            }
+
+            Account buddy = createBotBuddy();
+            m_UserManager.AddRosterItem(buddy.Identity, identity, "Admins");
+            m_UserManager.AddRosterItem(identity, buddy.Identity, "Bots");
+            try{
+            var result = workerManager.CreateInstance(
+                string.Format("{0}-{1}", identity.UserName, i_Name),
+                i_PluginId,
+                generateConfiguration(buddy, r_PluginsManager.GetManifest(i_PluginId).Result));
+                if (!result.Success)
+                {
+                    m_UserManager.DeleteUser(buddy.Identity);
+                    return result.Error;
+                }
+            }
+            catch (Exception e)
+            {
+                m_UserManager.DeleteUser(buddy.Identity);
+                throw;
+            }
+
+
+            return "Instance created successfully";
+        }
+
+        string generateConfiguration(Account i_Buddy, PluginManifest i_Manifest)
+        {
+            return string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
+<NodeConfiguration>
+    <Account>
+        <Username>{0}</Username>
+        <Domain>{1}</Domain>
+        <Password>{2}</Password>
+    </Account>
+    <MessangerClient>
+        <DllPath>.</DllPath>
+        <DllName>Monitron.Clients.XMPP.dll</DllName>
+        <Type>Monitron.Clients.XMPP.XMPPMessengerClient</Type>
+    </MessangerClient>
+    <Plugin>
+        <DllPath>{3}</DllPath>
+        <DllName>{4}</DllName>
+        <Type>{5}</Type>
+    </Plugin>
+ </NodeConfiguration>
+",
+            i_Buddy.Identity.UserName,
+            i_Buddy.Identity.Domain,
+            i_Buddy.Password,
+            i_Manifest.DllPath,
+            i_Manifest.DllName,
+            i_Manifest.Type
+        );
+        }
+
+        private static string generatePassword(int length)
+        {
+            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            StringBuilder res = new StringBuilder();
+            Random rnd = new Random();
+            while (0 < length--)
+            {
+                res.Append(valid[rnd.Next(valid.Length)]);
+            }
+            return res.ToString();
+        }
+
+        private Account createBotBuddy()
+        {
+            Account buddy = new Account(
+                i_UserName: Guid.NewGuid().ToString(),
+                i_Host: r_Client.Identity.Domain,
+                i_Password: generatePassword(16));
+            m_UserManager.AddUser(buddy.Identity, buddy.Password);
+            return buddy;
+        }
+
+        [RemoteCommand(
+            MethodName="remove_instance",
+            Description="remove an active instance of a plugin"
+        )]
+        public string RemoveInstance(
+            Identity identity,
+            [Opt("name", "n|name=", "{NAME} of the instance")] string i_Name,
+            [Opt("worker_id", "w|worker-id", "{WORKER_ID} of the worker you want to use")] string i_WorkerId)
+        {
+            IWorkerManager workerManager;
+            if (!r_AvailableWorkers.TryGetValue(i_WorkerId, out workerManager))
+            {
+                return string.Format("Inavlid worker id '{0}'", i_WorkerId);
+            }
+
+            var result = workerManager.RemoveInstance(string.Format("{0}-{1}", identity.UserName, i_Name));
+            if (!result.Success)
+            {
+                return result.Error;
+            }
+
+            return "Instance removed successfully";
         }
 
         [RemoteCommand(
@@ -257,6 +379,20 @@ namespace Monitron.Plugins.Management
         )]
         public string ListInstances(Identity identity)
         {
+            StringBuilder result = new StringBuilder();
+            foreach (var worker in r_AvailableWorkers)
+            {
+                result.Append(worker.Key);
+                result.Append(":\n");
+
+                foreach (var workerId in worker.Value.GetRunningWorkerIds())
+                {
+                    result.Append("\t");
+                    result.AppendLine(workerId);
+                }
+            }
+
+            return result.ToString();
         }
 
         [RemoteCommand(

@@ -1,7 +1,6 @@
 ---
-- name: enable iptables
-  service: name=iptables enabled=yes
 - name: start iptables
   service: name=iptables state=started
+
 - name: restart iptables
   service: name=iptables state=restarted

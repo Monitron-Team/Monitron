@@ -1,7 +1,6 @@
 ---
-- name: Enable MongoDB Server
-  service: name=mongod enabled=yes
-- name: Start MongoDB Server
+- name: start MongoDB server
   service: name=mongod state=started
-- name: Restart MongoDB Server
+
+- name: restart MongoDB server
   service: name=mongod state=restarted

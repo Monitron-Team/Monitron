@@ -1,6 +1,5 @@
-- name: Enable Prosody
-  service: name=prosody enabled=yes
-- name: Start Prosody
+- name: start Prosody
   service: name=prosody state=started
-- name: Restart Prosody
+
+- name: restart Prosody
   service: name=prosody state=restarted

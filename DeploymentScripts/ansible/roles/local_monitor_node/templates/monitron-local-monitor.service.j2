@@ -2,7 +2,7 @@
 Description=Monitron Local Monitor Service
 
 [Service]
-ExecStart=/usr/bin/mono /opt/MonitronLocalMonitor/Monitron.Node.exe --conf /etc/monitron/localmonitor.conf
+ExecStart=/usr/bin/mono {% if mono_debug %} --debug --debugger-agent=transport=dt_socket,address=0.0.0.0:{{mono_debug_port}},server=y {% endif %} /opt/MonitronLocalMonitor/Monitron.Node.exe --conf /etc/monitron/localmonitor.conf
 WorkingDirectory=/opt/MonitronLocalMonitor/
 Restart=always
 StandardOutput=syslog

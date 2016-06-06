@@ -55,6 +55,7 @@
     <Compile Include="FileTransferRequest.cs" />
     <Compile Include="FileTransferProgressEventArgs.cs" />
     <Compile Include="FileTransferAbortedEventArgs.cs" />
+    <Compile Include="IMessengerRpc.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

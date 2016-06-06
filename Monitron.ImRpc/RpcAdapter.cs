@@ -52,7 +52,7 @@ namespace Monitron.ImRpc
             }
             catch (Exception e)
             {
-                returnedValue = string.Format("Error executing: \"{0}\": ", i_EventArgs.Message, e.Message);
+                returnedValue = string.Format("Error executing: \"{0}\": {1}", i_EventArgs.Message, e.Message);
             }
 
             try

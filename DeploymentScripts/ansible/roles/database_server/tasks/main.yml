@@ -4,8 +4,11 @@
 - name: install MongoDB server
   dnf: name=mongodb-server state=latest
   notify:
-   - Enable MongoDB Server
-   - Start MongoDB Server
+   - start MongoDB server
+
+- name: enable MongoDB Server
+  service: name=mongod enabled=yes
+
 
 - name: configure MongoDB server
   copy:
@@ -15,7 +18,7 @@
    owner: root
    group: root
   notify:
-   - Restart MongoDB Server
+   - restart MongoDB server
 
 - name: install MongoDB client
   dnf: name=mongodb state=latest

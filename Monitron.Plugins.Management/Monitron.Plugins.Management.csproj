@@ -62,8 +62,6 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ManagementPlugin.cs" />
-    <Compile Include="PluginManifest.cs" />
-    <Compile Include="StoredPluginsManager.cs" />
     <Compile Include="UserAccountsManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -91,6 +89,10 @@
     <ProjectReference Include="..\Monitron.Plugins.LocalMonitorPlugin.Common\Monitron.Plugins.LocalMonitorPlugin.Common.csproj">
       <Project>{52426FCE-4261-40F3-91B9-20F9DE60FCEE}</Project>
       <Name>Monitron.Plugins.LocalMonitorPlugin.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.StoredPluginsManager\Monitron.StoredPluginsManager.csproj">
+      <Project>{3E3B5B38-C9DD-423C-A25A-751D125A0381}</Project>
+      <Name>Monitron.StoredPluginsManager</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
