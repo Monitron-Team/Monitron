@@ -24,10 +24,15 @@ namespace Monitron.AI.Tests
             XmlDocument doc = new XmlDocument();
             FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
             doc.Load(fs);
-            AIML bot = new AIML(testClass ,doc);
-            string res = bot.Request("echo " + wordToRepeat, friendIdentity);
+            AIML bot = new AIML(testClass , client, doc);
+            //string res = bot.Request("echo " + wordToRepeat, friendIdentity);
+
+            client.PushMessage(friendIdentity, "echo " + wordToRepeat);
+            Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
+
+
             //client.PushMessage(friendIdentity, string.Format("echo  \"{0}\"", wordToRepeat));
-            Assert.AreEqual(expectedResponse, res);
+            //Assert.AreEqual(expectedResponse, res);
 
         }
 
@@ -44,10 +49,29 @@ namespace Monitron.AI.Tests
             FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
             doc.Load(fs);
             TestMethodsClass testClass = new TestMethodsClass();
-            AIML bot = new AIML(testClass,doc);
-            string res = bot.Request(string.Format("add {0} {1}", first,second), friendIdentity);
-            //client.PushMessage(friendIdentity, string.Format("echo  \"{0}\"", wordToRepeat));
-            Assert.AreEqual(expectedResponse, res);
+            AIML bot = new AIML(testClass,client, doc);
+            client.PushMessage(friendIdentity, string.Format("add {0} {1}", first, second));
+            Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
+
+        }
+
+        [Test()]
+        public void TestMovies()
+        {
+            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
+            Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
+            MockMessengerClient client = new MockMessengerClient(clientIdnetity);
+            XmlDocument doc = new XmlDocument();
+            FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
+            doc.Load(fs);
+            TestMethodsClass testClass = new TestMethodsClass();
+            AIML bot = new AIML(testClass, client, doc);
+            string res = bot.Request("my name is maor", friendIdentity);
+            res = bot.Request("I am 27 years old", friendIdentity);
+            res = bot.Request("what is my name?", friendIdentity);
+            client.PushMessage(friendIdentity, "give me a movie title with my name");
+
+            //Assert.AreEqual(expectedResponse, res);
 
         }
 

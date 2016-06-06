@@ -42,17 +42,6 @@ namespace Monitron.ImRpc.Tests
             client.PushMessage(friendIdentity, string.Format("complex_cmd  {0}", expectedResult));
             Assert.AreEqual(expectedResult, client.SentMessageQueue.Dequeue().Item2);
         }
-
-        [Test()]
-        public void TestAI()
-        {
-            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
-            Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
-            MockMessengerClient client = new MockMessengerClient(clientIdnetity);
-            var adapter = new RpcAdapter(new TestClass(), client);
-            string expectedResult = "fuck you.";
-            client.PushMessage(friendIdentity, string.Format("maor sade nan", expectedResult));
-            Assert.AreEqual(expectedResult, client.SentMessageQueue.Dequeue().Item2);
-        }
+        
     }
 }
