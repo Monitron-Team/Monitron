@@ -10,8 +10,6 @@ namespace Monitron.AI.Tests
 {
     public class ImRpcTests
     {
-       
-
         [Test()]
         public void TestSimpleEcho()
         {
@@ -24,16 +22,10 @@ namespace Monitron.AI.Tests
             XmlDocument doc = new XmlDocument();
             FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
             doc.Load(fs);
-            AIML bot = new AIML(testClass , client, doc);
-            //string res = bot.Request("echo " + wordToRepeat, friendIdentity);
 
+            AIML bot = new AIML(testClass , client, doc);
             client.PushMessage(friendIdentity, "echo " + wordToRepeat);
             Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
-
-
-            //client.PushMessage(friendIdentity, string.Format("echo  \"{0}\"", wordToRepeat));
-            //Assert.AreEqual(expectedResponse, res);
-
         }
 
         [Test()]
@@ -66,11 +58,11 @@ namespace Monitron.AI.Tests
             doc.Load(fs);
             TestMethodsClass testClass = new TestMethodsClass();
             AIML bot = new AIML(testClass, client, doc);
-            string res = bot.Request("my name is maor", friendIdentity);
-            res = bot.Request("I am 27 years old", friendIdentity);
-            res = bot.Request("what is my name?", friendIdentity);
+            string res = bot.Request("my name is daniel", friendIdentity);
+            //res = bot.Request("I am 27 years old", friendIdentity);
+            //res = bot.Request("what is my name?", friendIdentity);
             client.PushMessage(friendIdentity, "give me a movie title with my name");
-
+            Assert.AreEqual("false", client.SentMessageQueue.Dequeue().Item2);
             //Assert.AreEqual(expectedResponse, res);
 
         }

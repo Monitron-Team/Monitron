@@ -15,20 +15,23 @@ namespace Monitron.AI.Tests
     class TestMethodsClass
     {
         [RemoteCommand(MethodName = "echo")]
-        public static string echo(Identity i_Buddy, State i_state ,string i_input)
+        public static string Echo(Identity i_Buddy, State i_State)
         {
-            return i_input;
+            string input = i_State.getKey("echo::text")?? "";
+            return input;
         }
 
         //[RemoteCommand(MethodName = "get_five")]
-        public static string getFive(Identity i_Buddy, State i_state)
+        public static string GetFive(Identity i_Buddy, State i_State)
         {
             return "5";
         }
 
         [RemoteCommand(MethodName = "add")]
-        public static string add(Identity i_Buddy, State i_state, string i_First, string i_Seconds)
+        public static string Add(Identity i_Buddy, State i_State)
         {
+            string i_First = i_State.getKey("add::first") ?? "";
+            string i_Seconds = i_State.getKey("add::second") ?? "";
             string result = "";
             int first, second;
             if (int.TryParse(i_First, out first) && int.TryParse(i_Seconds, out second))
@@ -40,9 +43,9 @@ namespace Monitron.AI.Tests
         }
 
         [RemoteCommand(MethodName = "movieDetailsByName")]
-        public static string movieDetailsByName(Identity i_Buddy, State i_state)
+        public static string MovieDetailsByName(Identity i_Buddy, State i_State)
         {
-            string name = i_state.getKey("name");
+            string name = i_State.getKey("name");
             string query = "http://www.omdbapi.com/?t=" + name +"&y=&plot=short&r=xml";
 
             //todo: first check if there is an internet connection.
