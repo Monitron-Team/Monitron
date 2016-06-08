@@ -12,6 +12,9 @@ namespace Monitron.ImRpc
 {
     public class RpcAdapter
     {
+        private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
+            (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
         private readonly object r_Obj;
         private readonly IMessengerClient r_MessangerClient;
         private readonly Dictionary<string, RpcMethod> r_MethodCache = new Dictionary<string, RpcMethod>();
@@ -49,6 +52,8 @@ namespace Monitron.ImRpc
                 {
                     returnedValue = string.Format(e.InnerException.Message);
                 }
+
+                sr_Log.Error("Error during rpc command", e);
             }
             catch (Exception e)
             {

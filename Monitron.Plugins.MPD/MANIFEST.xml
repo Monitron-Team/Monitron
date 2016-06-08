@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <PluginManifest>
-	<Id>Boombox-bot</Id>
-	<Name>Boombox bot</Name>
+	<Id>boombox</Id>
+	<Name>Boombox</Name>
 	<Description>Connect to MPD server and play remote music</Description>
 	<Version>1.0.0</Version>
 	<DllName>Monitron.Plugins.MPD.dll</DllName>
 	<Type>Monitron.Plugins.MPD.MPDPlugin</Type>
-	<DllPath>Monitron.Plugin.MPD</DllPath>
+	<DllPath>BoomBoxPlugin</DllPath>
 </PluginManifest>

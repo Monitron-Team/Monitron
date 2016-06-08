@@ -32,6 +32,7 @@ namespace Monitron.PluginDataStore.Cloud
 
         public void Write<T>(string i_Key, T i_Value)
         {
+            Delete(i_Key);
             GetDataStore<T>()
                 .InsertOne(new DataStoreEntry<T>
                     {
@@ -51,8 +52,9 @@ namespace Monitron.PluginDataStore.Cloud
 
         public void Delete(string i_Key)
         {
-            GetDataStore<object>()
-                .DeleteOne(Builders<DataStoreEntry<object>>.Filter.Eq("Key", i_Key));
+            IMongoDatabase db = GetDatabase();
+            db.GetCollection<BsonDocument>(r_Url.Username + "_data_store")
+                .DeleteMany(Builders<BsonDocument>.Filter.Eq("Key", i_Key));
         }
     }
 }

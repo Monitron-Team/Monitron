@@ -56,6 +56,9 @@
     <Reference Include="Mono.Options">
       <HintPath>..\packages\Mono.Options.4.2.2.0\lib\net4\Mono.Options.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

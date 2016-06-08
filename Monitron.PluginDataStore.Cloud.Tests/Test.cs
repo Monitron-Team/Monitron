@@ -24,6 +24,15 @@ namespace Monitron.PluginDataStore.Cloud.Tests
             TestStruct res = ds.Read<TestStruct>(key);
             Assert.AreEqual(s.s, res.s);
             Assert.AreEqual(s.i, res.i);
+            s = new TestStruct
+                {
+                    s = "sstring",
+                    i = 43,
+                };
+            ds.Write(key, s);
+            res = ds.Read<TestStruct>(key);
+            Assert.AreEqual(s.s, res.s);
+            Assert.AreEqual(s.i, res.i);
             ds.Delete(key);
         }
     }

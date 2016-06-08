@@ -37,6 +37,9 @@
     <Compile Include="RemoveInstanceResult.cs" />
     <Compile Include="ListInstancesResult.cs" />
     <Compile Include="InstanceStatus.cs" />
+    <Compile Include="PauseInstanceResult.cs" />
+    <Compile Include="UnpauseInstanceResult.cs" />
+    <Compile Include="GetLogResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -33,7 +33,7 @@
           </Builder>
         </Package>
         <Package name="Katy Perry Plugin Linux Binaries (Release)">
-          <Builder targetFile="..\DeploymentScripts\node-container\Monitron.Plugins.KatyPerry.tar" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
+          <Builder targetFile="..\DeploymentScripts\KatyPerryPlugin.tar" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
             <RootEntry path="..\Monitron.Plugins.KatyPerry\Monitron.Plugins.KatyPerry.csproj" />
           </Builder>
         </Package>
@@ -48,6 +48,15 @@
               <SolutionItemReference path="..\Monitron.Clients.XMPP\Monitron.Clients.XMPP.csproj" />
               <SolutionItemReference path="..\Monitron.Common\Monitron.Common.csproj" />
               <SolutionItemReference path="..\Monitron.Plugins.LocalMonitorPlugin.Common\Monitron.Plugins.LocalMonitorPlugin.Common.csproj" />
+            </ChildEntries>
+            <RootEntry path="..\Monitron.sln" id=":root:" />
+          </Builder>
+        </Package>
+        <Package name="BoomBox Plugin Linux Binaries (Release)">
+          <Builder targetFile="..\BoomBoxPlugin.tar" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
+            <ChildEntries>
+              <SolutionItemReference path="..\MPD.API\MPD.API.csproj" />
+              <SolutionItemReference path="..\Monitron.Plugins.MPD\Monitron.Plugins.MPD.csproj" />
             </ChildEntries>
             <RootEntry path="..\Monitron.sln" id=":root:" />
           </Builder>

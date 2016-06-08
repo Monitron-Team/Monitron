@@ -33,12 +33,16 @@ namespace Monitron.Plugins.LocalMonitorPlugin
             string i_PluginId,
             string i_Config)
         {
-            Stream pluginStream;
+            Stream pluginStream = null;
             try
             {
                 pluginStream = r_PluginsManager.OpenPluginDownloadStream(i_PluginId);
             }
-            catch (Exception e)
+            catch
+            {
+            }
+
+            if (pluginStream == null)
             {
                 return new CreateInstanceResult
                 {
@@ -46,22 +50,23 @@ namespace Monitron.Plugins.LocalMonitorPlugin
                     Error = string.Format("Could not find plugin '{0}'", i_PluginId)
                 };
             }
+
             
             DockerClient client = createClient();
             string containerId;
             try
             {
                 var resp = await client.Containers.CreateContainerAsync(
-                new CreateContainerParameters
-                {
-                    ContainerName = i_Name,
-                    Config = new Config
-                        {
-                            Image = "monitron/node-container",
-                            Tty = false,
-                        },
-                });
-
+                    new CreateContainerParameters
+                    {
+                        ContainerName = i_Name,
+                        Config = new Config
+                            {
+                                Image = "monitron/node-container",
+                                Tty = false,
+                            },
+                    });
+                
                 containerId = resp.Id;
             }
             catch (Exception e)
@@ -206,6 +211,104 @@ namespace Monitron.Plugins.LocalMonitorPlugin
             };
         }
 
+        public async Task<UnpauseInstanceResult> UnpauseInstanceAsync(string i_Name)
+        {
+            try
+            {
+                var client = createClient();
+                await client.Containers.UnpauseContainerAsync(i_Name);
+            }
+            catch (Exception e)
+            {
+                return new UnpauseInstanceResult
+                {
+                    Success = false,
+                    Error = e.Message,
+                };
+            }
+
+            return new UnpauseInstanceResult
+            {
+                Success = true,
+                Error = string.Empty,
+            };
+        }
+
+        public GetLogResult GetLog(string i_Name)
+        {
+            return GetLogAsync(i_Name).Result;
+        }
+
+        public async Task<GetLogResult> GetLogAsync(string i_Name)
+        {
+            try
+            {
+                var client = createClient();
+                var sr = new StreamReader(await client.Containers.GetContainerLogsAsync(
+                    i_Name,
+                    new GetContainerLogsParameters
+                    {
+                        Follow = false,
+                        Stderr = true,
+                        Stdout = true,
+                        Timestamps = false,
+                        Tail = new ContainerLogsTailN(50),
+                    },
+                    new System.Threading.CancellationToken()
+                ));
+                return new GetLogResult
+                {
+                    Success = true,
+                    Error = string.Empty,
+                    Log = sr.ReadLine(),
+                };
+            }
+            catch (Exception e)
+            {
+                return new GetLogResult
+                {
+                    Success = false,
+                    Error = e.Message,
+                    Log = string.Empty,
+                };
+            }
+        }
+
+
+        public UnpauseInstanceResult UnpauseInstance(string i_Name)
+        {
+            return UnpauseInstanceAsync(i_Name).Result;
+        }
+
+
+        public async Task<PauseInstanceResult> PauseInstanceAsync(string i_Name)
+        {
+            try
+            {
+                var client = createClient();
+                await client.Containers.PauseContainerAsync(i_Name);
+            }
+            catch (Exception e)
+            {
+                return new PauseInstanceResult
+                {
+                    Success = false,
+                    Error = e.Message,
+                };
+            }
+
+            return new PauseInstanceResult
+            {
+                Success = true,
+                Error = string.Empty,
+            };
+        }
+
+        public PauseInstanceResult PauseInstance(string i_Name)
+        {
+            return PauseInstanceAsync(i_Name).Result;
+        }
+
         public RemoveInstanceResult RemoveInstance(string i_Name)
         {
             return RemoveInstanceAsync(i_Name).Result;
@@ -230,7 +333,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
                     {
                         return new InstanceStatus
                         {
-                            Name = container.Names.First(),
+                            Name = container.Names.First().Substring(1),
                             Status = container.Status,
                         };
                     })

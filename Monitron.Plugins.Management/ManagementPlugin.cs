@@ -36,6 +36,8 @@ namespace Monitron.Plugins.Management
 		private readonly IMongoDatabase m_MongoDB;
 
 		private UserAccountsManager m_UserManager;
+
+        private IInstanceAllocationStrategy m_IstanceAllocationStrategy;
         
         public IMessengerClient MessangerClient
         {
@@ -51,6 +53,7 @@ namespace Monitron.Plugins.Management
 
         public ManagementPlugin(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
         {
+            m_IstanceAllocationStrategy = new BalancedInstanceAllocationStrategy();
             i_MessangerClient.ConnectionStateChanged += r_Client_ConnectionStateChanged;
             i_MessangerClient.FileTransferRequest = r_Client_FileTransferRequest;
             i_MessangerClient.FileTransferProgress += i_MessangerClient_FileTransferProgress;
@@ -130,12 +133,10 @@ namespace Monitron.Plugins.Management
         private string r_Client_FileTransferRequest(IFileTransfer i_FileTransfer) {
             if (i_FileTransfer.Size > k_MaxPluginSize)
             {
-                this.r_Client.SendMessage(i_FileTransfer.From, "Refusing upload, file to large");
+                this.r_Client.SendMessage(i_FileTransfer.From, "Refusing upload, file too large");
                 return null;
             }
                 
-            //this.r_Client.SendMessage(i_FileTransfer.From,
-            //    string.Format("File transfer for {} initiated", i_FileTransfer.Name));
             return getFileTransferTmpPath(i_FileTransfer);
         }
 
@@ -179,24 +180,37 @@ namespace Monitron.Plugins.Management
             }
         }
 
-        [RemoteCommand(MethodName="list_plugins")]
+        [RemoteCommand(
+            MethodName="list_plugins",
+            Description="List all available plugins"
+        )]
         public string ListPlugins(Identity buddy)
         {
-            string result = "";
+            StringBuilder result = new StringBuilder("\n");
+            bool pluginsFound = false;
             foreach (PluginManifest manifest in r_PluginsManager.ListPlugins())
             {
-                result += string.Format("{0} [{1}:{2}]\n", manifest.Name, manifest.Id, manifest.Version);
+                pluginsFound = true;
+                result.AppendFormat(
+                    "{0} [{1}:{2}]\n\t{3}\n",
+                    manifest.Name,
+                    manifest.Id,
+                    manifest.Version,
+                    manifest.Description);
             }
 
-            if (result == string.Empty)
+            if (!pluginsFound)
             {
-                result = "No plugins available";
+                result.Append("No plugins available");
             }
 
-            return result;
+            return result.ToString();
         }
 
-        [RemoteCommand(MethodName="delete_plugin")]
+        [RemoteCommand(
+            MethodName="delete_plugin",
+            Description="Make a plugin unavailable"
+        )]
         public string DeletePlugin(
             Identity buddy,
             [Opt("plugin_id", "p|plugin_id=", "{PLUGIN} to delete")] string i_PluginId)
@@ -214,14 +228,6 @@ namespace Monitron.Plugins.Management
                 }
             );
             return "Trying to delete plugin";
-        }
-
-        [RemoteCommand(MethodName="echo")]
-        public string Echo(
-            Identity buddy,
-            [Opt("text", "t|text=", "{TEXT} to echo back")] string i_Text)
-        {
-            return i_Text;
         }
 
 		[RemoteCommand(
@@ -265,19 +271,16 @@ namespace Monitron.Plugins.Management
         public string CreateInstance(
             Identity identity,
             [Opt("name", "n|name=", "{NAME} of the instance")] string i_Name,
-            [Opt("plugin_id", "p|plugin-id=", "{PLUGIN_ID} of the instance")] string i_PluginId,
-            [Opt("worker_id", "w|worker-id", "{WORKER_ID} of the worker you want to use")] string i_WorkerId)
+            [Opt("plugin_id", "p|plugin-id=", "{PLUGIN_ID} of the instance")] string i_PluginId)
         {
-            IWorkerManager workerManager;
-            if (!r_AvailableWorkers.TryGetValue(i_WorkerId, out workerManager))
+            IWorkerManager workerManager = m_IstanceAllocationStrategy.SelectWorkerForNewInstance(r_AvailableWorkers.Values);
+            if (workerManager == null)
             {
-                return string.Format("Inavlid worker id '{0}'", i_WorkerId);
+                return string.Format("Could not allocate new instance, system at full capacity");
             }
 
             Identity botIdentity = getBotIdentity(identity, i_Name);
             Account buddy = createBotBuddy(botIdentity);
-            m_UserManager.AddRosterItem(buddy.Identity, identity, "Admins");
-            m_UserManager.AddRosterItem(identity, buddy.Identity, "Bots");
             CreateInstanceResult result;
             try{
                 result = workerManager.CreateInstance(
@@ -299,6 +302,9 @@ namespace Monitron.Plugins.Management
                 m_UserManager.DeleteUser(buddy.Identity);
                 return result.Error;
             }
+
+            m_UserManager.AddRosterItem(buddy.Identity, identity, "Admins");
+            m_UserManager.AddRosterItem(identity, buddy.Identity, "Bots");
 
             return "Instance created successfully";
         }
@@ -370,22 +376,109 @@ namespace Monitron.Plugins.Management
             };
         }
 
+        private IWorkerManager FindInstance(Identity i_BotIdentity)
+        {
+            string name = i_BotIdentity.UserName;
+            foreach (var worker in r_AvailableWorkers.Values)
+            {
+                if (worker.ListInstances().Statuses.Any((status) => status.Name == name))
+                    return worker;
+            }
+
+            return null;
+        }
+
+        [RemoteCommand(
+            MethodName="pause_instance",
+            Description="pause an active instance of a plugin"
+        )]
+        public string PauseInstance(
+            Identity identity,
+            [Opt("name", "n|name=", "{NAME} of the instance")] string i_Name)
+        {
+            Identity botIdentity = getBotIdentity(identity, i_Name);
+
+            IWorkerManager workerManager = FindInstance(botIdentity);
+            if (workerManager == null)
+            {
+                return string.Format("Instance not found");
+            }
+            
+            var result = workerManager.PauseInstance(botIdentity.UserName);
+            if (!result.Success)
+            {
+                return result.Error;
+            }
+
+            return "Instance paused successfully";
+        }
+
+        [RemoteCommand(
+            MethodName="unpause_instance",
+            Description="unpause an active instance of a plugin"
+        )]
+        public string UnpauseInstance(
+            Identity identity,
+            [Opt("name", "n|name=", "{NAME} of the instance")] string i_Name)
+        {
+            Identity botIdentity = getBotIdentity(identity, i_Name);
+
+            IWorkerManager workerManager = FindInstance(botIdentity);
+            if (workerManager == null)
+            {
+                return string.Format("Instance not found");
+            }
+            
+            var result = workerManager.UnpauseInstance(botIdentity.UserName);
+            if (!result.Success)
+            {
+                return result.Error;
+            }
+
+            return "Instance paused successfully";
+        }
+
+        [RemoteCommand(
+            MethodName="get_log",
+            Description="get log on an instance of a plugin"
+        )]
+        public string GetLog(
+            Identity identity,
+            [Opt("name", "n|name=", "{NAME} of the instance")] string i_Name)
+        {
+            Identity botIdentity = getBotIdentity(identity, i_Name);
+
+            IWorkerManager workerManager = FindInstance(botIdentity);
+            if (workerManager == null)
+            {
+                return string.Format("Instance not found");
+            }
+
+            var result = workerManager.GetLog(botIdentity.UserName);
+            if (!result.Success)
+            {
+                return result.Error;
+            }
+
+            return "log:\n" + result.Log;
+        }
+
+
         [RemoteCommand(
             MethodName="remove_instance",
             Description="remove an active instance of a plugin"
         )]
         public string RemoveInstance(
             Identity identity,
-            [Opt("name", "n|name=", "{NAME} of the instance")] string i_Name,
-            [Opt("worker_id", "w|worker-id", "{WORKER_ID} of the worker you want to use")] string i_WorkerId)
+            [Opt("name", "n|name=", "{NAME} of the instance")] string i_Name)
         {
-            IWorkerManager workerManager;
-            if (!r_AvailableWorkers.TryGetValue(i_WorkerId, out workerManager))
-            {
-                return string.Format("Inavlid worker id '{0}'", i_WorkerId);
-            }
-
             Identity botIdentity = getBotIdentity(identity, i_Name);
+
+            IWorkerManager workerManager = FindInstance(botIdentity);
+            if (workerManager == null)
+            {
+                return string.Format("Instance not found");
+            }
 
             var result = workerManager.RemoveInstance(botIdentity.UserName);
             if (!result.Success)
@@ -414,7 +507,7 @@ namespace Monitron.Plugins.Management
                     instancesFound = true;
                     result.Append(worker.Key.PadRight(10));
                     var parts = instance.Name.Split(new char[] { '-' }, 2);
-                    result.Append(parts[0].Substring(1).PadRight(10));
+                    result.Append(parts[0].PadRight(10));
                     result.Append(parts[1].PadRight(30));
                     result.AppendLine(instance.Status);
                 }

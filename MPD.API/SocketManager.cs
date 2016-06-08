@@ -50,11 +50,16 @@ namespace Libmpc
     public void Connect(IPEndPoint ep)
     {
       if (ep == null)
+      {
         throw new ArgumentNullException("ep");
+      }
 
       if (m_Socket != null)
+      {
         m_Socket.Dispose();
-      m_Socket = new Socket(SocketType.Stream, ProtocolType.IP);
+      }
+
+      m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
       m_Socket.NoDelay = true;
       m_Socket.Connect(ep);
     } // Connect

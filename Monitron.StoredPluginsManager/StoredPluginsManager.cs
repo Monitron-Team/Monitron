@@ -78,7 +78,8 @@ namespace Monitron
         public Stream OpenPluginDownloadStream(string i_PluginId)
         {
             GridFSBucket bucket = getBucket();
-            return bucket.OpenDownloadStreamByName(i_PluginId);
+            var stream = bucket.OpenDownloadStreamByName(i_PluginId);
+            return stream;
         }
 
 

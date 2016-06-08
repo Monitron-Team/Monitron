@@ -63,6 +63,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ManagementPlugin.cs" />
     <Compile Include="UserAccountsManager.cs" />
+    <Compile Include="IInstanceAllocationStrategy.cs" />
+    <Compile Include="BalancedInstanceAllocationStrategy.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

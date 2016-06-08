@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Collections.Generic;
 using System.Threading;
@@ -34,32 +35,45 @@ namespace Monitron.Plugins.MPD
 			m_DataStore = i_DataStore;
 			r_Adapter = new RpcAdapter(this, r_Client);
 			r_Client.ConnectionStateChanged += r_Client_ConnectionStateChanged;
-
-			connectMPDServer();
-			new Thread(PopulatePlayList).Start();
+            try
+            {
+                connectMPDServer();
+            }
+            catch
+            {
+            }
+            r_Client_ConnectionStateChanged(r_Client, new ConnectionStateChangedEventArgs(r_Client.IsConnected));
 		}
 
 		private void connectMPDServer()
 		{
-			string IP = m_DataStore.Read<string>("IP");
+			string IP = m_DataStore.Read<string>("host");
 			int port = m_DataStore.Read<int>("port");
 
-			IPAddress[] address = Dns.GetHostAddresses(IP);
-			IPEndPoint ie = new IPEndPoint(address[0], port);
-			m_Mpc = new Mpc();
-			m_Mpc.Connection = new MpcConnection(ie);
+			IPAddress[] addresses = Dns.GetHostAddresses(IP);
+            if (addresses.Length == 0)
+            {
+                throw new Exception("Could not find " + IP);
+            }
+			IPEndPoint ie = new IPEndPoint(
+                addresses.Where((address) => address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).First(),
+                port);
+            m_Mpc = new Mpc();
+            m_Mpc.Connection = new MpcConnection(ie);
+            new Thread(PopulatePlayList).Start();
+
 		}
 
 		private void r_Client_ConnectionStateChanged (object sender, ConnectionStateChangedEventArgs e)
 		{
 			if(e.IsConnected) 
-			{
-				foreach(var buddy in r_Client.Buddies) 
-				{
-					string welcomeMessange = "\nHi, I am a MPD bot";
-					r_Client.SendMessage(buddy.Identity, welcomeMessange);
-					r_Client.SetNickname("BoomBox Bot");
-					r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.MPD.Boombox.png"));
+            {
+                r_Client.SetNickname("BoomBox Bot");
+                r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.MPD.Boombox.png"));
+                foreach(var buddy in r_Client.Buddies) 
+                {
+                    string welcomeMessage = "\nHi, I am a MPD bot";
+                    r_Client.SendMessage(buddy.Identity, welcomeMessage);
 				}
 			}
 		}
@@ -69,6 +83,25 @@ namespace Monitron.Plugins.MPD
 		{
 			return m_Mpc.Stats().ToString();
 		}
+
+        [RemoteCommand(MethodName="set_host")]
+        public string setHost(Identity i_Buddy, string i_Host, int i_Port)
+        {
+            m_DataStore.Write("host", i_Host);
+            m_DataStore.Write("port", i_Port);
+            return "Host information updated";
+        }
+
+        [RemoteCommand(MethodName="connect")]
+        public string connect(Identity i_Buddy)
+        {
+            string IP = m_DataStore.Read<string>("host");
+            int port = m_DataStore.Read<int>("port");
+            r_Client.SendMessage(i_Buddy, 
+                string.Format("Connecting to {0}:{1}", IP, port));
+            connectMPDServer();
+            return "Connected to Boombox, Start playing!";
+        }
 
 		[RemoteCommand(MethodName="songs_list")]
 		public string GetSongsList(Identity i_Buddy)
