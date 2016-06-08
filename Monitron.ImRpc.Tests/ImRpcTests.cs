@@ -13,9 +13,10 @@ namespace Monitron.ImRpc.Tests
             Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
             MockMessengerClient client = new MockMessengerClient(clientIdnetity);
             new RpcAdapter(new TestClass(), client);
-            string expectedResponse = "Hello World!";
+            string expectedResponse = "Hello World";
             client.PushMessage(friendIdentity, string.Format("echo  \"{0}\"", expectedResponse));
             Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
+            
         }
 
         [Test()]
@@ -48,9 +49,9 @@ namespace Monitron.ImRpc.Tests
             Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
             Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
             MockMessengerClient client = new MockMessengerClient(clientIdnetity);
-            new RpcAdapter(new TestClass(), client);
-            string expectedResult = "what is your name?";
-            client.PushMessage(friendIdentity, string.Format("complex_cmd  {0}", expectedResult));
+            var adapter = new RpcAdapter(new TestClass(), client);
+            string expectedResult = "fuck you.";
+            client.PushMessage(friendIdentity, string.Format("maor sade nan", expectedResult));
             Assert.AreEqual(expectedResult, client.SentMessageQueue.Dequeue().Item2);
         }
     }
