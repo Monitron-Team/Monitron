@@ -1,7 +1,5 @@
 ﻿using System.Threading;
-
 using NUnit.Framework;
-
 using Monitron.Clients.Mock;
 using Monitron.Common;
 
@@ -40,6 +38,18 @@ namespace Monitron.ImRpc.Tests
             MockMessengerClient client = new MockMessengerClient(clientIdnetity);
             new RpcAdapter(new TestClass(), client);
             string expectedResult = "word 3 1.5 \"multiple words\"";
+            client.PushMessage(friendIdentity, string.Format("complex_cmd  {0}", expectedResult));
+            Assert.AreEqual(expectedResult, client.SentMessageQueue.Dequeue().Item2);
+        }
+
+        [Test()]
+        public void TestAI()
+        {
+            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
+            Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
+            MockMessengerClient client = new MockMessengerClient(clientIdnetity);
+            new RpcAdapter(new TestClass(), client);
+            string expectedResult = "what is your name?";
             client.PushMessage(friendIdentity, string.Format("complex_cmd  {0}", expectedResult));
             Assert.AreEqual(expectedResult, client.SentMessageQueue.Dequeue().Item2);
         }
