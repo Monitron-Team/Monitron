@@ -59,7 +59,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S22.Xmpp.Tests", "S22.Xmpp.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.LocalMonitorPlugin.Common", "Monitron.Plugins.LocalMonitorPlugin.Common\Monitron.Plugins.LocalMonitorPlugin.Common.csproj", "{52426FCE-4261-40F3-91B9-20F9DE60FCEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.MPD", "Monitron.Plugins.MPD\Monitron.Plugins.MPD.csproj", "{6FB74285-3300-4A0D-B441-367F4C66BCA8}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.StoredPluginsManager", "Monitron.StoredPluginsManager\Monitron.StoredPluginsManager.csproj", "{3E3B5B38-C9DD-423C-A25A-751D125A0381}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.PluginDataStore.Cloud.Tests", "Monitron.PluginDataStore.Cloud.Tests\Monitron.PluginDataStore.Cloud.Tests.csproj", "{023669BC-B0A5-436B-984E-C4E3AAD1EA69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPD.API", "MPD.API\MPD.API.csproj", "{320A28BD-0436-4507-9F22-F5EA33B04C9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,10 +85,6 @@ Global
 		{334282CE-688C-433C-8434-E23123B1CC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{334282CE-688C-433C-8434-E23123B1CC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{334282CE-688C-433C-8434-E23123B1CC5E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E3B5B38-C9DD-423C-A25A-751D125A0381}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E3B5B38-C9DD-423C-A25A-751D125A0381}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E3B5B38-C9DD-423C-A25A-751D125A0381}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E3B5B38-C9DD-423C-A25A-751D125A0381}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4140B458-B63E-4D0E-AC79-462B99BAE930}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4140B458-B63E-4D0E-AC79-462B99BAE930}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4140B458-B63E-4D0E-AC79-462B99BAE930}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -95,10 +97,6 @@ Global
 		{50D209C8-C9F4-4690-8D3C-558B592EC80B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50D209C8-C9F4-4690-8D3C-558B592EC80B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50D209C8-C9F4-4690-8D3C-558B592EC80B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52426FCE-4261-40F3-91B9-20F9DE60FCEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52426FCE-4261-40F3-91B9-20F9DE60FCEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52426FCE-4261-40F3-91B9-20F9DE60FCEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52426FCE-4261-40F3-91B9-20F9DE60FCEE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{58199704-1F8F-4268-82CA-456AEE7D010F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{58199704-1F8F-4268-82CA-456AEE7D010F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58199704-1F8F-4268-82CA-456AEE7D010F}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -5,4 +5,7 @@ do
 done
 echo "starting node"
 cd /opt/Node
-mono ./Monitron.Node.exe --conf node.conf
+while [ 1 == 1 ]
+do
+	mono ./Monitron.Node.exe --conf node.conf
+done

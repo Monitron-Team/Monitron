@@ -24,7 +24,7 @@ namespace Monitron.Plugins.KatyPerry
 
         private readonly RpcAdapter r_Adapter;
 
-        public KatyPerry(IMessengerClient i_MessangerClient)
+        public KatyPerry(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
         {
             i_MessangerClient.ConnectionStateChanged += r_Client_ConnectionStateChanged;
             sr_Log.Info("Management Plugin starting");
@@ -38,6 +38,7 @@ namespace Monitron.Plugins.KatyPerry
         {
             if (r_Client.IsConnected)
             {
+                r_Client.SetNickname("Katy Perry");
                 sr_Log.Debug("Setting up avatar");
                 r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.KatyPerry.KatyPerryAvatar.png"));
                 sr_Log.Debug("Notifying buddies how I feel about them");

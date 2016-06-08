@@ -14,6 +14,7 @@ using System.Xml.Serialization;
 using System.Collections.Generic;
 using Monitron.Plugins.LocalMonitorPlugin.Common;
 using System.Text;
+using System.Security;
 
 namespace Monitron.Plugins.Management
 {
@@ -273,26 +274,31 @@ namespace Monitron.Plugins.Management
                 return string.Format("Inavlid worker id '{0}'", i_WorkerId);
             }
 
-            Account buddy = createBotBuddy();
+            Identity botIdentity = getBotIdentity(identity, i_Name);
+            Account buddy = createBotBuddy(botIdentity);
             m_UserManager.AddRosterItem(buddy.Identity, identity, "Admins");
             m_UserManager.AddRosterItem(identity, buddy.Identity, "Bots");
+            CreateInstanceResult result;
             try{
-            var result = workerManager.CreateInstance(
-                string.Format("{0}-{1}", identity.UserName, i_Name),
-                i_PluginId,
-                generateConfiguration(buddy, r_PluginsManager.GetManifest(i_PluginId).Result));
-                if (!result.Success)
-                {
-                    m_UserManager.DeleteUser(buddy.Identity);
-                    return result.Error;
-                }
+                result = workerManager.CreateInstance(
+                    botIdentity.UserName,
+                    i_PluginId,
+                    generateConfiguration(buddy, r_PluginsManager.GetManifest(i_PluginId).Result));
             }
             catch (Exception e)
             {
-                m_UserManager.DeleteUser(buddy.Identity);
-                throw;
+                result = new CreateInstanceResult
+                {
+                    Success = false,
+                    Error = e.Message,
+                };
             }
 
+            if (!result.Success)
+            {
+                m_UserManager.DeleteUser(buddy.Identity);
+                return result.Error;
+            }
 
             return "Instance created successfully";
         }
@@ -316,14 +322,20 @@ namespace Monitron.Plugins.Management
         <DllName>{4}</DllName>
         <Type>{5}</Type>
     </Plugin>
+    <DataStore>
+        <DllPath>.</DllPath>
+        <DllName>Monitron.PluginDataStore.Cloud.dll</DllName>
+        <Type>Monitron.PluginDataStore.Cloud.CloudPluginDataStore</Type>
+        <Location>mongodb://monitron_mgmt:HellIsForHeroes%40!@boss.monitron.test/monitron</Location>
+    </DataStore>
  </NodeConfiguration>
 ",
-            i_Buddy.Identity.UserName,
-            i_Buddy.Identity.Domain,
-            i_Buddy.Password,
-            i_Manifest.DllPath,
-            i_Manifest.DllName,
-            i_Manifest.Type
+            SecurityElement.Escape(i_Buddy.Identity.UserName),
+            SecurityElement.Escape(i_Buddy.Identity.Domain),
+            SecurityElement.Escape(i_Buddy.Password),
+            SecurityElement.Escape(i_Manifest.DllPath),
+            SecurityElement.Escape(i_Manifest.DllName),
+            SecurityElement.Escape(i_Manifest.Type)
         );
         }
 
@@ -339,14 +351,23 @@ namespace Monitron.Plugins.Management
             return res.ToString();
         }
 
-        private Account createBotBuddy()
+        private Account createBotBuddy(Identity i_BotIdentity)
         {
             Account buddy = new Account(
-                i_UserName: Guid.NewGuid().ToString(),
-                i_Host: r_Client.Identity.Domain,
+                i_UserName: i_BotIdentity.UserName,
+                i_Host: i_BotIdentity.Domain,
                 i_Password: generatePassword(16));
             m_UserManager.AddUser(buddy.Identity, buddy.Password);
             return buddy;
+        }
+
+        private Identity getBotIdentity(Identity i_Owner, string i_Name)
+        {
+            return new Identity
+            {
+                Domain = r_Client.Identity.Domain,
+                UserName = string.Format("{0}-{1}", i_Owner.UserName, i_Name),
+            };
         }
 
         [RemoteCommand(
@@ -364,11 +385,16 @@ namespace Monitron.Plugins.Management
                 return string.Format("Inavlid worker id '{0}'", i_WorkerId);
             }
 
-            var result = workerManager.RemoveInstance(string.Format("{0}-{1}", identity.UserName, i_Name));
+            Identity botIdentity = getBotIdentity(identity, i_Name);
+
+            var result = workerManager.RemoveInstance(botIdentity.UserName);
             if (!result.Success)
             {
                 return result.Error;
             }
+
+            m_UserManager.RemoveRosterItem(identity, botIdentity);
+            m_UserManager.DeleteUser(botIdentity);
 
             return "Instance removed successfully";
         }
@@ -379,30 +405,25 @@ namespace Monitron.Plugins.Management
         )]
         public string ListInstances(Identity identity)
         {
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new StringBuilder("\n");
+            bool instancesFound = false;
             foreach (var worker in r_AvailableWorkers)
             {
-                result.Append(worker.Key);
-                result.Append(":\n");
-
-                foreach (var workerId in worker.Value.GetRunningWorkerIds())
+                foreach (var instance in worker.Value.ListInstances().Statuses)
                 {
-                    result.Append("\t");
-                    result.AppendLine(workerId);
+                    instancesFound = true;
+                    result.Append(worker.Key.PadRight(10));
+                    var parts = instance.Name.Split(new char[] { '-' }, 2);
+                    result.Append(parts[0].Substring(1).PadRight(10));
+                    result.Append(parts[1].PadRight(30));
+                    result.AppendLine(instance.Status);
                 }
             }
-
+            if (!instancesFound)
+            {
+                result.Append("No instances are running");
+            }
             return result.ToString();
-        }
-
-        [RemoteCommand(
-            MethodName="\ud83d\udca9\ud83d\udca9\ud83d\udca9",
-            Description=
-            @"That's not very nice!"
-        )]
-        public string Poop(Identity identity)
-        {
-            return "\ud83d\udca9\ud83d\udca9\ud83d\udca9";
         }
 
 		[RemoteCommand(

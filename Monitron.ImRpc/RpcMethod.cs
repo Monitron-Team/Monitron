@@ -193,9 +193,14 @@ namespace Monitron.ImRpc
                         {
                             parameters[i] = this.convertTo(r_ParameterInfos[i].ParameterType, extra[i - 1]);
                         }
-                        else
+                        else if (r_ParameterInfos[i].DefaultValue != DBNull.Value)
                         {
                             parameters[i] = r_ParameterInfos[i].DefaultValue;
+                        }
+                        else
+                        {
+                            throw new Exception(
+                                String.Format("Expected {0} parameters got {1}", r_ParameterInfos.Length, i));
                         }
                     }
                 }

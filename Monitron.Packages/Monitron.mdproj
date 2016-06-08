@@ -21,7 +21,7 @@
           </Builder>
         </Package>
         <Package name="Pluginless Node Linux Binaries (Release)">
-          <Builder targetFile="..\Monitron.tar.gz" platform="Linux" configuration="Debug" ctype="BinariesZipPackageBuilder">
+          <Builder targetFile="..\DeploymentScripts\node-container\Node.tar.gz" platform="Linux" configuration="Debug" ctype="BinariesZipPackageBuilder">
             <ChildEntries>
               <SolutionItemReference path="..\S22.Xmpp\S22.Xmpp.csproj" />
               <SolutionItemReference path="..\Monitron.Node\Monitron.Node.csproj" />

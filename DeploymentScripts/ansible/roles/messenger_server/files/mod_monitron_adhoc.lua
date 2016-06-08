@@ -24,6 +24,7 @@ local usermanager_set_password = require "core.usermanager".set_password;
 local rm_load_roster = require "core.rostermanager".load_roster;
 local rm_remove_from_roster = require "core.rostermanager".remove_from_roster;
 local rm_save_roster = require "core.rostermanager".save_roster;
+local rm_roster_push = require "core.rostermanager".roster_push;
 local dataforms_new = require "util.dataforms".new;
 
 local MONITRON_COMMAND_PATH = "http://monitron.ddns.net/protocol/admin#"
@@ -211,6 +212,7 @@ local add_roster_item_command_handler = adhoc_simple(add_roster_item_layout, fun
     local success, err_type, err_cond, err_msg = rm_save_roster(username, host, roster)
 
     if success then
+	rm_roster_push(username, host, itemjid);
     	info = "Roster item added successfully"
     else
     	roster[itemjid] = old_item
@@ -222,7 +224,6 @@ local add_roster_item_command_handler = adhoc_simple(add_roster_item_layout, fun
     	error = error,
     	info = info
     }
-    	
 end);
 
 -- Deleting an item to a user's roster
@@ -261,6 +262,7 @@ local delete_roster_item_command_handler = adhoc_simple(delete_roster_item_layou
 
     if success then
     	info = "Roster item deleted successfully"
+	rm_roster_push(username, host, itemjid);
     else
     	roster[itemjid] = old_item
     	error = { message = "("..err_type..") "..err_cond..": "..err_msg }
@@ -271,7 +273,6 @@ local delete_roster_item_command_handler = adhoc_simple(delete_roster_item_layou
     	error = error,
     	info = info
     }
-    	
 end);
 
 local add_user_desc = adhoc_new("Add User", MONITRON_COMMAND_PATH.."add-user", add_user_command_handler, "monitron_admin");

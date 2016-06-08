@@ -86,12 +86,13 @@ namespace Monitron.Clients.XMPP
             startConnect();
         }
 
-        private void startConnect()
+        private void startConnect(bool i_Force = false)
         {
             Thread t = new Thread(delegate ()
                 {
-                    while (!m_Client.Connected)
+                    while (!m_Client.Connected || i_Force)
                     {
+                        i_Force = false;
                         try
                         {
                             if (m_PingTimer != null)
@@ -101,7 +102,7 @@ namespace Monitron.Clients.XMPP
 
                             m_Client.Dispose();
                         }
-                        catch (InvalidOperationException)
+                        catch
                         {
                             // We are not connected
                         }
@@ -146,7 +147,14 @@ namespace Monitron.Clients.XMPP
                             if (IsConnected)
                             {
                                 Jid jid = new Jid(r_Account.Identity.Domain, null);
-                                m_Client.Ping(jid);
+                                try
+                                {
+                                    m_Client.Ping(jid);
+                                }
+                                catch
+                                {
+                                    startConnect(i_Force: true);
+                                }
                             }
                         },
                         null,

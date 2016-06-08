@@ -211,18 +211,41 @@ namespace Monitron.Plugins.LocalMonitorPlugin
             return RemoveInstanceAsync(i_Name).Result;
         }
 
-        public string[] GetRunningWorkerIds()
+        public ListInstancesResult ListInstances()
         {
-            DockerClient client = new DockerClientConfiguration(new Uri("http://localhost:2376"))
-                .CreateClient();
-            return client.Containers.ListContainersAsync(
-                new ListContainersParameters
+            var client = createClient();
+            try
+            {
+            return new ListInstancesResult
+            {
+                Success = true,
+                Error = string.Empty,
+                Statuses = client.Containers
+                    .ListContainersAsync(new ListContainersParameters
+                    {
+                        All = true,
+                    })
+                    .Result
+                    .Select((container) =>
+                    {
+                        return new InstanceStatus
+                        {
+                            Name = container.Names.First(),
+                            Status = container.Status,
+                        };
+                    })
+                    .ToArray(),
+            };
+            }
+            catch (Exception e)
+            {
+                return new ListInstancesResult
                 {
-                    All = true,
-                })
-                .Result
-                .Select((container) => container.Names.First())
-                .ToArray();
+                    Success = false,
+                    Error = e.Message,
+                    Statuses = new InstanceStatus[0],
+                };
+            }
         }
     }
 }
