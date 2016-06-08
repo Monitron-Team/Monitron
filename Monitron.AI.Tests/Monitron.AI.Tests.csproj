@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Monitron.AI.Tests</RootNamespace>
     <AssemblyName>Monitron.AI.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -30,10 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -42,6 +38,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AI.Tests.cs" />
@@ -50,20 +49,17 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monitron.AI\Monitron.AI.csproj">
-      <Project>{4b194316-8c5e-497b-82d0-3940577255dc}</Project>
+      <Project>{4B194316-8C5E-497B-82D0-3940577255DC}</Project>
       <Name>Monitron.AI</Name>
     </ProjectReference>
     <ProjectReference Include="..\Monitron.Clients.Mock\Monitron.Clients.Mock.csproj">
-      <Project>{febbb41f-7a01-485e-9936-5207ff5badf3}</Project>
+      <Project>{FEBBB41F-7A01-485E-9936-5207FF5BADF3}</Project>
       <Name>Monitron.Clients.Mock</Name>
     </ProjectReference>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
-      <Project>{f6c59df6-5c97-4b51-925c-dbd8dc245779}</Project>
+      <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
       <Name>Monitron.Common</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
@@ -76,4 +72,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

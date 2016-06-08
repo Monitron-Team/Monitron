@@ -23,7 +23,7 @@ namespace Monitron.AI.Tests
             FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
             doc.Load(fs);
 
-            AIML bot = new AIML(testClass , client, doc);
+            AI bot = new AI(testClass , client, doc);
             client.PushMessage(friendIdentity, "echo " + wordToRepeat);
             Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
         }
@@ -41,7 +41,7 @@ namespace Monitron.AI.Tests
             FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
             doc.Load(fs);
             TestMethodsClass testClass = new TestMethodsClass();
-            AIML bot = new AIML(testClass,client, doc);
+            AI bot = new AI(testClass,client, doc);
             client.PushMessage(friendIdentity, string.Format("add {0} {1}", first, second));
             Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
 
@@ -57,7 +57,7 @@ namespace Monitron.AI.Tests
             FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
             doc.Load(fs);
             TestMethodsClass testClass = new TestMethodsClass();
-            AIML bot = new AIML(testClass, client, doc);
+            AI bot = new AI(testClass, client, doc);
             string res = bot.Request("my name is daniel", friendIdentity);
             //res = bot.Request("I am 27 years old", friendIdentity);
             //res = bot.Request("what is my name?", friendIdentity);
