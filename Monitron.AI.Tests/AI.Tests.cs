@@ -8,7 +8,7 @@ using Monitron.Common;
 using NUnit.Framework;
 namespace Monitron.AI.Tests
 {
-    public class ImRpcTests
+    public class AiTests
     {
         [Test()]
         public void TestSimpleEcho()
@@ -18,12 +18,7 @@ namespace Monitron.AI.Tests
             MockMessengerClient client = new MockMessengerClient(clientIdnetity);
             string wordToRepeat = "Bamba";
             string expectedResponse = "You said: " + wordToRepeat + ".";
-            TestMethodsClass testClass = new TestMethodsClass();
-            XmlDocument doc = new XmlDocument();
-            FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
-            doc.Load(fs);
-
-            AIML bot = new AIML(testClass , client, doc);
+            TestMethodsClass testClass = new TestMethodsClass(client);
             client.PushMessage(friendIdentity, "echo " + wordToRepeat);
             Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
         }
@@ -37,14 +32,9 @@ namespace Monitron.AI.Tests
             int first = 4;
             int second = 5;
             string expectedResponse = string.Format("{0} + {1} = {2}.", first, second, first + second);
-            XmlDocument doc = new XmlDocument();
-            FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
-            doc.Load(fs);
-            TestMethodsClass testClass = new TestMethodsClass();
-            AIML bot = new AIML(testClass,client, doc);
+            TestMethodsClass testClass = new TestMethodsClass(client);
             client.PushMessage(friendIdentity, string.Format("add {0} {1}", first, second));
             Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
-
         }
 
         [Test()]
@@ -53,19 +43,25 @@ namespace Monitron.AI.Tests
             Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
             Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
             MockMessengerClient client = new MockMessengerClient(clientIdnetity);
-            XmlDocument doc = new XmlDocument();
-            FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
-            doc.Load(fs);
-            TestMethodsClass testClass = new TestMethodsClass();
-            AIML bot = new AIML(testClass, client, doc);
-            string res = bot.Request("my name is daniel", friendIdentity);
-            //res = bot.Request("I am 27 years old", friendIdentity);
-            //res = bot.Request("what is my name?", friendIdentity);
+            TestMethodsClass testClass = new TestMethodsClass(client);
             client.PushMessage(friendIdentity, "give me a movie title with my name");
-            Assert.AreEqual("false", client.SentMessageQueue.Dequeue().Item2);
-            //Assert.AreEqual(expectedResponse, res);
+            Assert.AreEqual("this_will_always_fail", client.SentMessageQueue.Dequeue().Item2); 
+                //todo: regex for respons. this will always fail because the respones depends on the name 
 
         }
+        [Test()]
+        public void TestTzafiCV()
+        {
+            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
+            Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
+            MockMessengerClient client = new MockMessengerClient(clientIdnetity);
+            string expectedResponse = "Mifratz Shlomo 27, Holon";
+            TestMethodsClass testClass = new TestMethodsClass(client);
+            client.PushMessage(friendIdentity, "Where do you live");
+            Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
+        }
+       
+
 
     }
 }

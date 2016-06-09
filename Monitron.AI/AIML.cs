@@ -16,7 +16,7 @@ namespace Monitron.AI
         private Dictionary<Identity, User> m_Users;
         private readonly IMessengerClient r_MessangerClient;
 
-        public AIML(object i_Object, IMessengerClient i_MessangerClient, XmlDocument i_Doc = null)
+        public AIML(object i_Object, IMessengerClient i_MessangerClient)
         {
             r_MessangerClient = i_MessangerClient;
             r_MessangerClient.MessageArrived += r_MessengerClient_MessageArrived;
@@ -28,7 +28,14 @@ namespace Monitron.AI
             this.initializeMethodsCache(i_Object);
             m_bot.isAcceptingUserInput = false;
             m_bot.loadAIMLFromFiles();
-            m_bot.loadAIMLFromXML(i_Doc,"TempName");
+            m_bot.isAcceptingUserInput = true;
+        }
+
+        public void loadAIMLFromXML(XmlDocument i_XmlDoc, string i_DocName)
+        {
+            m_bot.isAcceptingUserInput = false;
+            m_bot.loadAIMLFromFiles();
+            m_bot.loadAIMLFromXML(i_XmlDoc, i_DocName);
             m_bot.isAcceptingUserInput = true;
         }
 
@@ -37,8 +44,6 @@ namespace Monitron.AI
             User user = this.getUserFromBuddy(i_Buddy);
             Request r = new Request(i_message, user, this.m_bot);
             Result res = this.m_bot.Chat(r);
-            string paramCountStr = user.Predicates.grabSetting("param_count");
-            int paramCountInt;
             List<object> parameters =  new List<object>();
             parameters.Add(i_Buddy);
             parameters.Add(new State(user.Predicates));
@@ -79,6 +84,8 @@ namespace Monitron.AI
                 }
             }
         }
+
+      
 
         public void r_MessengerClient_MessageArrived(object i_Sender, MessageArrivedEventArgs i_EventArgs)
         {

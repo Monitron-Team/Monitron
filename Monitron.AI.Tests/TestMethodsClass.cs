@@ -12,8 +12,32 @@ using Monitron.Common;
 
 namespace Monitron.AI.Tests
 {
-    class TestMethodsClass
+    class TestMethodsClass : INodePlugin
     {
+        private readonly IMessengerClient r_Client;
+
+        public IMessengerClient MessangerClient
+        {
+            get
+            {
+                return r_Client;
+            }
+        }
+        private readonly AIML r_Ai ;
+
+        public TestMethodsClass(IMessengerClient i_MessangerClient)
+        {
+            r_Client = i_MessangerClient;
+            XmlDocument doc = new XmlDocument();
+            doc.Load(new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read));
+            XmlDocument docTzafi = new XmlDocument();
+            docTzafi.Load(new FileStream("D:\\TzafiCV.aiml", FileMode.Open, FileAccess.Read));
+            this.r_Ai = new AIML(this, r_Client);
+            this.r_Ai.loadAIMLFromXML(doc,"modifications.aiml");
+            this.r_Ai.loadAIMLFromXML(docTzafi, "TzafiCV.aiml");
+        }
+
+
         [RemoteCommand(MethodName = "echo")]
         public static string Echo(Identity i_Buddy, State i_State)
         {
@@ -107,5 +131,6 @@ namespace Monitron.AI.Tests
             }
             return result;
         }
+
     }
 }
