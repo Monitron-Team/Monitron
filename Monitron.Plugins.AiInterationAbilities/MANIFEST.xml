@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<PluginManifest>
+	<Id>Inspector_Gadget</Id>
+	<Name>Inspector Gadget</Name>
+	<Description>Bot that demonstrate using .NET methods using AI.</Description>
+	<Version>1.0.0</Version>
+	<DllPath>Monitron.Plugins.InspectorGadget</DllPath>
+	<DllName>Monitron.Plugins.InspectorGadget.dll</DllName>
+	<Type>Monitron.Plugins.InspectorGadget.InspectorGadget</Type>
+</PluginManifest>

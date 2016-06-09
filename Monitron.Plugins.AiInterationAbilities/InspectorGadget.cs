@@ -3,19 +3,50 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
+using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Monitron.AI;
 using Monitron.Common;
 
-namespace Monitron.AI.Tests
+namespace Monitron.Plugins.InspectorGadget
 {
-    class TestMethodsClass
+    public class InspectorGadget : INodePlugin
     {
+        private readonly IMessengerClient r_Client;
+        private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
+           (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public IMessengerClient MessangerClient
+        {
+            get
+            {
+                return r_Client;
+            }
+        }
+        private readonly AI.AI r_Ai;
+
+        public InspectorGadget(IMessengerClient i_MessangerClient)
+        {
+            i_MessangerClient.ConnectionStateChanged += r_Client_ConnectionStateChanged;
+            sr_Log.Info("Bumbelbee - Ai integrator starting");
+            r_Client = i_MessangerClient;
+            sr_Log.Debug("Setting up AI");
+            r_Client_ConnectionStateChanged(this, null);
+            r_Client = i_MessangerClient;
+            this.r_Ai = new AI.AI(this, r_Client);
+            using (var fs = new FileStream("./CustomizedMethods.aiml", FileMode.Open, FileAccess.Read))
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.Load(fs);
+                this.r_Ai.LoadAIML(doc, "modifications.aiml");
+            }
+        }
+
         [RemoteCommand(MethodName = "echo")]
         public static string Echo(Identity i_Buddy, State i_State)
         {
@@ -43,7 +74,6 @@ namespace Monitron.AI.Tests
 
             return result;
         }
-
         [RemoteCommand(MethodName = "movieDetailsByName")]
         public string MovieDetailsByName(Identity i_Buddy, State i_State)
         {
@@ -80,15 +110,14 @@ namespace Monitron.AI.Tests
         [RemoteCommand(MethodName = "imageSearch")]
         public string findPic(Identity i_Buddy, State i_State)
         {
+            MessangerClient.SendMessage(i_Buddy,"Let me search the web...");
             string result = "";
             string subject = i_State.getKey("imagesearch::subject");
             string query = string.Format(
                 "https://pixabay.com/en/photos/?q={0}&image_type=&cat=&min_width=&min_height=",
                 subject);
             string responseFromServer = sendWebRequest(query);
-            //XDocument doc = XDocument.Parse(responseFromServer);
             string regexPattern = "(srcset=\")([/0-9a-zA-Z_.\\-]*)";
-            //string regexPattern = "(data\\-url=\")([/ 0-9 a-z A-Z_.\\-]*)";
             Regex rgx = new Regex(regexPattern);
             Match match = rgx.Match(responseFromServer);
             if (match.Success)
@@ -98,14 +127,13 @@ namespace Monitron.AI.Tests
             }
             else
             {
-                result = string.Format("Couldn't find pictues for {0}", subject);
+                result = string.Format("Couldn't find pictues for {0}", subject); //todo: this will result in: "Here is a link of a ***: Couldn't find pictues for ***"
             }
 
             return result;
         }
 
-
-
+        
         private string sendWebRequest(string i_Url)
         {
             // Create a request using a URL that can receive a post. 
@@ -143,5 +171,24 @@ namespace Monitron.AI.Tests
             response.Close();
             return responseFromServer;
         }
+
+        void r_Client_ConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
+        {
+            if (r_Client.IsConnected)
+            {
+                r_Client.SetNickname("Bumblebee");
+                sr_Log.Debug("Setting up avatar");
+                r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.AiInterationAbilities.Bumblebee_avatar.png"));
+                /*sr_Log.Debug("sending a wellcom message");
+                //string welcomeMessage = "\nHi, I am the AI integrator bot";
+                    
+                foreach (var buddy in r_Client.Buddies)
+                {
+                    r_Client.SendMessage(buddy.Identity, welcomeMessage);
+                }
+                */
+            }
+        }
+
     }
 }

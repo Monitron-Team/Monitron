@@ -35,7 +35,9 @@ namespace Monitron.AI
 
         public void LoadAIML(XmlDocument i_Doc, string i_Name)
         {
+            m_bot.isAcceptingUserInput = false;
             m_bot.loadAIMLFromXML(i_Doc, i_Name);
+            m_bot.isAcceptingUserInput = true;
         }
 
         public string Request(string i_message, Identity i_Buddy)
