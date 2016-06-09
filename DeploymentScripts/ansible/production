@@ -1,6 +1,3 @@
-[messenger_servers]
-monitron.ddns.net
-[database_servers]
-monitron.ddns.net
-[management_servers]
-monitron.ddns.net
+[boss_servers]
+162.243.116.100
+[worker_servers]

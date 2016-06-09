@@ -135,6 +135,7 @@ namespace Monitron.Clients.XMPP
                     }
 
                     OnConnectionStateChanged(new ConnectionStateChangedEventArgs(m_Client.Connected));
+                    m_Client.FileTransferSettings.ForceInBandBytestreams = true;
                     m_Client.Message += m_Client_MessageArrived;
                     m_Client.RosterUpdated += m_Client_RosterUpdated;
                     m_Client.Error += m_Client_Error;

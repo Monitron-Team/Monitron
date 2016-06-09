@@ -21,9 +21,9 @@ namespace Monitron.Plugins.ChatBot
         
         public ChatBot(IMessengerClient i_Client, IPluginDataStore i_DataStore)
         {
+            r_Ai = new AI.AI(this, i_Client, true);
             r_Client = i_Client;
             r_Client.ConnectionStateChanged += r_Client_ConnectionStateChanged;
-            r_Ai = new AI.AI(this, i_Client, true);
             r_Client_ConnectionStateChanged(r_Client, new ConnectionStateChangedEventArgs(r_Client.IsConnected));
         }
 

@@ -9,7 +9,7 @@
   notify:
    - restart local monitor
 
-- name: create management user
+- name: create local monitor user
   user: name=monitron system=yes createhome=no home=/opt/MonitronLocalMonitor shell=/sbin/nologin comment="Monitron Local Monitor"
 
 - name: install service file
