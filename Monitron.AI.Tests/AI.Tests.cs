@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -10,7 +11,34 @@ namespace Monitron.AI.Tests
 {
     public class ImRpcTests
     {
-       
+        [Test()]
+        public void TestAI()
+        {
+            Identity clientIdnetity = new Identity { UserName = "test", Domain = "test" };
+            Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
+            MockMessengerClient client = new MockMessengerClient(clientIdnetity);
+            string wordToRepeat = "Bamba";
+            string expectedResponse = "You said: " + wordToRepeat + ".";
+            TestMethodsClass testClass = new TestMethodsClass();
+            XmlDocument doc = new XmlDocument();
+            FileStream fs = new FileStream("C:\\TestXml.xml", FileMode.Open, FileAccess.Read);
+            doc.Load(fs);
+            AIML bot = new AIML(testClass, client, doc);
+            //string res = bot.Request("echo " + wordToRepeat, friendIdentity);
+
+            //client.PushMessage(friendIdentity, "echo " + wordToRepeat);
+            //Assert.AreEqual(expectedResponse, client.SentMessageQueue.Dequeue().Item2);
+
+            string msg = Console.ReadLine();
+            while (msg != "bye")
+            {
+                client.PushMessage(friendIdentity, msg);
+            }
+
+            //client.PushMessage(friendIdentity, string.Format("echo  \"{0}\"", wordToRepeat));
+            //Assert.AreEqual(expectedResponse, res);
+
+        }
 
         [Test()]
         public void TestSimpleEcho()
@@ -22,7 +50,7 @@ namespace Monitron.AI.Tests
             string expectedResponse = "You said: " + wordToRepeat + ".";
             TestMethodsClass testClass = new TestMethodsClass();
             XmlDocument doc = new XmlDocument();
-            FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
+            FileStream fs = new FileStream("C:\\TestXml.xml", FileMode.Open, FileAccess.Read);
             doc.Load(fs);
             AIML bot = new AIML(testClass , client, doc);
             //string res = bot.Request("echo " + wordToRepeat, friendIdentity);
@@ -46,7 +74,7 @@ namespace Monitron.AI.Tests
             int second = 5;
             string expectedResponse = string.Format("{0} + {1} = {2}.", first, second, first + second);
             XmlDocument doc = new XmlDocument();
-            FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
+            FileStream fs = new FileStream("C:\\TestXml.xml", FileMode.Open, FileAccess.Read);
             doc.Load(fs);
             TestMethodsClass testClass = new TestMethodsClass();
             AIML bot = new AIML(testClass,client, doc);
@@ -62,7 +90,7 @@ namespace Monitron.AI.Tests
             Identity friendIdentity = new Identity { UserName = "friend", Domain = "test" };
             MockMessengerClient client = new MockMessengerClient(clientIdnetity);
             XmlDocument doc = new XmlDocument();
-            FileStream fs = new FileStream("D:\\TestXml.xml", FileMode.Open, FileAccess.Read);
+            FileStream fs = new FileStream("C:\\TestXml.xml", FileMode.Open, FileAccess.Read);
             doc.Load(fs);
             TestMethodsClass testClass = new TestMethodsClass();
             AIML bot = new AIML(testClass, client, doc);

@@ -56,6 +56,10 @@
   </Target>
   -->
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="Mono.Options">
       <HintPath>..\packages\Mono.Options.4.2.2.0\lib\net4\Mono.Options.dll</HintPath>
