@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
+using AIMLbot.Utils;
 
 namespace Monitron.AI
 {
@@ -36,6 +37,13 @@ namespace Monitron.AI
         public void LoadAIML(XmlDocument i_Doc, string i_Name)
         {
             m_bot.loadAIMLFromXML(i_Doc, i_Name);
+        }
+
+        public SettingsDictionary GlobalSettings {
+            get
+            {
+                return m_bot.GlobalSettings;
+            }
         }
 
         public string Request(string i_message, Identity i_Buddy)

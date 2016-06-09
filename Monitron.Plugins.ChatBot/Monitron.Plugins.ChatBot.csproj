@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BBE721B8-775E-49D8-83CA-3A2E18E8F9AE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Monitron.Plugins.ChatBot</RootNamespace>
+    <AssemblyName>Monitron.Plugins.ChatBot</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ChatBot.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Monitron.AI\Monitron.AI.csproj">
+      <Project>{4B194316-8C5E-497B-82D0-3940577255DC}</Project>
+      <Name>Monitron.AI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
+      <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
+      <Name>Monitron.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AIMLbot\AIMLbot\AIMLbot.csproj">
+      <Project>{9C87D82C-0E27-4995-A2CB-72BCB84EF2E2}</Project>
+      <Name>AIMLbot</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Avatar.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MANIFEST.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

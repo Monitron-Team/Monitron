@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<PluginManifest>
+	<Id>chat-bot</Id>
+	<Name>Chat Bot</Name>
+	<Description>Launches your very own chat bot to spend lonely nights with.</Description>
+	<Version>1.0.0</Version>
+	<DllPath>ChatBot</DllPath>
+	<DllName>Monitron.Plugins.ChatBot.dll</DllName>
+	<Type>Monitron.Plugins.ChatBot.ChatBot</Type>
+</PluginManifest>

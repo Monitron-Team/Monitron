@@ -73,6 +73,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.PluginDataStore.Cl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPD.API", "MPD.API\MPD.API.csproj", "{320A28BD-0436-4507-9F22-F5EA33B04C9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.ChatBot", "Monitron.Plugins.ChatBot\Monitron.Plugins.ChatBot.csproj", "{BBE721B8-775E-49D8-83CA-3A2E18E8F9AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,10 @@ Global
 		{B70F8B3C-AF1E-4539-9893-077F111EC4B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B70F8B3C-AF1E-4539-9893-077F111EC4B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B70F8B3C-AF1E-4539-9893-077F111EC4B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBE721B8-775E-49D8-83CA-3A2E18E8F9AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBE721B8-775E-49D8-83CA-3A2E18E8F9AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBE721B8-775E-49D8-83CA-3A2E18E8F9AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBE721B8-775E-49D8-83CA-3A2E18E8F9AE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C4974800-90A6-4691-8202-5EC0199EDB8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C4974800-90A6-4691-8202-5EC0199EDB8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4974800-90A6-4691-8202-5EC0199EDB8D}.Release|Any CPU.ActiveCfg = Release|Any CPU

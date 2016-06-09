@@ -61,6 +61,11 @@
             <RootEntry path="..\Monitron.sln" id=":root:" />
           </Builder>
         </Package>
+        <Package name="ChatBot Plugin Linux Binaries (Release)">
+          <Builder targetFile="..\ChatBot.tar" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
+            <RootEntry path="..\Monitron.Plugins.ChatBot\Monitron.Plugins.ChatBot.csproj" />
+          </Builder>
+        </Package>
       </Packages>
     </Packages>
   </PropertyGroup>
