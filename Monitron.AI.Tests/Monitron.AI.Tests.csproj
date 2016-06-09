@@ -74,5 +74,8 @@
   -->
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="TestXml.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

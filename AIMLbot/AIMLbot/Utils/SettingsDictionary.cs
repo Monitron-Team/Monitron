@@ -97,16 +97,17 @@ namespace AIMLbot.Utils
             if (pathToSettings.Length > 0)
             {
                 FileInfo fi = new FileInfo(pathToSettings);
+                XmlDocument xmlDoc = new XmlDocument();
                 if (fi.Exists)
                 {
-                    XmlDocument xmlDoc = new XmlDocument();
                     xmlDoc.Load(pathToSettings);
-                    this.loadSettings(xmlDoc);
                 }
                 else
                 {
-                    throw new FileNotFoundException();
+                    xmlDoc = Bot.GetDefault(Path.GetFileName(pathToSettings));
                 }
+
+                this.loadSettings(xmlDoc);
             }
             else
             {

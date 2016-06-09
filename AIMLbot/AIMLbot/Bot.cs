@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -345,6 +346,24 @@ namespace AIMLbot
             loader.loadAIML();
         }
 
+        public void loadDefaultAIMLFiles()
+        {
+            AIMLLoader loader = new AIMLLoader(this);
+
+            foreach (var aiml in Assembly
+                .GetExecutingAssembly()
+                .GetManifestResourceNames()
+                .Where((name) => name.StartsWith("AIMLbot.ConfigurationFiles.aiml."))
+                .Where((name) => name.EndsWith(".aiml")))
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.Load(Assembly.GetExecutingAssembly().GetManifestResourceStream(aiml));
+                loader.loadAIMLFromXML(
+                    doc,
+                    aiml);
+            }
+        }
+
         /// <summary>
         /// Allows the bot to load a new XML version of some AIML
         /// </summary>
@@ -377,8 +396,19 @@ namespace AIMLbot
         public void loadSettings()
         {
             // try a safe default setting for the settings xml file
-            string path = Path.Combine(Environment.CurrentDirectory, Path.Combine("config", "Settings.xml"));
-            this.loadSettings(path);          
+            this.loadSettings(null);          
+        }
+
+        internal static XmlDocument GetDefault(string file)
+        {
+            Stream resource = Assembly
+                .GetExecutingAssembly()
+                .GetManifestResourceStream("AIMLbot.ConfigurationFiles." + file);
+
+            var sr = new StreamReader(resource);
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(sr.ReadToEnd());
+            return doc;
         }
 
         /// <summary>
@@ -388,7 +418,14 @@ namespace AIMLbot
         /// <param name="pathToSettings">Path to the settings xml file</param>
         public void loadSettings(string pathToSettings)
         {
-            this.GlobalSettings.loadSettings(pathToSettings);
+            if (pathToSettings == null)
+            {
+                this.GlobalSettings.loadSettings(GetDefault("Settings.xml"));
+            }
+            else
+            {
+                this.GlobalSettings.loadSettings(pathToSettings);
+            }
 
             // Checks for some important default settings
             if (!this.GlobalSettings.containsSettingCalled("version"))

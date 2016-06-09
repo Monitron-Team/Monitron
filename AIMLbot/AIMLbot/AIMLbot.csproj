@@ -9,7 +9,7 @@
     <RootNamespace>AIMLbot</RootNamespace>
     <AssemblyName>AIMLbot</AssemblyName>
     <SignAssembly>false</SignAssembly>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -88,15 +88,6 @@
     <Compile Include="Utils\TextTransformer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="ConfigurationFiles\DefaultPredicates.xml" />
-    <Content Include="ConfigurationFiles\GenderSubstitutions.xml" />
-    <Content Include="ConfigurationFiles\Person2Substitutions.xml" />
-    <Content Include="ConfigurationFiles\PersonSubstitutions.xml" />
-    <Content Include="ConfigurationFiles\Settings.xml" />
-    <Content Include="ConfigurationFiles\Splitters.xml" />
-    <Content Include="ConfigurationFiles\Substitutions.xml" />
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -105,4 +96,48 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <EmbeddedResource Include="ConfigurationFiles\DefaultPredicates.xml" />
+    <EmbeddedResource Include="ConfigurationFiles\GenderSubstitutions.xml" />
+    <EmbeddedResource Include="ConfigurationFiles\Person2Substitutions.xml" />
+    <EmbeddedResource Include="ConfigurationFiles\PersonSubstitutions.xml" />
+    <EmbeddedResource Include="ConfigurationFiles\Settings.xml" />
+    <EmbeddedResource Include="ConfigurationFiles\Splitters.xml" />
+    <EmbeddedResource Include="ConfigurationFiles\Substitutions.xml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\AI.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Atomic.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Biography.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Bot.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Botmaster.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Client.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Computers.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\CustomTagTest.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Default.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Emotion.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Food.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Geography.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\History.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Inquiry.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Interjection.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\IU.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Knowledge.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Literature.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Money.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Movies.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Music.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Personality.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Philosophy.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Pickup.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Predicates.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Reduce.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Reductions.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Salutations.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Science.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Stack.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\Stories.aiml" />
+    <EmbeddedResource Include="ConfigurationFiles\aiml\That.aiml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ConfigurationFiles\aiml\" />
+  </ItemGroup>
 </Project>

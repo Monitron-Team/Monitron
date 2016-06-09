@@ -16,20 +16,26 @@ namespace Monitron.AI
         private Dictionary<Identity, User> m_Users;
         private readonly IMessengerClient r_MessangerClient;
 
-        public AI(object i_Object, IMessengerClient i_MessangerClient, XmlDocument i_Doc = null)
+        public AI(object i_Object, IMessengerClient i_MessangerClient, bool i_LoadDefaults = true)
         {
             r_MessangerClient = i_MessangerClient;
             r_MessangerClient.MessageArrived += r_MessengerClient_MessageArrived;
             m_bot = new Bot();
-            Console.WriteLine(this.m_bot.PathToAIML);
-            Console.WriteLine(this.m_bot.PathToConfigFiles);
             m_bot.loadSettings();
             m_Users = new Dictionary<Identity, User>();
             this.initializeMethodsCache(i_Object);
             m_bot.isAcceptingUserInput = false;
-            m_bot.loadAIMLFromFiles();
-            m_bot.loadAIMLFromXML(i_Doc,"TempName");
+            if (i_LoadDefaults)
+            {
+                m_bot.loadDefaultAIMLFiles();
+            }
+
             m_bot.isAcceptingUserInput = true;
+        }
+
+        public void LoadAIML(XmlDocument i_Doc, string i_Name)
+        {
+            m_bot.loadAIMLFromXML(i_Doc, i_Name);
         }
 
         public string Request(string i_message, Identity i_Buddy)
