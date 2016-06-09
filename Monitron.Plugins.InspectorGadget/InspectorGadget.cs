@@ -30,7 +30,7 @@ namespace Monitron.Plugins.InspectorGadget
         }
         private readonly AI.AI r_Ai;
 
-        public InspectorGadget(IMessengerClient i_MessangerClient)
+        public InspectorGadget(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
         {
             i_MessangerClient.ConnectionStateChanged += r_Client_ConnectionStateChanged;
             sr_Log.Info("Bumbelbee - Ai integrator starting");
