@@ -75,7 +75,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.PluginDataStore.Cl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPD.API", "MPD.API\MPD.API.csproj", "{320A28BD-0436-4507-9F22-F5EA33B04C9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.InspectorGadget", "Monitron.Plugins.AiInterationAbilities\Monitron.Plugins.InspectorGadget.csproj", "{8B0A2271-D36E-4F73-BB64-81C84383BE32}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.InspectorGadget", "Monitron.Plugins.InspectorGadget\Monitron.Plugins.InspectorGadget.csproj", "{8B0A2271-D36E-4F73-BB64-81C84383BE32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
