@@ -15,9 +15,10 @@ namespace Monitron.AI
         private readonly Dictionary<string, MethodInfo> r_MethodCache = new Dictionary<string, MethodInfo>();
         private Dictionary<Identity, User> m_Users;
         private readonly IMessengerClient r_MessangerClient;
-
+        private readonly object r_Instance;
         public AI(object i_Object, IMessengerClient i_MessangerClient, bool i_LoadDefaults = true)
         {
+            r_Instance = i_Object;
             r_MessangerClient = i_MessangerClient;
             r_MessangerClient.MessageArrived += r_MessengerClient_MessageArrived;
             m_bot = new Bot();
@@ -50,7 +51,7 @@ namespace Monitron.AI
             parameters.Add(new State(user.Predicates));
             string input = res.Output;
             Regex rgx = new Regex("{{(\\w+)}}");
-            string result = rgx.Replace(input, i_X=> this.r_MethodCache[i_X.Groups[1].Value].Invoke(null, parameters.ToArray()).ToString());
+            string result = rgx.Replace(input, i_X=> this.r_MethodCache[i_X.Groups[1].Value].Invoke(this.r_Instance, parameters.ToArray()).ToString());
             return result;
         }
 
@@ -71,10 +72,7 @@ namespace Monitron.AI
 
         private void initializeMethodsCache(object i_Obj)
         {
-            MethodInfo[] myArrayMethodInfo =
-                i_Obj.GetType().GetMethods( BindingFlags.Public | 
-                                            BindingFlags.Static |
-                                            BindingFlags.DeclaredOnly);
+            MethodInfo[] myArrayMethodInfo = i_Obj.GetType().GetMethods();
 
             foreach (MethodInfo meth in myArrayMethodInfo)
             {

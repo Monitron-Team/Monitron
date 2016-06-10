@@ -58,11 +58,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CustomizedMethods.aiml" />
+    <None Include="CustomizedMethods.aiml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="inspector_gadget.png" />
+    <EmbeddedResource Include="inspector_gadget.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="MANIFEST.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
