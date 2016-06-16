@@ -44,3 +44,20 @@ Monitron.Clients.XMPP.Tests/app.config
 Monitron.CloudManagers.DigitalOcean.Tests/app.config
 *.swp
 /Boty.Api/node_modules/
+/Boty.Api/uploads/
+#
+# compiled output
+/Boty.Frontend/dist
+/Boty.Frontend/tmp
+
+# dependencies
+/Boty.Frontend/node_modules
+/Boty.Frontend/bower_components
+
+# misc
+/Boty.Frontend/.sass-cache
+/Boty.Frontend/connect.lock
+/Boty.Frontend/coverage/*
+/Boty.Frontend/libpeerconnection.log
+/Boty.Frontendnpm-debug.log
+/Boty.Frontendtestem.log

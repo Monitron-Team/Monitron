@@ -4,6 +4,7 @@ const mongoose   = require('mongoose'),
 const PluginSchema = new Schema({
   name: String,
   description: String,
+  version: String
 });
 
 module.exports = mongoose.model('NodePlugin', PluginSchema, 'plugin_store.files');

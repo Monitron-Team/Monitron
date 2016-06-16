@@ -44,6 +44,7 @@ const registry = new API.ResourceTypeRegistry({
       resource._attrs = {
         name: metadata.name,
         description: metadata.description,
+        version: metadata.version
       };
       return resource;
     }
@@ -113,6 +114,7 @@ router.delete('/:type(' + allowedDELETE + ')/:id', request_handler);
 router.get('/sessions/create', (req, res) => {
   res.status(403).send("You shouldn't do that");
 });
+router.delete('/node-plugins/:id', NodePluginController.delete );
 router.post('/node-plugins/upload', upload.single('plugin'), (req, res, next) => {
   NodePluginController.upload(req.file, (err) => {
     if (err) {
@@ -123,7 +125,6 @@ router.post('/node-plugins/upload', upload.single('plugin'), (req, res, next) =>
     res.send("OK!");
   });
 });
-//router.get('/node-plugins/', NodePluginController.list);
 router.post('/sessions/create', (req, res) => {
   models.Account.findOne({
     name: req.body.username,

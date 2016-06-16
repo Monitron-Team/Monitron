@@ -35,14 +35,19 @@ function upload(file, callback) {
               dll_path: path.parse(header.name).dir,
             }
           });
-          tarFile = fs.createReadStream(file.path);
-          stream.on('close', () => {
-            callback(null);
+          gfs.remove({
+            filename: manifest.Id[0],
+            root: BUCKET
+          }, (err) => {
+            tarFile = fs.createReadStream(file.path);
+            stream.on('close', () => {
+              callback(null);
+            });
+            stream.on('error', (err) => {
+              callback("Internal failuer while uploading plugin");
+            });
+            tarFile.pipe(stream);
           });
-          stream.on('error', (err) => {
-            callback("Internal failuer while uploading plugin");
-          });
-          tarFile.pipe(stream);
         });
       });
     } else {
@@ -66,16 +71,23 @@ function upload(file, callback) {
   tarFile.pipe(extract);
 }
 
-function list(req, res) {
+function delete_cb(req, res) {
   let gfs = Grid(conn.db, mongoose.mongo);
-  conn.db.collection(BUCKET + ".files").find()
-  .each((err, item) => {
-    console.log(err, item);
+  gfs.remove({
+    _id: req.params.id,
+    root: BUCKET
+  }, (err) => {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+
+    res.status(200).send('{"meta": {}}');
   });
 }
 
 module.exports = {
   upload: upload,
-  list: list
+  delete: delete_cb
 };
 /* vim: set sw=2 ts=2 tw=2 et : */
