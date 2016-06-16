@@ -1,0 +1,21 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+			<th>Name</th><th>Description</th><th>Actions</th>
+		</tr>
+  </thead>
+  <tbody>
+{{#each model as |plugin|}}
+<tr>
+  <td>{{plugin.name}}</td>
+  <td>{{plugin.description}}</td>
+  <td>
+    {{#action-menu title="Action"}}
+    <li><a href="#" {{action "delete_plugin" account on="click"}}>Delete</a></li>
+    {{/action-menu}}
+  </td>
+</tr>
+{{/each}}
+  </tbody>
+</table>
+<!-- vim: set tabstop=2 shiftwidth=2 expandtab: -->

@@ -1,0 +1,37 @@
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed"
+      data-toggle="collapse" data-target="#menu-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      {{ link-to '🤖 Boty' 'index' class="navbar-brand"}}
+    </div>
+
+    <div class="collapse navbar-collapse" id="menu-collapse">
+      <ul class="nav navbar-nav">
+          {{#if session.isAuthenticated}}
+            <li>{{ link-to 'Accounts' 'accounts'}}</li>
+            <li>{{ link-to 'Node Plugins' 'node-plugins'}}</li>
+          {{/if}}
+        <li>{{ link-to 'About' 'about' }}</li>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+          {{#if session.isAuthenticated}}
+            <li><a href="#" {{ action 'invalidateSession' on='click' }} >Logout</a></li>
+          {{else}}
+            <li>{{ link-to 'Log-In' 'log-in' }}</li>
+          {{/if}}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+    {{outlet}}
+</div>
+<!-- vim: set tabstop=2 shiftwidth=2 expandtab: -->

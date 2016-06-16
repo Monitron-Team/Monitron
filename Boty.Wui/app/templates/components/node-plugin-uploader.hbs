@@ -1,0 +1,27 @@
+<form {{action "fileUpload" on="submit"}}>
+  {{#if lastUpload}}
+    <div class="alert alert-success">
+      <strong>Success!</strong> Plugin was uploaded successfully.
+    </div>
+  {{/if}}
+  {{#if errorMessage}}
+    <div class="alert alert-danger" role="alert">{{errorMessage}}</div>
+  {{/if}}
+    <div class="form-group">
+      <div class="input-group">
+        <span class="input-group-btn">
+          <button for="file" class="btn btn-default" disabled={{uploading}} type="button" id="file-picker">Select file</button>
+        </span>
+        {{#if uploading}}
+          <span class="form-control"><img src="/spinner.svg"/> Uploading...</span>
+        {{/if}}
+        {{#unless uploading}}
+          <span href="javascript:;" class="form-control">{{fileName}}</span>
+        {{/unless}}
+        <div class="input-group-btn">
+          <button type="submit" class="btn btn-primary" disabled={{uploading}}>Upload</button>
+        </div>
+      </div>
+    </div>
+</form>
+<!-- vim: set tabstop=2 shiftwidth=2 expandtab: -->

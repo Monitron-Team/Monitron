@@ -2,6 +2,9 @@
 - include_vars: cert_vault.yml
 - include_vars: passwords_vault.yml
 
+- name: clean log files ( remove once enough time has passed )
+  file: name=/var/log/prosody state=absent
+
 - name: install Prosody
   dnf: name=prosody state=latest
   notify:

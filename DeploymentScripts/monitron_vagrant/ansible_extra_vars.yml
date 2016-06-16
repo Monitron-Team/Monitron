@@ -4,3 +4,4 @@ prosody_ssl: false
 vagrant_install: false
 mono_debug: false
 mono_debug_port: 6699
+journald_max_use: 50M
