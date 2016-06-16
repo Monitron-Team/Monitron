@@ -1,0 +1,9 @@
+server {
+  root /var/www/dist;
+  index index.html index.htm;
+  server_name {{domain_name}};
+
+  location / {
+          try_files $uri $uri/ /index.html?/$request_uri;
+  }
+}

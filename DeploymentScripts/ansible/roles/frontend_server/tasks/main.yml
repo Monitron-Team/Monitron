@@ -1,0 +1,11 @@
+---
+- name: upload frontend
+  synchronize: src=../../Boty.Frontend/dist dest=/var/www/ archive=no checksum=yes delete=yes recursive=yes
+
+- name: update selinux context
+  raw: restorecon -R /var/www/
+
+- name: configure nginx site
+  template: src=boty.frontend.conf.j2 dest=/etc/nginx/conf.d/boty.frontend.conf
+  notify:
+    - restart nginx

@@ -12,10 +12,16 @@
   remote_user: root
 
   roles:
-    - {role: firewall, exported_services: ["database_server", "messenger_server"]}
+    - {role: firewall, exported_services: [
+      "database_server",
+      "messenger_server",
+      "frontend_server"
+      ]}
     - messenger_server
     - database_server
     - management_node
+    - frontend_server
+    - api_server
 
 - name: set up worker servers
   hosts: worker_servers

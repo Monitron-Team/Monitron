@@ -1,0 +1,3 @@
+---
+- name: vacuume logs
+  raw: journalctl --vacuum-size={{journald_max_use}}

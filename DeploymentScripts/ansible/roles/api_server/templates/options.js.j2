@@ -1,0 +1,10 @@
+const mongo_url = 'mongodb://{{domain_name}}/monitron';
+const mongo_options = {
+  user: 'monitron_mgmt',
+  password: '{{monitron_admin_password}}'
+};
+
+module.exports = {
+  mongo_url: mongo_url,
+  mongo_options: mongo_options
+};

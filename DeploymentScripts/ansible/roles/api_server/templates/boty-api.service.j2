@@ -1,0 +1,16 @@
+[Unit]
+Description=Boty API Service
+
+[Service]
+ExecStart=/usr/bin/node /opt/Boty.Api/server.js
+WorkingDirectory=/opt/Boty.Api/
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=boty-api
+User=boty_api
+Group=boty_api
+
+[Install]
+WantedBy=multi-user.target
+

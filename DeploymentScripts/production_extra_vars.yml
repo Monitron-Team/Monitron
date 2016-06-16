@@ -3,3 +3,4 @@ domain_name: monitron.ddns.net
 prosody_ssl: true
 vagrant_install: false
 mono_debug: false
+journald_max_use: 50M

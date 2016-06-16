@@ -43,3 +43,4 @@ Thumbs.db
 Monitron.Clients.XMPP.Tests/app.config
 Monitron.CloudManagers.DigitalOcean.Tests/app.config
 *.swp
+/Boty.Api/node_modules/

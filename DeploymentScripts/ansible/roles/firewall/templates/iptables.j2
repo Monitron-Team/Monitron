@@ -19,5 +19,10 @@
 # Mono debugging port
 -A INPUT -p tcp -m state --state NEW -m tcp --dport {{mono_debug_port}} -j ACCEPT
 {% endif %}
+{% if 'frontend_server' in exported_services %}
+# nginx port
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 9898 -j ACCEPT
+{% endif %}
 -A INPUT -j REJECT --reject-with icmp-host-prohibited
 COMMIT

@@ -1,4 +1,8 @@
 #!/bin/env sh
+echo Building Frontend
+pushd ../Boty.Frontend/
+ember build --environment=production
+popd
 echo Deploying Monitron...
 ansible-playbook \
 	--inventory-file ansible/production \
