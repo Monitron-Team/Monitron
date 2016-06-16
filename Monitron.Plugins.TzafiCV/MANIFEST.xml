@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<PluginManifest>
+	<Id>tzafi_cv</Id>
+	<Name>Tzafi CV</Name>
+	<Description>This bot will tell you all about Tzafi's cv</Description>
+	<Version>1.0.0</Version>
+	<DllPath>Monitron.Plugins.TzafiCV</DllPath>
+	<DllName>Monitron.Plugins.TzafiCV.dll</DllName>
+	<Type>Monitron.Plugins.TzafiCV.TzafiCV</Type>
+</PluginManifest>

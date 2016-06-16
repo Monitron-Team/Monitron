@@ -1,0 +1,149 @@
+<aiml>
+
+<!-- Greetings -->
+<category>
+	<pattern>Hi</pattern>
+	<template>
+		<random>
+			<li>Hi there!
+				I'm Tzafi Waisblat's CV-Boty :)
+				You can ask me about her CV</li>
+			<li>Hello!
+				I'm Tzafi Waisblat's CV-Boty :)
+				You can ask me about her CV</li>
+			<li>Greetings!
+				I'm Tzafi Waisblat's CV-Boty :)
+				You can ask me about her CV</li>
+		</random>
+	</template>
+</category>
+<category>
+	<pattern>Hello</pattern>
+	<template> <srai>Hi</srai> </template>
+</category>
+<category>
+	<pattern>Hey</pattern>
+	<template> <srai>Hi</srai> </template>
+</category>
+
+<category>
+	<pattern>Who are you *</pattern>
+	<template>
+		I'm Tzafi Waisblat's CV-Boty :)
+		You can ask me about her CV
+	</template>
+</category>
+<category>
+	<pattern>What are you *</pattern>
+	<template> <srai>Who are you</srai> </template>
+</category>
+
+<!-- Present -->
+<category>
+	<pattern>What do you do *</pattern>
+	<template>
+		I am a Computer Science student and I work at Elbit.
+	</template>
+</category>
+<category>
+	<pattern>What's your occupation</pattern>
+	<template> <srai>What do you do today</srai> </template>
+</category>
+<category>
+	<pattern>What is your occupation</pattern>
+	<template> <srai>What do you do today</srai> </template>
+</category>
+<category>
+	<pattern>* tell * yourself *</pattern>
+	<template> <srai>What do you do today</srai> </template>
+</category>
+
+<!-- Adress -->
+<category>
+	<pattern>Where do you live *</pattern>
+	<template>
+		Mifratz Shlomo 27, Holon
+	</template>
+</category>
+<category>
+	<pattern>* address *</pattern>
+	<template> <srai>Where do you live</srai> </template>
+</category>
+<category>
+	<pattern>* residence *</pattern>
+	<template> <srai>Where do you live</srai> </template>
+</category>
+
+<!-- email -->
+<category>
+	<pattern>* your email *</pattern>
+	<template>
+		tzafiwaisblat@gmail.com
+	</template>
+</category>
+<category>
+	<pattern>* your e-mail *</pattern>
+	<template> <srai>your email</srai> </template>
+</category>
+
+<!-- phone num -->
+<category>
+	<pattern>* your phone number *</pattern>
+	<template>
+		054-9994509
+	</template>
+</category>
+<category>
+	<pattern>* your number *</pattern>
+	<template> <srai>your phone number</srai> </template>
+</category>
+
+<!-- education -->
+<category>
+	<pattern>* education *</pattern>
+	<template>
+		I'm in the last year of Computer Science BSc.
+		I also have BSc.Agr in Animal Science, that I've finishid in 2011.
+	</template>
+</category>
+<category>
+	<pattern>* study *</pattern>
+	<template> <srai>education</srai> </template>
+</category>
+
+<!-- work experience -->
+<category>
+	<pattern>* experience *</pattern>
+	<template>
+		I'm currently working at Elbit, in student position. I'm in a GUI team, writing in C# and wpf.
+		In 2012-2015 I've been a QA tester in Qualitest.
+		Funny thing that before that I used to milk cows in Givat Hashlosha.
+	</template>
+</category>
+<category>
+	<pattern>* work *</pattern>
+	<template> <srai>education</srai> </template>
+</category>
+
+<category>
+	<pattern>* hobbies *</pattern>
+	<template>
+		I love to create things, like painting, crocheting, and anything that involves working with my hands.
+		I also love music - listening and playing (my guitar).
+		I love traveling, cycling, and enjoying the beautiful world we have.
+	</template>
+</category>
+<category>
+	<pattern>* hobby *</pattern>
+	<template> <srai>hobbies</srai> </template>
+</category>
+<category>
+	<pattern>* free time *</pattern>
+	<template> <srai>hobbies</srai> </template>
+</category>
+<category>
+	<pattern>* for fun *</pattern>
+	<template> <srai>hobbies</srai> </template>
+</category>
+
+</aiml>

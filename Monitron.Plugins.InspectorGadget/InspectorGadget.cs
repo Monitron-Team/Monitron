@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Timers;
 using System.Xml;
 using System.Xml.Linq;
 using Monitron.AI;
@@ -46,23 +42,7 @@ namespace Monitron.Plugins.InspectorGadget
                 doc.Load(fs);
                 this.r_Ai.LoadAIML(doc, "modifications.aiml");
             }
-
-            // Create a timer
-            Timer myTimer = new System.Timers.Timer();
-            // Tell the timer what to do when it elapses
-            myTimer.Elapsed += new ElapsedEventHandler(myEvent);
-            // Set it to go off every five seconds
-            myTimer.Interval = 5000;
-            // And start it        
-            myTimer.Enabled = true;
     }
-        // Implement a call with the right signature for events going off
-        private void myEvent(object source, ElapsedEventArgs e)
-        {
-            Identity clientIdnetity = new Identity { UserName = "maor", Domain = "monitron.ddns.net" };
-            Identity friendIdentity = new Identity { UserName = "daniel_local", Domain = "monitron.ddns.net" };
-            //this.r_Client.SendMessage(clientIdnetity, "echo 22");
-        }
 
         [RemoteCommand(MethodName = "echo")]
         public static string Echo(Identity i_Buddy, State i_State)
@@ -197,7 +177,7 @@ namespace Monitron.Plugins.InspectorGadget
                 sr_Log.Debug("Setting up avatar");
                 r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.InspectorGadget.inspector_gadget.png"));
                 sr_Log.Debug("sending a wellcom message");
-                string welcomeMessage = "\nHi, I am Inspector Gadget and I want to die!";
+                string welcomeMessage = "\nHi, I am Inspector Gadget!";
                     
                 foreach (var buddy in r_Client.Buddies)
                 {
