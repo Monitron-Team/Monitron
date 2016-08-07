@@ -31,7 +31,7 @@ namespace Monitron.Plugins.Kodi
             r_Client = i_MessangerClient;
             m_DataStore = i_DataStore;
             r_Adapter = new RpcAdapter(this, r_Client);
-            //r_Client.ConnectionStateChanged += r_Client_ConnectionStateChanged;
+            r_Client.ConnectionStateChanged += r_Client_ConnectionStateChanged;
             //try
             //{
             //    connectMPDServer();
@@ -39,7 +39,21 @@ namespace Monitron.Plugins.Kodi
             //catch
             //{
             //}
-            //r_Client_ConnectionStateChanged(r_Client, new ConnectionStateChangedEventArgs(r_Client.IsConnected));
+            r_Client_ConnectionStateChanged(r_Client, new ConnectionStateChangedEventArgs(r_Client.IsConnected));
+        }
+
+        private void r_Client_ConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
+        {
+            if (e.IsConnected)
+            {
+                r_Client.SetNickname("Kodi Bot");
+                //r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.MPD.Boombox.png"));
+                foreach (var buddy in r_Client.Buddies)
+                {
+                    string welcomeMessage = "\nHi, I am a Kodi bot";
+                    r_Client.SendMessage(buddy.Identity, welcomeMessage);
+                }
+            }
         }
 
         [RemoteCommand(MethodName = "play_pause")]
@@ -60,11 +74,11 @@ namespace Monitron.Plugins.Kodi
 
         }
 
-        [RemoteCommand(MethodName = "volume_up")]
-        public string KodiVolumeUp(Identity i_Buddy)
-        {
+        //[RemoteCommand(MethodName = "volume_up")]
+        //public string KodiVolumeUp(Identity i_Buddy)
+        //{
 
-        }
+        //}
 
         /*
         class Program
