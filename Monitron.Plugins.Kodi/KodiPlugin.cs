@@ -7,6 +7,7 @@ using System.Reflection;
 using Monitron.Common;
 using Monitron.ImRpc;
 using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace Monitron.Plugins.Kodi
 {
@@ -18,9 +19,13 @@ namespace Monitron.Plugins.Kodi
         private const string k_ErrorMessage = "Sorry, something is wrong..";
         private const string k_SuccessMessage = "Done!";
         private const int k_VolumeChange = 10;
+        
         // Kodi parameters
         private readonly string r_Url;
         private int m_Volume;
+        private bool m_IsPlaying;
+        private Dictionary<int, string> m_VideosList;
+        private string m_VideoListMsg;
 
         public IMessengerClient MessangerClient
         {
@@ -65,6 +70,14 @@ namespace Monitron.Plugins.Kodi
 
         private void initKodiParams()
         {
+            m_VideosList = new Dictionary<int, string>();
+            getVolume();
+            getPlayingStatus();
+            getVideoList();
+        }
+
+        private void getVolume()
+        {
             string getVolume = "{\"jsonrpc\": \"2.0\", \"method\": \"Application.GetProperties\", \"params\": { \"properties\": [\"volume\"] }, \"id\": 1}";
             string volResponse = sendRequest(getVolume);
             JObject volJson;
@@ -79,6 +92,11 @@ namespace Monitron.Plugins.Kodi
             }
         }
 
+        private void getPlayingStatus()
+        {
+            // TBD
+        }
+
         private string sendUserRequest(string req)
         {
             string msg = k_SuccessMessage;
@@ -90,6 +108,27 @@ namespace Monitron.Plugins.Kodi
             }
 
             return msg;
+        }
+
+        private void getVideoList()
+        {
+            int videoCounter = 0;
+            string libraryPath = @"C:\Users\Public\Videos";
+            m_VideoListMsg = "Video List:\n";
+            string[] fileslist;
+
+            if (Directory.Exists(libraryPath))
+            {
+                fileslist = Directory.GetFiles(libraryPath);
+                foreach (string fileName in fileslist)
+                {
+                    videoCounter++;
+                    string videoName = Path.GetFileNameWithoutExtension(fileName);
+                    string filePath = fileName.Replace(@"\", @"/");
+                    m_VideosList.Add(videoCounter, filePath);
+                    m_VideoListMsg += (videoCounter.ToString() + " - " + videoName + "\n");
+                }
+            }
         }
 
         private string sendRequest(string req)
@@ -145,11 +184,18 @@ namespace Monitron.Plugins.Kodi
         }
 
         [RemoteCommand(MethodName = "play")]
-        public string KodiPlay(Identity i_Buddy)
+        public string KodiPlay(Identity i_Buddy, int i_Video)
         {
-            //string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\":{\"file\":\"C:/Users/Public/Videos/Sample Videos/Wildlife.wmv\"}}, \"id\": 1}";
-            string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\":{\"file\":\"C:/Users/tzafi/Downloads/Alt-J  - Taro.mp4\"}}, \"id\": 1}";
+            string videoPath;
+            m_VideosList.TryGetValue(i_Video, out videoPath);
+            string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\":{\"file\":\"" + videoPath + "\"}}, \"id\": 1}";
             return sendUserRequest(request);
+        }
+
+        [RemoteCommand(MethodName = "list")]
+        public string KodiList(Identity i_Buddy)
+        {
+            return m_VideoListMsg;
         }
     }
 }
