@@ -8,6 +8,7 @@ using Monitron.Common;
 using Monitron.ImRpc;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using System.Web.Script.Serialization;
 
 namespace Monitron.Plugins.Kodi
 {
@@ -18,13 +19,17 @@ namespace Monitron.Plugins.Kodi
         private IPluginDataStore m_DataStore;
         private const string k_ErrorMessage = "Sorry, something is wrong..";
         private const string k_SuccessMessage = "Done!";
+        private const string k_MaxVolMessage = "The volume is on maximum level";
+        private const string k_MinVolMessage = "The volume is on minimum level";
         private const int k_VolumeChange = 10;
-        
+        private const int k_MaxVolume = 100;
+        private const int k_MinVolume = 0;
+
         // Kodi parameters
         private readonly string r_Url;
         private int m_Volume;
         private bool m_IsPlaying;
-        private Dictionary<int, string> m_VideosList;
+        private MovieDetails[] m_Movies;
         private string m_VideoListMsg;
 
         public IMessengerClient MessangerClient
@@ -70,10 +75,9 @@ namespace Monitron.Plugins.Kodi
 
         private void initKodiParams()
         {
-            m_VideosList = new Dictionary<int, string>();
+            m_Movies = getVideoList();
             getVolume();
             getPlayingStatus();
-            getVideoList();
         }
 
         private void getVolume()
@@ -110,25 +114,23 @@ namespace Monitron.Plugins.Kodi
             return msg;
         }
 
-        private void getVideoList()
+        private MovieDetails[] getVideoList()
         {
-            int videoCounter = 0;
-            string libraryPath = @"C:\Users\Public\Videos";
+            string request = "{\"jsonrpc\": \"2.0\", \"method\": \"VideoLibrary.GetMovies\", \"params\": { \"limits\": { \"start\" : 0, \"end\": 75 }, \"properties\" : [\"file\"] }, \"id\": 1}";
+            var response = sendRequest(request);
             m_VideoListMsg = "Video List:\n";
-            string[] fileslist;
 
-            if (Directory.Exists(libraryPath))
+            JObject responseJson;
+            responseJson = JObject.Parse(response);
+            MovieDetails[] movies = responseJson["result"]["movies"].ToObject<MovieDetails[]>();
+
+            foreach (MovieDetails movie in movies)
             {
-                fileslist = Directory.GetFiles(libraryPath);
-                foreach (string fileName in fileslist)
-                {
-                    videoCounter++;
-                    string videoName = Path.GetFileNameWithoutExtension(fileName);
-                    string filePath = fileName.Replace(@"\", @"/");
-                    m_VideosList.Add(videoCounter, filePath);
-                    m_VideoListMsg += (videoCounter.ToString() + " - " + videoName + "\n");
-                }
+                movie.file = movie.file.Replace(@"\", @"/");
+                m_VideoListMsg += (movie.movieid.ToString() + " - " + movie.label + "\n");
             }
+
+            return movies;
         }
 
         private string sendRequest(string req)
@@ -150,6 +152,21 @@ namespace Monitron.Plugins.Kodi
             return response;
         }
 
+        private string getMoviePath(int id)
+        {
+            string path = string.Empty;
+            foreach (MovieDetails movie in m_Movies)
+            {
+                if(movie.movieid == id)
+                {
+                    path = movie.file;
+                    break;
+                }
+            }
+
+            return path;
+        }
+
         [RemoteCommand(MethodName = "play_pause")]
         public string KodiPlayPause(Identity i_Buddy)
         {
@@ -160,34 +177,67 @@ namespace Monitron.Plugins.Kodi
         [RemoteCommand(MethodName = "vol_up")]
         public string KodiVolumeUp(Identity i_Buddy)
         {
-            string vol = (m_Volume + k_VolumeChange).ToString();
-            string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetVolume\", \"params\": { \"volume\": " + vol + " }, \"id\": 1}";
-            string result = sendUserRequest(request);
-            if (request.Equals(k_SuccessMessage))
+            string msg = string.Empty;
+
+            if (m_Volume == k_MaxVolume)
             {
-                Int32.TryParse(vol, out m_Volume);
+                msg = k_MaxVolMessage;
             }
-            return result;
+            else
+            {
+                string vol = (m_Volume + k_VolumeChange).ToString();
+                string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetVolume\", \"params\": { \"volume\": " + vol + " }, \"id\": 1}";
+                msg = sendUserRequest(request);
+                if (msg.Equals(k_SuccessMessage))
+                {
+                    Int32.TryParse(vol, out m_Volume);
+                }
+            }
+
+            return msg;
         }
 
         [RemoteCommand(MethodName = "vol_down")]
         public string KodiVolumeDown(Identity i_Buddy)
         {
-            string vol = (m_Volume - k_VolumeChange).ToString();
+            string msg = string.Empty;
+
+            if (m_Volume == k_MinVolume)
+            {
+                msg = k_MinVolMessage;
+            }
+            else
+            {
+                string vol = (m_Volume - k_VolumeChange).ToString();
+                string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetVolume\", \"params\": { \"volume\": " + vol + " }, \"id\": 1}";
+                msg = sendUserRequest(request);
+                if (msg.Equals(k_SuccessMessage))
+                {
+                    Int32.TryParse(vol, out m_Volume);
+                }
+            }
+
+            return msg;
+        }
+
+        [RemoteCommand(MethodName = "mute")]
+        public string KodiMute(Identity i_Buddy)
+        {
+            string vol = "0";
             string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetVolume\", \"params\": { \"volume\": " + vol + " }, \"id\": 1}";
-            string result = sendUserRequest(request);
-            if (request.Equals(k_SuccessMessage))
+            string msg = sendUserRequest(request);
+            if (msg.Equals(k_SuccessMessage))
             {
                 Int32.TryParse(vol, out m_Volume);
             }
-            return result;
+
+            return msg;
         }
 
         [RemoteCommand(MethodName = "play")]
         public string KodiPlay(Identity i_Buddy, int i_Video)
         {
-            string videoPath;
-            m_VideosList.TryGetValue(i_Video, out videoPath);
+            string videoPath = getMoviePath(i_Video);
             string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\":{\"file\":\"" + videoPath + "\"}}, \"id\": 1}";
             return sendUserRequest(request);
         }
@@ -196,6 +246,20 @@ namespace Monitron.Plugins.Kodi
         public string KodiList(Identity i_Buddy)
         {
             return m_VideoListMsg;
+        }
+
+        private class MovieDetails
+        {
+            public string file;
+            public string label;
+            public int movieid;
+
+            public MovieDetails(string file, string label, int movieid)
+            {
+                this.file = file;
+                this.label = label;
+                this.movieid = movieid;
+            }
         }
     }
 }
