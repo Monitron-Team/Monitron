@@ -4,7 +4,7 @@
 	<Name>Katy Perry</Name>
 	<Description>Launches your very own Katy to sing for you.</Description>
 	<Version>1.2.0</Version>
-	<DllPath>Monitron.Plugins.KatyPerry</DllPath>
+	<DllPath>KatyPerryPlugin</DllPath>
 	<DllName>Monitron.Plugins.KatyPerry.dll</DllName>
 	<Type>Monitron.Plugins.KatyPerry.KatyPerry</Type>
 </PluginManifest>

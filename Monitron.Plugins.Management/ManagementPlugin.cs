@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using Monitron.Plugins.LocalMonitorPlugin.Common;
 using System.Text;
 using System.Security;
-using Microsoft.Owin.Hosting;
 
 namespace Monitron.Plugins.Management
 {

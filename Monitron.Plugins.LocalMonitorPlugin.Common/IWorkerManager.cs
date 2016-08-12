@@ -12,4 +12,3 @@ namespace Monitron.Plugins.LocalMonitorPlugin.Common
         GetLogResult GetLog(string i_Name);
     }
 }
-
