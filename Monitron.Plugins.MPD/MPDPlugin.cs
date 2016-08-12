@@ -122,22 +122,46 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="stop")]
 		public string StopSong(Identity i_Buddy)
 		{
-			m_Mpc.Stop();
-			return "stop playing " + m_Mpc.CurrentSong().Title;
+			if (m_Mpc != null)
+			{
+				m_Mpc.Stop();
+				return "stop playing " + m_Mpc.CurrentSong().Title;
+			} 
+			else
+			{
+				return "Cannot stop playing current song";
+			}
 		}
 
 		[RemoteCommand(MethodName="play")]
 		public string PlaySong(Identity i_Buddy)
 		{
-			m_Mpc.Play();
-			return "start playing " + m_Mpc.CurrentSong().Title;
+			if(m_Mpc != null)
+			{
+				m_Mpc.Play();
+				return "start playing " + m_Mpc.CurrentSong().Title;
+			} 
+			else
+			{
+				return "Cannot start playing";
+			}
+
+
 		}
 
 		[RemoteCommand(MethodName="next")]
 		public string NextSong(Identity i_Buddy)
 		{
-			m_Mpc.Next();
-			return "start playing " + m_Mpc.CurrentSong().Title;
+			if (m_Mpc != null)
+			{
+				m_Mpc.Next();
+				return "start playing " + m_Mpc.CurrentSong().Title;
+			} 
+			else
+			{
+				return "Cannot move to next song"; 
+			}
+
 		}
 			
 		private void PopulatePlayList()
