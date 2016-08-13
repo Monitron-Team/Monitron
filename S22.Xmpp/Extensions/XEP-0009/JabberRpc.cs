@@ -12,14 +12,15 @@ using S22.Xmpp.Client;
 
 namespace S22.Xmpp
 {
-    internal class JabberRpc : XmppExtension, IInputFilter<Iq>
+	internal class JabberRpc : XmppExtension, IInputFilter<Iq>, IDiscovery
     {
         private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
             (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
-        private readonly Dictionary<string, object> rpcServers = new Dictionary<string, object>();
+		private readonly Dictionary<string, object> rpcServers = new Dictionary<string, object>();
         public JabberRpc(XmppIm im): base (im)
         {
+			RegisterJabberRpcServer<IDiscovery, JabberRpc>(this);
         }
 
         public override IEnumerable<string> Namespaces
@@ -204,5 +205,19 @@ namespace S22.Xmpp
             Type t = tb.CreateType();
             return Activator.CreateInstance(t, new Object[] { im, target }) as T;
         }
+
+		public Dictionary<string,object>.KeyCollection GetRpcServers
+		{
+			get
+			{
+				return rpcServers.Keys;
+			}
+		}
+
+		string[] IDiscovery.GetImplementedInterfaces()
+		{
+			return rpcServers.Keys.ToArray();
+		}
+
     }
 }

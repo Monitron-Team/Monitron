@@ -66,14 +66,15 @@
             <RootEntry path="..\Monitron.Plugins.ChatBot\Monitron.Plugins.ChatBot.csproj" />
           </Builder>
         </Package>
-        <Package name="MPD Node Linux Binaries (Release armel)">
-          <Builder targetFile="..\MPDPackage.tar.gz" platform="Linux" configuration="Release|armel" ctype="BinariesZipPackageBuilder">
+        <Package name="MPD Node Linux Binaries (Release)">
+          <Builder targetFile="..\MPDPackage.tar.gz" platform="Linux" configuration="Release" ctype="BinariesZipPackageBuilder">
             <ChildEntries>
               <SolutionItemReference path="..\Monitron.ImRpc\Monitron.ImRpc.csproj" />
               <SolutionItemReference path="..\Monitron.PluginDataStore.Local\Monitron.PluginDataStore.Local.csproj" />
               <SolutionItemReference path="..\Monitron.Node\Monitron.Node.csproj" />
               <SolutionItemReference path="..\Monitron.Clients.XMPP\Monitron.Clients.XMPP.csproj" />
               <SolutionItemReference path="..\Monitron.Common\Monitron.Common.csproj" />
+              <SolutionItemReference path="..\Monitron.Plugins.MPD\Monitron.Plugins.MPD.csproj" />
             </ChildEntries>
             <RootEntry path="..\Monitron.sln" id=":root:" />
           </Builder>

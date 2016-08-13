@@ -9,6 +9,7 @@ using Monitron.Common;
 using Monitron.ImRpc;
 using Libmpc;
 
+
 namespace Monitron.Plugins.MPD
 {
 	public class MPDPlugin: INodePlugin
@@ -42,7 +43,17 @@ namespace Monitron.Plugins.MPD
             catch
             {
             }
+			registerToJabber(r_Client);
             r_Client_ConnectionStateChanged(r_Client, new ConnectionStateChangedEventArgs(r_Client.IsConnected));
+		}
+
+		private void registerToJabber(IMessengerClient r_Client)
+		{
+			IMessengerRpc rpc = (r_Client as IMessengerRpc);
+			if(rpc != null)
+			{
+				rpc.RegisterRpcServer <INodePlugin, MPDPlugin>(this);
+			}
 		}
 
 		private void connectMPDServer()
@@ -122,22 +133,64 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="stop")]
 		public string StopSong(Identity i_Buddy)
 		{
-			m_Mpc.Stop();
-			return "stop playing " + m_Mpc.CurrentSong().Title;
+			if (m_Mpc != null)
+			{
+				m_Mpc.Stop();
+				return "stop playing " + m_Mpc.CurrentSong().Title;
+			} 
+			else
+			{
+				return "Cannot stop playing current song";
+			}
 		}
 
 		[RemoteCommand(MethodName="play")]
 		public string PlaySong(Identity i_Buddy)
 		{
-			m_Mpc.Play();
-			return "start playing " + m_Mpc.CurrentSong().Title;
+			if(m_Mpc != null)
+			{
+				m_Mpc.Play();
+				return "start playing " + m_Mpc.CurrentSong().Title;
+			} 
+			else
+			{
+				return "Cannot start playing";
+			}
+
+
+		}
+
+		[RemoteCommand(MethodName="test")]
+		public string test(Identity i_Buddy)
+		{
+			Identity newIdentity = new Identity();
+			newIdentity.Domain = i_Buddy.Domain;
+			newIdentity.Resource = "Test";
+			newIdentity.UserName = i_Buddy.UserName;
+			IMessengerRpc rpc = (r_Client as IMessengerRpc);
+			string[] rpcServers = rpc.GetRegisterServersList(newIdentity);
+
+			string welcomeMessage = "my friends are: ";
+			foreach(var buddy in r_Client.Buddies) 
+			{
+				//string[] rpcServers = rpc.GetRegisterServersList(buddy.Identity);
+			}
+			return welcomeMessage;
 		}
 
 		[RemoteCommand(MethodName="next")]
 		public string NextSong(Identity i_Buddy)
 		{
-			m_Mpc.Next();
-			return "start playing " + m_Mpc.CurrentSong().Title;
+			if (m_Mpc != null)
+			{
+				m_Mpc.Next();
+				return "start playing " + m_Mpc.CurrentSong().Title;
+			} 
+			else
+			{
+				return "Cannot move to next song"; 
+			}
+
 		}
 			
 		private void PopulatePlayList()
