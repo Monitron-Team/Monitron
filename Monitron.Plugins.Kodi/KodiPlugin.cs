@@ -279,12 +279,12 @@ namespace Monitron.Plugins.Kodi
                     if (interf.Equals("IAudioBot"))
                     {
                         IAudioBot currentBot = rpc.CreateRpcClient<IAudioBot>(buddy.Identity);
-                        currentBot.PauseAudio(i_Buddy);
+                        currentBot.PauseAudio();
                     }
                     else if (interf.Equals("IAudioBot"))
                     {
                         IMovieBot currentBot = rpc.CreateRpcClient<IMovieBot>(buddy.Identity);
-                        currentBot.PauseMovie(i_Buddy);
+                        currentBot.PauseMovie();
                     }
                 }
             }
@@ -312,9 +312,9 @@ namespace Monitron.Plugins.Kodi
             return sendUserRequest(request);
         }
 
-        public string PauseMovie(Identity i_Buddy)
+        public string PauseMovie()
         {
-            return KodiStop(i_Buddy);
+			return KodiStop(new Identity());
         }
 
         private class MovieDetails
