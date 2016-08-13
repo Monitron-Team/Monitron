@@ -1,2 +1,5 @@
 - name: start boty api server
+  service: name=boty-api state=started
+
+- name: restart boty api server
   service: name=boty-api state=restarted

@@ -2,8 +2,17 @@
 - name: install packages for ansible support
   raw: dnf -y install python python-dnf
 
-- name: install Ansible dependencies
+- name: install Ansible dependencies (libselinux)
   dnf: name=libselinux-python state=latest
+
+- name: install Ansible dependencies (tar)
+  dnf: name=tar state=latest
+
+- name: install Ansible dependencies (unzip)
+  dnf: name=unzip state=latest
+
+- name: install Ansible dependencies (rsync)
+  dnf: name=rsync state=latest
 
 - name: limit journald size
   template: src=journald.conf.j2 dest=/etc/systemd/journald.conf

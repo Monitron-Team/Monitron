@@ -59,15 +59,12 @@ namespace Monitron.Plugins.LocalMonitorPlugin
                 var resp = await client.Containers.CreateContainerAsync(
                     new CreateContainerParameters
                     {
-                        ContainerName = i_Name,
-                        Config = new Config
-                            {
-                                Image = "monitron/node-container",
-                                Tty = false,
-                            },
+						Name = i_Name,
+                        Image = "monitron/node-container",
+                        Tty = false,
                     });
                 
-                containerId = resp.Id;
+				containerId = resp.ID;
             }
             catch (Exception e)
             {
@@ -89,7 +86,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
             {
                 await client.Containers.RemoveContainerAsync(
                     containerId,
-                    new RemoveContainerParameters
+					new ContainerRemoveParameters
                     {
                         Force = true,
                         RemoveVolumes = true,
@@ -106,7 +103,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
             {
                 await client.Containers.ExtractArchiveToContainerAsync(
                     containerId,
-                    new ExtractArchiveToContainerParameters
+					new ContainerPathStatParameters
                     {
                         Path = "/opt/Node",
                     },
@@ -117,7 +114,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
             {
                 await client.Containers.RemoveContainerAsync(
                     containerId,
-                    new RemoveContainerParameters
+					new ContainerRemoveParameters
                     {
                         Force = true,
                         RemoveVolumes = true,
@@ -145,7 +142,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
                 ms = new MemoryStream(ms.GetBuffer());
                 await client.Containers.ExtractArchiveToContainerAsync(
                     containerId,
-                    new ExtractArchiveToContainerParameters
+                    new ContainerPathStatParameters
                     {
                         Path = "/",
                     },
@@ -156,7 +153,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
             {
                 await client.Containers.RemoveContainerAsync(
                     containerId,
-                    new RemoveContainerParameters
+                    new ContainerRemoveParameters
                     {
                         Force = true,
                         RemoveVolumes = true,
@@ -189,7 +186,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
             {
                 await client.Containers.RemoveContainerAsync(
                     i_Name,
-                    new RemoveContainerParameters
+					new ContainerRemoveParameters
                     {
                         Force = true,
                         RemoveVolumes = true,
@@ -246,13 +243,12 @@ namespace Monitron.Plugins.LocalMonitorPlugin
                 var client = createClient();
                 var sr = new StreamReader(await client.Containers.GetContainerLogsAsync(
                     i_Name,
-                    new GetContainerLogsParameters
+					new ContainerLogsParameters
                     {
                         Follow = false,
-                        Stderr = true,
-                        Stdout = true,
-                        Timestamps = false,
-                        Tail = new ContainerLogsTailN(50),
+						ShowStderr = true,
+						ShowStdout = true,
+						Timestamps = false,
                     },
                     new System.Threading.CancellationToken()
                 ));
@@ -324,7 +320,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
                 Success = true,
                 Error = string.Empty,
                 Statuses = client.Containers
-                    .ListContainersAsync(new ListContainersParameters
+						.ListContainersAsync(new ContainersListParameters
                     {
                         All = true,
                     })

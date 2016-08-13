@@ -7,7 +7,7 @@
 - name: upload management service
   unarchive: src=MonitronManagement.tar.gz dest=/opt
   notify:
-   - restart Management Server
+   - restart Management server
 
 - name: create management user
   user: name=monitron system=yes createhome=no home=/opt/MonitronManagement shell=/sbin/nologin comment="Monitron Management"

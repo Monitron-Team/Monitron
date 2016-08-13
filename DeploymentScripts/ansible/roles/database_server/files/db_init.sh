@@ -7,4 +7,3 @@ db.createUser({
     "roles": [ "readWrite" ]
 })
 EOF
-mongo monitron -u monitron_mgmt -p "$1" < /dev/null
