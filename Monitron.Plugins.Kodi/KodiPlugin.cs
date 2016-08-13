@@ -1,18 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Collections.Generic;
-using System.Threading;
-using System.Reflection;
-using Monitron.Common;
+﻿using Monitron.Common;
 using Monitron.ImRpc;
 using Newtonsoft.Json.Linq;
-using System.IO;
-using System.Web.Script.Serialization;
+using System;
+using System.Net;
+using System.Reflection;
 
 namespace Monitron.Plugins.Kodi
 {
-    public class KodiPlugin : INodePlugin
+    public class KodiPlugin : INodePlugin, IMovieBot
     {
 		private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
 			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -34,6 +29,7 @@ namespace Monitron.Plugins.Kodi
         private bool m_IsPlaying;
         private MovieDetails[] m_Movies;
         private string m_VideoListMsg;
+        //private int m_Speed;
 
         public IMessengerClient MessangerClient
         {
@@ -82,7 +78,7 @@ namespace Monitron.Plugins.Kodi
 			sr_Log.Info("Starting init params");
 			m_Movies = getVideoList();
             getVolume();
-            getPlayingStatus();
+            //getPlayingStatus();
         }
 
         private void getVolume()
@@ -103,7 +99,18 @@ namespace Monitron.Plugins.Kodi
 
         private void getPlayingStatus()
         {
-            // TBD
+            //string getStatus = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetProperties\", \"params\": { \"playerid\": 0 , \"properties\": [ \"type\", \"partymode\", \"speed\", \"time\", \"percentage\", \"totaltime\", \"playlistid\", \"position\", \"repeat\", \"shuffled\", \"canseek\", \"canchangespeed\", \"canmove\", \"canzoom\", \"canrotate\", \"canshuffle\", \"canrepeat\", \"currentaudiostream\", \"audiostreams\", \"subtitleenabled\", \"currentsubtitle\", \"subtitles\", \"live\"]}, \"id\": 1}";
+            //string volResponse = sendRequest(getStatus);
+            //JObject volJson;
+            //if (!string.IsNullOrEmpty(volResponse))
+            //{
+            //    volJson = JObject.Parse(volResponse);
+            //    m_Volume = (int)volJson["result"]["volume"];
+            //}
+            //else
+            //{
+            //    // could not get current volume
+            //}
         }
 
         private string sendUserRequest(string req)
@@ -253,6 +260,18 @@ namespace Monitron.Plugins.Kodi
         public string KodiList(Identity i_Buddy)
         {
             return m_VideoListMsg;
+        }
+
+        [RemoteCommand(MethodName = "pause")]
+        public string KodiPause(Identity i_Buddy)
+        {
+            string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetSpeed\", \"params\": { \"playerid\": 1, \"speed\": 0 }, \"id\": 1}";
+            return sendUserRequest(request);
+        }
+
+        public string PauseMovie(Identity i_Buddy)
+        {
+            return KodiPause(i_Buddy);
         }
 
         private class MovieDetails
