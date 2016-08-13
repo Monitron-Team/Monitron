@@ -53,6 +53,8 @@ namespace S22.Xmpp
 
             return response.Data["query"].FirstChild as XmlElement;
         }
+
+
     }
 }
 

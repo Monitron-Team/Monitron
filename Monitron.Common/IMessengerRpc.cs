@@ -8,6 +8,7 @@ namespace Monitron.Common
         void RegisterRpcServer<I, T>(T server)
             where I : class
             where T : I;
+		string[] GetRegisterServersList(Identity identidy);
     }
 }
 

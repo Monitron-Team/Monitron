@@ -1556,5 +1556,23 @@ namespace S22.Xmpp.Client {
             vCards = im.LoadExtension<VCards>();
             jabberRpc = im.LoadExtension<JabberRpc>();
 		}
+			
+
+		public string[] GetImplementedInterfaces(Jid i_Jid)
+		{
+			var client = CreateJabberRpcClient<IDiscovery>(i_Jid);
+			if (client != null)
+			{
+				try
+				{
+					return client.GetImplementedInterfaces();
+				}
+				catch (Exception)
+				{
+					
+				}
+			}
+			return null;
+		}
 	}
 }

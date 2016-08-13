@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{A68E223D-95B4-460B-A06B-F30104D48169}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>Monitron.Discovery</RootNamespace>
     <AssemblyName>Monitron.Discovery</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>

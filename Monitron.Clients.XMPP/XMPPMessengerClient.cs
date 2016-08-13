@@ -315,6 +315,11 @@ namespace Monitron.Clients.XMPP
         {
             m_Client.RegisterJabberRpcServer<I, T>(server);
         }
+
+		public string[] GetRegisterServersList(Identity i_Identity)
+		{
+			return m_Client.GetImplementedInterfaces(i_Identity.ToJid());
+		}
     }
 }
 
