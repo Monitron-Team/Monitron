@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -43,6 +43,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KodiPlugin.cs" />
@@ -50,11 +53,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
-      <Project>{f6c59df6-5c97-4b51-925c-dbd8dc245779}</Project>
+      <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
       <Name>Monitron.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\Monitron.ImRpc\Monitron.ImRpc.csproj">
-      <Project>{50d209c8-c9f4-4690-8d3c-558b592ec80b}</Project>
+      <Project>{50D209C8-C9F4-4690-8D3C-558B592EC80B}</Project>
       <Name>Monitron.ImRpc</Name>
     </ProjectReference>
   </ItemGroup>
@@ -66,6 +69,7 @@
     <None Include="node.config.example">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

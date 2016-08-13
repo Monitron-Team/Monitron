@@ -14,7 +14,10 @@ namespace Monitron.Plugins.Kodi
 {
     public class KodiPlugin : INodePlugin
     {
-        private readonly IMessengerClient r_Client;
+		private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
+			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+		private readonly IMessengerClient r_Client;
         private readonly RpcAdapter r_Adapter;
         private IPluginDataStore m_DataStore;
         private const string k_ErrorMessage = "Sorry, something is wrong..";
@@ -42,7 +45,8 @@ namespace Monitron.Plugins.Kodi
 
         public KodiPlugin(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
         {
-            r_Client = i_MessangerClient;
+			sr_Log.Info("Starting Kodi Pluggin");
+			r_Client = i_MessangerClient;
             m_DataStore = i_DataStore;
 
             string ip = m_DataStore.Read<string>("ip");
@@ -75,7 +79,8 @@ namespace Monitron.Plugins.Kodi
 
         private void initKodiParams()
         {
-            m_Movies = getVideoList();
+			sr_Log.Info("Starting init params");
+			m_Movies = getVideoList();
             getVolume();
             getPlayingStatus();
         }
@@ -116,11 +121,13 @@ namespace Monitron.Plugins.Kodi
 
         private MovieDetails[] getVideoList()
         {
-            string request = "{\"jsonrpc\": \"2.0\", \"method\": \"VideoLibrary.GetMovies\", \"params\": { \"limits\": { \"start\" : 0, \"end\": 75 }, \"properties\" : [\"file\"] }, \"id\": 1}";
+			sr_Log.Info("Getting Video list");
+			string request = "{\"jsonrpc\": \"2.0\", \"method\": \"VideoLibrary.GetMovies\", \"params\": { \"limits\": { \"start\" : 0, \"end\": 75 }, \"properties\" : [\"file\"] }, \"id\": 1}";
             var response = sendRequest(request);
             m_VideoListMsg = "Video List:\n";
-
+			sr_Log.Info("reponse: " + response);
             JObject responseJson;
+			sr_Log.Info("Try to parse Json response");
             responseJson = JObject.Parse(response);
             MovieDetails[] movies = responseJson["result"]["movies"].ToObject<MovieDetails[]>();
 
