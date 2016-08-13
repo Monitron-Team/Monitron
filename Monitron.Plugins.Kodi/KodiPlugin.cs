@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Net;
 using System.Reflection;
+using System.Linq;
 
 namespace Monitron.Plugins.Kodi
 {
@@ -19,17 +20,17 @@ namespace Monitron.Plugins.Kodi
         private const string k_SuccessMessage = "Done!";
         private const string k_MaxVolMessage = "The volume is on maximum level";
         private const string k_MinVolMessage = "The volume is on minimum level";
+        private const string k_VolErrorMessage = "Volume Error";
         private const int k_VolumeChange = 10;
         private const int k_MaxVolume = 100;
         private const int k_MinVolume = 0;
+        private const int k_VolError = -1;
 
         // Kodi parameters
         private readonly string r_Url;
         private int m_Volume;
-        private bool m_IsPlaying;
         private MovieDetails[] m_Movies;
         private string m_VideoListMsg;
-        //private int m_Speed;
 
         public IMessengerClient MessangerClient
         {
@@ -53,21 +54,30 @@ namespace Monitron.Plugins.Kodi
             r_Client.ConnectionStateChanged += r_Client_ConnectionStateChanged;
             r_Client_ConnectionStateChanged(r_Client, new ConnectionStateChangedEventArgs(r_Client.IsConnected));
 
+            registerToJabber(i_MessangerClient);
+
             initKodiParams();
+        }
+
+        private void registerToJabber(IMessengerClient r_Client)
+        {
+            IMessengerRpc rpc = (r_Client as IMessengerRpc);
+            if (rpc != null)
+            {
+                rpc.RegisterRpcServer<IMovieBot, KodiPlugin>(this);
+            }
         }
 
         private void r_Client_ConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
         {
-            // Is Kodi up?
-            // Test Connection
-
             if (e.IsConnected)
             {
                 r_Client.SetNickname("Kodi Bot");
                 r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.Kodi.Kodi.png"));
-                foreach (var buddy in r_Client.Buddies)
+                var admins = r_Client.Buddies.Where(item => item.Groups.Contains("admin"));
+                foreach (var buddy in admins)
                 {
-                    string welcomeMessage = "\nHi, I am a Kodi bot";
+                    string welcomeMessage = "Hi, I am a Kodi bot :)";
                     r_Client.SendMessage(buddy.Identity, welcomeMessage);
                 }
             }
@@ -78,7 +88,6 @@ namespace Monitron.Plugins.Kodi
 			sr_Log.Info("Starting init params");
 			m_Movies = getVideoList();
             getVolume();
-            //getPlayingStatus();
         }
 
         private void getVolume()
@@ -88,29 +97,20 @@ namespace Monitron.Plugins.Kodi
             JObject volJson;
             if (!string.IsNullOrEmpty(volResponse))
             {
-                volJson = JObject.Parse(volResponse);
-                m_Volume = (int)volJson["result"]["volume"];
+                try
+                {
+                    volJson = JObject.Parse(volResponse);
+                    m_Volume = (int)volJson["result"]["volume"];
+                }
+                catch
+                {
+                    m_Volume = k_VolError;
+                }
             }
             else
             {
-                // could not get current volume
+                m_Volume = k_VolError;
             }
-        }
-
-        private void getPlayingStatus()
-        {
-            //string getStatus = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetProperties\", \"params\": { \"playerid\": 0 , \"properties\": [ \"type\", \"partymode\", \"speed\", \"time\", \"percentage\", \"totaltime\", \"playlistid\", \"position\", \"repeat\", \"shuffled\", \"canseek\", \"canchangespeed\", \"canmove\", \"canzoom\", \"canrotate\", \"canshuffle\", \"canrepeat\", \"currentaudiostream\", \"audiostreams\", \"subtitleenabled\", \"currentsubtitle\", \"subtitles\", \"live\"]}, \"id\": 1}";
-            //string volResponse = sendRequest(getStatus);
-            //JObject volJson;
-            //if (!string.IsNullOrEmpty(volResponse))
-            //{
-            //    volJson = JObject.Parse(volResponse);
-            //    m_Volume = (int)volJson["result"]["volume"];
-            //}
-            //else
-            //{
-            //    // could not get current volume
-            //}
         }
 
         private string sendUserRequest(string req)
@@ -135,13 +135,22 @@ namespace Monitron.Plugins.Kodi
 			sr_Log.Info("reponse: " + response);
             JObject responseJson;
 			sr_Log.Info("Try to parse Json response");
-            responseJson = JObject.Parse(response);
-            MovieDetails[] movies = responseJson["result"]["movies"].ToObject<MovieDetails[]>();
+            MovieDetails[] movies = new MovieDetails[0];
 
-            foreach (MovieDetails movie in movies)
+            try
             {
-                movie.file = movie.file.Replace(@"\", @"/");
-                m_VideoListMsg += (movie.movieid.ToString() + " - " + movie.label + "\n");
+                responseJson = JObject.Parse(response);
+                movies = responseJson["result"]["movies"].ToObject<MovieDetails[]>();
+
+                foreach (MovieDetails movie in movies)
+                {
+                    movie.file = movie.file.Replace(@"\", @"/");
+                    m_VideoListMsg += (movie.movieid.ToString() + " - " + movie.label + "\n");
+                }
+            }
+            catch
+            {
+
             }
 
             return movies;
@@ -197,6 +206,10 @@ namespace Monitron.Plugins.Kodi
             {
                 msg = k_MaxVolMessage;
             }
+            else if(m_Volume == k_VolError)
+            {
+                msg = k_VolErrorMessage;
+            }
             else
             {
                 string vol = (m_Volume + k_VolumeChange).ToString();
@@ -219,6 +232,10 @@ namespace Monitron.Plugins.Kodi
             if (m_Volume == k_MinVolume)
             {
                 msg = k_MinVolMessage;
+            }
+            else if (m_Volume == k_VolError)
+            {
+                msg = k_VolErrorMessage;
             }
             else
             {
@@ -251,9 +268,35 @@ namespace Monitron.Plugins.Kodi
         [RemoteCommand(MethodName = "play")]
         public string KodiPlay(Identity i_Buddy, int i_Video)
         {
+            IMessengerRpc rpc = (r_Client as IMessengerRpc);
+            string msg = string.Empty;
+
+            foreach (var buddy in r_Client.Buddies)
+            {
+                string[] implementedInterfaces = rpc.GetRegisterServersList(buddy.Identity);
+                foreach (string interf in implementedInterfaces)
+                {
+                    if (interf.Equals("IAudioBot"))
+                    {
+                        IAudioBot currentBot = rpc.CreateRpcClient<IAudioBot>(buddy.Identity);
+                        currentBot.PauseAudio(i_Buddy);
+                    }
+                    else if (interf.Equals("IAudioBot"))
+                    {
+                        IMovieBot currentBot = rpc.CreateRpcClient<IMovieBot>(buddy.Identity);
+                        currentBot.PauseMovie(i_Buddy);
+                    }
+                }
+            }
+
             string videoPath = getMoviePath(i_Video);
-            string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\":{\"file\":\"" + videoPath + "\"}}, \"id\": 1}";
-            return sendUserRequest(request);
+            if (string.IsNullOrEmpty(videoPath) == false)
+            {
+                string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Open\", \"params\": { \"item\":{\"file\":\"" + videoPath + "\"}}, \"id\": 1}";
+                msg = sendUserRequest(request);
+            }
+
+            return msg;
         }
 
         [RemoteCommand(MethodName = "list")]
@@ -262,16 +305,16 @@ namespace Monitron.Plugins.Kodi
             return m_VideoListMsg;
         }
 
-        [RemoteCommand(MethodName = "pause")]
-        public string KodiPause(Identity i_Buddy)
+        [RemoteCommand(MethodName = "stop")]
+        public string KodiStop(Identity i_Buddy)
         {
-            string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.SetSpeed\", \"params\": { \"playerid\": 1, \"speed\": 0 }, \"id\": 1}";
+            string request = "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Stop\", \"params\": { \"playerid\": 1 }, \"id\": 1}";
             return sendUserRequest(request);
         }
 
         public string PauseMovie(Identity i_Buddy)
         {
-            return KodiPause(i_Buddy);
+            return KodiStop(i_Buddy);
         }
 
         private class MovieDetails

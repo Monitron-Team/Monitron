@@ -206,15 +206,7 @@ namespace S22.Xmpp
             return Activator.CreateInstance(t, new Object[] { im, target }) as T;
         }
 
-		public Dictionary<string,object>.KeyCollection GetRpcServers
-		{
-			get
-			{
-				return rpcServers.Keys;
-			}
-		}
-
-		string[] IDiscovery.GetImplementedInterfaces()
+		public string[] GetImplementedInterfaces()
 		{
 			return rpcServers.Keys.ToArray();
 		}
