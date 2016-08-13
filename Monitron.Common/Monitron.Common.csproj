@@ -38,6 +38,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IAudioBot.cs" />
+    <Compile Include="IMovieBot.cs" />
     <Compile Include="IPluginDataStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IMessengerClient.cs" />

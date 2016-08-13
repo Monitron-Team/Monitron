@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Common", "Monitron.Common\Monitron.Common.csproj", "{F6C59DF6-5C97-4B51-925C-DBD8DC245779}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Clients.XMPP", "Monitron.Clients.XMPP\Monitron.Clients.XMPP.csproj", "{9531CE9C-0770-47E0-985A-B35701D096B9}"
@@ -75,7 +77,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPD.API", "MPD.API\MPD.API.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.ChatBot", "Monitron.Plugins.ChatBot\Monitron.Plugins.ChatBot.csproj", "{BBE721B8-775E-49D8-83CA-3A2E18E8F9AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Discovery", "Monitron.Discovery\Monitron.Discovery.csproj", "{A68E223D-95B4-460B-A06B-F30104D48169}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitron.Plugins.Kodi", "Monitron.Plugins.Kodi\Monitron.Plugins.Kodi.csproj", "{BB3FA247-D990-4D60-BFF4-3DF264E72C4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -181,10 +183,6 @@ Global
 		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EA99E39-8C5C-4F69-9F3F-8E3074C518FA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A68E223D-95B4-460B-A06B-F30104D48169}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A68E223D-95B4-460B-A06B-F30104D48169}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A68E223D-95B4-460B-A06B-F30104D48169}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A68E223D-95B4-460B-A06B-F30104D48169}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B70F8B3C-AF1E-4539-9893-077F111EC4B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B70F8B3C-AF1E-4539-9893-077F111EC4B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B70F8B3C-AF1E-4539-9893-077F111EC4B6}.Release|Any CPU.ActiveCfg = Release|Any CPU

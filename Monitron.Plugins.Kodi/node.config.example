@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<NodeConfiguration>
+	<MessangerClient>
+		<DllPath>C:\Users\tzafi\Source\Repos\Monitron\Monitron.Clients.XMPP\bin\Debug</DllPath>
+		<DllName>Monitron.Clients.XMPP.dll</DllName>
+		<Type>Monitron.Clients.XMPP.XMPPMessengerClient</Type>
+	</MessangerClient>
+	<Account>
+		<Username>kodi</Username>
+		<Domain>monitron.ddns.net</Domain>
+		<Password>XXXXXX</Password>
+	 </Account>
+	 <Plugin>
+	 	<DllPath>C:\Users\tzafi\Source\Repos\Monitron\Monitron.Plugins.Kodi\bin\Debug</DllPath>
+		<DllName>Monitron.Plugins.Kodi.dll</DllName>
+		<Type>Monitron.Plugins.Kodi.KodiPlugin</Type>
+	 </Plugin>
+	 <DataStore>
+		<DllPath>C:\Users\tzafi\Source\Repos\Monitron\Monitron.PluginDataStore.Local\bin\Debug</DllPath>
+		<DllName>Monitron.PluginDataStore.Local.dll</DllName>
+		<Type>Monitron.PluginDataStore.Local.LocalPluginDataStore</Type>
+	 	<Location>C:\Users\tzafi\AppData\Roaming\Monitron\LocalDataStore.json</Location>
+	 </DataStore>
+ </NodeConfiguration>
+

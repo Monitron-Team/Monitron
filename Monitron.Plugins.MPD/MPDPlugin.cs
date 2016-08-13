@@ -4,7 +4,6 @@ using System.Net;
 using System.Collections.Generic;
 using System.Threading;
 using System.Reflection;
-
 using Monitron.Common;
 using Monitron.ImRpc;
 using Libmpc;
