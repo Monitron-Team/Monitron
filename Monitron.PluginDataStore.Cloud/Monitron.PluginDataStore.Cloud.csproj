@@ -44,17 +44,17 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="MongoDB.Bson">
-      <HintPath>..\packages\MongoDB.Bson.2.2.3\lib\net45\MongoDB.Bson.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver.Core">
-      <HintPath>..\packages\MongoDB.Driver.Core.2.2.3\lib\net45\MongoDB.Driver.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver">
-      <HintPath>..\packages\MongoDB.Driver.2.2.3\lib\net45\MongoDB.Driver.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\packages\MongoDB.Bson.2.2.4\lib\net45\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core">
+      <HintPath>..\packages\MongoDB.Driver.Core.2.2.4\lib\net45\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\packages\MongoDB.Driver.2.2.4\lib\net45\MongoDB.Driver.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

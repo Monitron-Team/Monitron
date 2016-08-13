@@ -39,9 +39,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Monitron.PluginDataStore.Cloud\Monitron.PluginDataStore.Cloud.csproj">
       <Project>{FEDF6E7E-C6F5-47A5-B517-E24C4AC472EC}</Project>
       <Name>Monitron.PluginDataStore.Cloud</Name>
@@ -50,5 +47,8 @@
       <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
       <Name>Monitron.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
