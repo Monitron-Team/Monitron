@@ -274,14 +274,14 @@ namespace Monitron.Plugins.Kodi
             foreach (var buddy in r_Client.Buddies)
             {
                 string[] implementedInterfaces = rpc.GetRegisterServersList(buddy.Identity);
-                foreach(string interf in implementedInterfaces)
+                foreach (string interf in implementedInterfaces)
                 {
-                    if(interf.Equals("IAudioBot"))
+                    if (interf.Equals("IAudioBot"))
                     {
                         IAudioBot currentBot = rpc.CreateRpcClient<IAudioBot>(buddy.Identity);
                         currentBot.PauseAudio(i_Buddy);
                     }
-                    else if(interf.Equals("IAudioBot"))
+                    else if (interf.Equals("IAudioBot"))
                     {
                         IMovieBot currentBot = rpc.CreateRpcClient<IMovieBot>(buddy.Identity);
                         currentBot.PauseMovie(i_Buddy);
