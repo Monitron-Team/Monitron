@@ -268,27 +268,26 @@ namespace Monitron.Plugins.Kodi
         [RemoteCommand(MethodName = "play")]
         public string KodiPlay(Identity i_Buddy, int i_Video)
         {
-            IMessengerRpc rpc = (r_Client as IMessengerRpc);
-            string msg = string.Empty;
+			IMessengerRpc rpc = (r_Client as IMessengerRpc);
+			foreach(var buddy in r_Client.Buddies)
+			{
+				string[] resources = buddy.Resources;
+				if(resources.Length > 0)
+				{
+					var buddyIden = buddy.Identity;
+					buddyIden.Resource = resources[0];
+					string[] implementedInterfaces = rpc.GetRegisterServersList(buddyIden);
 
-            foreach (var buddy in r_Client.Buddies)
-            {
-                string[] implementedInterfaces = rpc.GetRegisterServersList(buddy.Identity);
-                foreach (string interf in implementedInterfaces)
-                {
-                    if (interf.Equals("IAudioBot"))
-                    {
-                        IAudioBot currentBot = rpc.CreateRpcClient<IAudioBot>(buddy.Identity);
-                        currentBot.PauseAudio();
-                    }
-                    else if (interf.Equals("IAudioBot"))
-                    {
-                        IMovieBot currentBot = rpc.CreateRpcClient<IMovieBot>(buddy.Identity);
-                        currentBot.PauseMovie();
-                    }
-                }
-            }
+					if(implementedInterfaces.Contains("IAudioBot"))
+					{
+						IMessengerRpc AudioRpc = (r_Client as IMessengerRpc);
+						IAudioBot audioBot = AudioRpc.CreateRpcClient<IAudioBot>(buddyIden);
+						audioBot.PauseAudio();
+					}
+				}
+			}
 
+			string msg = string.Empty;
             string videoPath = getMoviePath(i_Video);
             if (string.IsNullOrEmpty(videoPath) == false)
             {

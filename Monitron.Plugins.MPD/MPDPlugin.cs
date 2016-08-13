@@ -11,7 +11,7 @@ using Libmpc;
 
 namespace Monitron.Plugins.MPD
 {
-	public class MPDPlugin: INodePlugin
+	public class MPDPlugin: INodePlugin, IAudioBot
 	{
 		private readonly IMessengerClient r_Client;
 
@@ -51,7 +51,7 @@ namespace Monitron.Plugins.MPD
 			IMessengerRpc rpc = (r_Client as IMessengerRpc);
 			if(rpc != null)
 			{
-				rpc.RegisterRpcServer <INodePlugin, MPDPlugin>(this);
+				rpc.RegisterRpcServer <IAudioBot, MPDPlugin>(this);
 			}
 		}
 
@@ -207,6 +207,11 @@ namespace Monitron.Plugins.MPD
 				{
 				}
 			}
+		}
+
+		public string PauseAudio()
+		{
+			return StopSong(new Identity());
 		}
 	}
 }
