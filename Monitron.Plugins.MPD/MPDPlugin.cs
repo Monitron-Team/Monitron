@@ -80,9 +80,9 @@ namespace Monitron.Plugins.MPD
             {
                 r_Client.SetNickname("BoomBox Bot");
                 r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.MPD.Boombox.png"));
-                foreach(var buddy in r_Client.Buddies) 
+				foreach(var buddy in r_Client.Buddies.Where(item => item.Groups.Contains("admin"))) 
                 {
-                    string welcomeMessage = "\nHi, I am a MPD bot";
+					string welcomeMessage = "\nHi, I am a MPD bot";
                     r_Client.SendMessage(buddy.Identity, welcomeMessage);
 				}
 			}
@@ -148,6 +148,25 @@ namespace Monitron.Plugins.MPD
 		{
 			if(m_Mpc != null)
 			{
+				IMessengerRpc rpc = (r_Client as IMessengerRpc);
+				foreach(var buddy in r_Client.Buddies) 
+				{
+					string[] resources = buddy.Resources;
+					if (resources.Length>0)
+					{
+						var buddyIden = buddy.Identity;
+						buddyIden.Resource = resources[0];
+						string[] implementedInterfaces = rpc.GetRegisterServersList(buddyIden);
+
+						if (implementedInterfaces.Contains("IMovieBot"))
+						{
+							IMessengerRpc movieRpc = (r_Client as IMessengerRpc);
+							IMovieBot movieBot = movieRpc.CreateRpcClient<IMovieBot>(buddyIden);
+							movieBot.PauseMovie();
+						}
+					}
+				}
+
 				m_Mpc.Play();
 				return "start playing " + m_Mpc.CurrentSong().Title;
 			} 
@@ -158,25 +177,7 @@ namespace Monitron.Plugins.MPD
 
 
 		}
-
-		[RemoteCommand(MethodName="test")]
-		public string test(Identity i_Buddy)
-		{
-			Identity newIdentity = new Identity();
-			newIdentity.Domain = i_Buddy.Domain;
-			newIdentity.Resource = "Test";
-			newIdentity.UserName = i_Buddy.UserName;
-			IMessengerRpc rpc = (r_Client as IMessengerRpc);
-			string[] rpcServers = rpc.GetRegisterServersList(newIdentity);
-
-			string welcomeMessage = "my friends are: ";
-			foreach(var buddy in r_Client.Buddies) 
-			{
-				//string[] rpcServers = rpc.GetRegisterServersList(buddy.Identity);
-			}
-			return welcomeMessage;
-		}
-
+			
 		[RemoteCommand(MethodName="next")]
 		public string NextSong(Identity i_Buddy)
 		{

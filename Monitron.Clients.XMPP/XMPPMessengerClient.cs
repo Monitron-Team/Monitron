@@ -26,6 +26,8 @@ namespace Monitron.Clients.XMPP
 
         private static readonly TimeSpan sr_PingDelayTimeSpan = TimeSpan.FromSeconds(30);
 
+		private Dictionary<string, SortedSet<string>> m_MapAccountResources; 
+
         private Timer m_PingTimer;
 
         public Monitron.Common.FileTransferRequest FileTransferRequest { get; set; }
@@ -50,7 +52,15 @@ namespace Monitron.Clients.XMPP
             {
                 foreach (RosterItem item in m_Client.GetRoster())
                 {
-                    yield return new BuddyListItem(item.Jid.ToIdentity(), item.Groups);
+					string[] resources = new string[0];
+					string jidId = item.Jid.ToString();
+					string bareId = item.Jid.GetBareJid().ToString();
+
+					if(m_MapAccountResources.ContainsKey(bareId))
+					{
+						resources = m_MapAccountResources[bareId].ToArray();
+					}
+					yield return new BuddyListItem(item.Jid.ToIdentity(), item.Groups, resources);
                 }
             }
         }
@@ -78,6 +88,7 @@ namespace Monitron.Clients.XMPP
         public XMPPMessengerClient(Account i_Account)
         {
             this.r_Account = i_Account;
+			this.m_MapAccountResources = new Dictionary<string, SortedSet<string>>();
             m_Client = new XmppClient(
                 hostname: r_Account.Identity.Domain,
                 username: r_Account.Identity.UserName,
@@ -226,12 +237,32 @@ namespace Monitron.Clients.XMPP
 
         public void OnBuddySignedIn(BuddySignedInEventArgs i_BuddySignedInEventArgs)
         {
-            BuddySignedIn?.Invoke(this, i_BuddySignedInEventArgs);
+			Jid bareJid = i_BuddySignedInEventArgs.Buddy.ToJid().GetBareJid();
+			string bareId = bareJid.ToString();
+
+			if (m_MapAccountResources.ContainsKey(bareId))
+			{
+				m_MapAccountResources[bareId].Add(i_BuddySignedInEventArgs.Buddy.Resource);
+			} 
+			else
+			{
+				m_MapAccountResources.Add(bareId, new SortedSet<string>(){i_BuddySignedInEventArgs.Buddy.Resource});
+			}
+
+			BuddySignedIn?.Invoke(this, i_BuddySignedInEventArgs);
         }
 
         public void OnBuddySignedOut(BuddySignedOutEventArgs i_BuddySignedOutEventArgs)
         {
-            BuddySignedOut?.Invoke(this, i_BuddySignedOutEventArgs);
+			Jid bareJid = i_BuddySignedOutEventArgs.Buddy.ToJid().GetBareJid();
+			string bareId = bareJid.ToString();
+
+			if(m_MapAccountResources.ContainsKey(bareId))
+			{
+				m_MapAccountResources[bareId].Remove(i_BuddySignedOutEventArgs.Buddy.Resource);
+			}
+
+			BuddySignedOut?.Invoke(this, i_BuddySignedOutEventArgs);
         }
 
         public void OnConnectionStateChanged(ConnectionStateChangedEventArgs i_Args)
@@ -249,8 +280,8 @@ namespace Monitron.Clients.XMPP
 
         public void m_Client_RosterUpdated(object i_Sender, RosterUpdatedEventArgs i_Args)
         {
-            OnBuddyListChanged(new BuddyListChangedEventArgs(
-                new BuddyListItem(i_Args.Item.Jid.ToIdentity(), i_Args.Item.Groups),
+			OnBuddyListChanged(new BuddyListChangedEventArgs(
+				new BuddyListItem(i_Args.Item.Jid.ToIdentity(), i_Args.Item.Groups, new string[] {i_Args.Item.Jid.Resource}),
                 i_Args.Removed
             ));
         }

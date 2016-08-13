@@ -8,6 +8,6 @@ namespace Monitron.Common
 {
     public interface IMovieBot
     {
-        string PauseMovie(Identity i_Buddy);
+        string PauseMovie();
     }
 }
