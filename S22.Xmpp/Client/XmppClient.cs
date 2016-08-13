@@ -1560,19 +1560,21 @@ namespace S22.Xmpp.Client {
 
 		public string[] GetImplementedInterfaces(Jid i_Jid)
 		{
-			var client = CreateJabberRpcClient<IDiscovery>(i_Jid);
+			string[] implmentedInterfaces = new string[0];
+			IDiscovery client = CreateJabberRpcClient<IDiscovery>(i_Jid);
+
 			if (client != null)
 			{
 				try
 				{
-					return client.GetImplementedInterfaces();
+					implmentedInterfaces = client.GetImplementedInterfaces();
 				}
 				catch (Exception)
 				{
 					
 				}
 			}
-			return null;
+			return implmentedInterfaces;
 		}
 	}
 }

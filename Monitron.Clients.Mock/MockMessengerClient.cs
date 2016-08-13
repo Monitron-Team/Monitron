@@ -57,7 +57,7 @@ namespace Monitron.Clients.Mock
             {
                 foreach (var pair in BuddyDictionary)
                 {
-                    yield return new BuddyListItem(pair.Key, pair.Value);
+					yield return new BuddyListItem(pair.Key, null, null);
                 }
             }
         }
@@ -109,7 +109,7 @@ namespace Monitron.Clients.Mock
 
             BuddyDictionary.Add(Account.Identity, i_Groups);
             OnBuddyListChanged(new BuddyListChangedEventArgs(
-                new BuddyListItem(i_Identity, i_Groups), false)
+				new BuddyListItem(i_Identity, i_Groups, null), false)
             );
         }
 
@@ -133,7 +133,7 @@ namespace Monitron.Clients.Mock
             string[] groups = BuddyDictionary[i_Identity];
             BuddyDictionary.Remove(i_Identity);
             OnBuddyListChanged(new BuddyListChangedEventArgs(
-                new BuddyListItem(i_Identity, groups), true)
+                new BuddyListItem(i_Identity, groups, null), true)
             );
         }
 

@@ -8,6 +8,6 @@ namespace Monitron.Common
 {
     public interface IAudioBot
     {
-        string PauseAudio(Identity i_Buddy);
+        string PauseAudio();
     }
 }
