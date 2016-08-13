@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Monitron.Common
+﻿namespace Monitron.Common
 {
     public interface IMovieBot
     {
+        //[RemoteCommand(MethodName = "pause_movie")]
         string PauseMovie(Identity i_Buddy);
     }
 }
