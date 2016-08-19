@@ -9,7 +9,6 @@
 - name: enable MongoDB Server
   service: name=mongod enabled=yes
 
-
 - name: configure MongoDB server
   copy:
    src: "mongod.conf"

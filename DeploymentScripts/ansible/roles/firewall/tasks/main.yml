@@ -1,4 +1,7 @@
 ---
+- name: remove firewalld if installed
+  dnf: name=firewalld state=absent
+
 - name: install iptables services
   dnf: name=iptables-services state=latest
   notify:

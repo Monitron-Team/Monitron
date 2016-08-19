@@ -4,6 +4,7 @@
     "version": "1.0.0",
     "description": "API Server for Boty",
     "author": "Saggi Mizrahi",
+    "license": "AFL-3.0",
     "dependencies": {
         "express": "^4.0.0",
 	"body-parser": "^1.15.0",

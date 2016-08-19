@@ -1,12 +1,11 @@
 #!/bin/env sh
 echo Gather Api Server Dependencies...
 pushd ../Boty.Api/
-npm install
+make
 popd
 echo Building Frontend
 pushd ../Boty.Frontend/
-npm install
-ember build --environment=production
+make
 popd
 echo Build .Net bits
 pushd ../
