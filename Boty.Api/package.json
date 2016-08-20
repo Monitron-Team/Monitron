@@ -6,6 +6,7 @@
     "author": "Saggi Mizrahi",
     "license": "AFL-3.0",
     "dependencies": {
+	"co": "^4.6.0",
         "express": "^4.0.0",
 	"body-parser": "^1.15.0",
         "mongoose": "^4.0.0",

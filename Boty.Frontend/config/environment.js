@@ -23,7 +23,7 @@ module.exports = function(environment) {
     store: 'simple-auth-session-store:local-storage',
     authorizer: 'authorizer:boty',
     crossOriginWhitelist: ['http://localhost:9898/'],
-    routeAfterAuthentication: '/accounts',
+    routeAfterAuthentication: '/me',
     authenticationRoute: 'log-in'
   }
 

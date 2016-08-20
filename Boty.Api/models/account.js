@@ -2,7 +2,7 @@ const mongoose   = require('mongoose'),
       Schema     = mongoose.Schema;
 
 const AccountSchema = new Schema({
-  name: {type: String, unique: true, required: true},
+  name: {type: String, unique: true, required: true, index: true},
   password: String,
   "is-admin": {type: Boolean, default: false},
 });

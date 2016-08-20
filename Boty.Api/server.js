@@ -1,3 +1,4 @@
+const co = require('co');
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -11,7 +12,8 @@ const options = require('./options.js');
 const models = {
   'NodePlugin': require('./models/node-plugin.js'),
   'Account': require('./models/account.js'),
-  'Session': require('./models/session.js')
+  'Session': require('./models/session.js'),
+  'Contact': require('./models/contact.js')
 };
 
 mongoose.connect(
@@ -40,7 +42,7 @@ const registry = new API.ResourceTypeRegistry({
       'self': '/node-plugins/{id}'
     },
     beforeRender: (resource, req, res) => {
-      metadata = resource._attrs.metadata;
+      let metadata = resource._attrs.metadata;
       resource._attrs = {
         name: metadata.name,
         description: metadata.description,
@@ -49,40 +51,75 @@ const registry = new API.ResourceTypeRegistry({
       return resource;
     }
   },
+  'contacts': {
+    urlTemplates: {
+      'self': '/contacts/{id}'
+    },
+    beforeRender: (resource, req, res) => {
+      resource.removeAttr('password');
+      return resource;
+    },
+    beforeSave: co.wrap(function*(resource, req, res) {
+      if (req.method === 'PATCH') {
+        if (resource.password === null || resource.password === '') {
+          let contact;
+          try {
+            contact = yield models.Contact.findOne({_id: resource._id}).exec();
+          } catch (err) {
+            res.status(500).send(err);
+            return Promise.resolve(null);
+          }
+
+          resource.setAttr('password', contact.password);
+        }
+      } else {
+        if (resource.password === null || resource.password === '') {
+          res.status(500).send('Invalid password');
+          return Promise.resolve(null);
+        }
+      }
+
+      return Promise.resolve(resource);
+    })
+  },
   'accounts': {
     urlTemplates: {
       'self': '/accounts/{id}'
     },
     beforeRender: (resource, req, res) => {
-      resource.removeAttr("password");
+      resource.removeAttr('password');
       return resource;
     },
-    beforeSave: (resource, req, res) => {
+    beforeSave: co.wrap(function*(resource, req, res) {
       if (req.method === 'PATCH') {
         if (resource.password === null || resource.password === '') {
-          models.Account.findOne({
-            _id: resource._id
-          }, (err, account) => {
-            if (err) {
-              res.status(500).send(err);
-              return;
-            }
+          let account;
+          try {
+            account = yield models.Account.findOne({_id: resource._id}).exec();
+          } catch (err) {
+            res.status(500).send(err);
+            return Promise.resolve(null);
+          }
 
-            resource.password = account.password;
-          });
+          resource.setAttr('password', account.password);
+        }
+      } else {
+        if (resource.password === null || resource.password === '') {
+          res.status(500).send('Invalid password');
+          return Promise.resolve(null);
         }
       }
 
-      return resource;
-    }
+      return Promise.resolve(resource);
+    })
   }
 }, {
   'dbAdapter': adapter
 });
 
 let api_controller = new API.controllers.API(registry);
-let docs_controller = new API.controllers.Documentation(registry, {name: 'Boty API'});
-let front = new API.httpStrategies.Express(api_controller, docs_controller);
+//let docs_controller = new API.controllers.Documentation(registry, {name: 'Boty API'});
+let front = new API.httpStrategies.Express(api_controller);//, docs_controller);
 let request_handler = front.apiRequest.bind(front);
 
 const port = process.env.port || 9898;
@@ -95,15 +132,19 @@ app.use('/api/v1/', router);
 
 const allowedGET = [
   'node-plugins',
+  'contacts',
   'accounts'
 ].join('|');
 const allowedPOST = [
+  'contacts',
   'accounts'
 ].join('|');
 const allowedPATCH = [
+  'contacts',
   'accounts'
 ].join('|');
 const allowedDELETE = [
+  'contacts',
   'accounts'
 ].join('|');
 router.get('/:type(' + allowedGET + ')', request_handler);
@@ -122,12 +163,13 @@ router.post('/node-plugins/upload', upload.single('plugin'), (req, res, next) =>
       return;
     }
 
-    res.send("OK!");
+    res.send('OK!');
   });
 });
 router.post('/sessions/create', (req, res) => {
   models.Account.findOne({
     name: req.body.username,
+    password: req.body.password
   }, (err, account) => {
     if (err) {
       res.status(403).send(err);
@@ -147,6 +189,8 @@ router.post('/sessions/create', (req, res) => {
       }
 
       res.json({
+        account: account._id,
+        is_admin: account["is-admin"],
         id_token: session._id
       });
     })

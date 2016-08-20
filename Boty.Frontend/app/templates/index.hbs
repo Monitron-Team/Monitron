@@ -1,5 +1,54 @@
-<div class="page-header">
+<div style="
+   background-color: rgba(255, 255, 255, 1);
+    padding: 0em 0em 1em 1em;
+    border-color: #EEEEEE;
+    border-width: .5em;
+    border-radius: 25px;
+    border-style: solid;
+    width:25em;
+">
+<div class="page-header" style="margin: 0px 0 20px">
   <h1>Boty! <small>Let's <strong>bot</strong> it up</small></h1>
 </div>
+{{#unless session.isAuthenticated}}
 <p>{{link-to 'Register an account!' 'register' class='btn btn-primary'}}</p>
+{{/unless}}
+</div>
+<div
+  style="
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -99;
+    -ms-transform: translatex(-50%) translatey(-50%);
+    -moz-transform: translatex(-50%) translatey(-50%);
+    -webkit-transform: translatex(-50%) translatey(-50%);
+    transform: translatex(-50%) translatey(-50%);
+    background-size: cover;
+    background-color: rgba(255, 255, 255, 0.5);"
+  >
+</div>
+<video playsinline autoplay muted loop id="bgvid"
+  style="
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -100;
+    -ms-transform: translatex(-50%) translatey(-50%);
+    -moz-transform: translatex(-50%) translatey(-50%);
+    -webkit-transform: translatex(-50%) translatey(-50%);
+    transform: translatex(-50%) translatey(-50%);
+    background-size: cover;
+    -webkit-filter: blur(4px);
+  ">
+  <source src="bg.mp4" type="video/mp4">
+</video>
 <!-- vim: set tabstop=2 shiftwidth=2 expandtab: -->

@@ -5,7 +5,14 @@ export default Ember.Controller.extend({
     submission() {
       this.model.save()
         .then((account) => this.transitionToRoute('index'))
-        .catch((err) => this.set('errorMessage', err.message));
+          .catch((err) => {
+            if (err.errors && err.errors[0]) {
+              this.set('errorMessage', err.errors[0].title);
+            }
+            else {
+              this.set('errorMessage', err.message);
+            }
+          });
     }
   }
 });

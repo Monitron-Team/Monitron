@@ -27,9 +27,11 @@ export default Base.extend({
               dataType: 'json'
           }).then(function(response) {
               Ember.run(function() {
-                  resolve({
-                      token: response.id_token
-                  });
+                resolve({
+                  account: response.account,
+                  isAdmin: response["is-admin"],
+                  token: response.id_token
+                });
               });
           }, function(xhr, status, error) {
               var response = xhr.responseText;

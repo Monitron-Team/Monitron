@@ -7,6 +7,11 @@
       <strong>Register failed:</strong> {{error.message}}
     </div>
   {{/each}}
+  {{#if errorMessage}}
+    <div class="alert alert-danger" role="alert">
+      <strong>Register failed:</strong> {{errorMessage}}
+    </div>
+  {{/if}}
   <form {{action "submission" on="submit"}}>
     <div class="form-group">
       <label for="username">User Name:</label>
