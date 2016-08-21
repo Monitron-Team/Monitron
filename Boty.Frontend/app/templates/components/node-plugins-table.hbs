@@ -1,7 +1,7 @@
-<table class="table table-striped">
+<table class="table table-striped table-hover">
   <thead>
     <tr>
-      <th>Name</th><th>Description</th><th>version</th><th>Actions</th>
+      <th>Name</th><th>Description</th><th>version</th><th></th>
 		</tr>
   </thead>
   <tbody>
@@ -10,10 +10,8 @@
   <td>{{plugin.name}}</td>
   <td>{{plugin.description}}</td>
   <td>{{plugin.version}}</td>
-  <td>
-    {{#action-menu title="Action"}}
-    <li><a href="#" {{action "delete_plugin" plugin on="click"}}>Delete</a></li>
-    {{/action-menu}}
+  <td style="text-align:right;">
+    <button class="btn btn-danger btn-xs" {{action "delete_plugin" plugin on="click"}}><i class="fa fa-trash"/> Delete</button>
   </td>
 </tr>
 {{/each}}

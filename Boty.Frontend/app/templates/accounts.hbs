@@ -1,23 +1,21 @@
 {{page-header title="Registered Accounts"}}
-<table class="table table-striped">
+<table class="table table-striped table-hover">
   <thead>
     <tr>
-			<th>Name</th><th>Admin</th><th>Actions</th>
+      <th>Name</th><th>Admin</th><th>Device Manufacturer</th><th></th>
 		</tr>
   </thead>
   <tbody>
 {{#each model as |account|}}
   <tr><td>{{account.name}}</td>
     <td>
-      {{#if account.isAdmin}}
-        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-			{{/if}}
+      {{toggle-button value=account.isAdmin on-clicked=(action "toggle_admin" account)}}
   	</td>
-		<td>
-      {{#action-menu title="Action"}}
-				<li><a href="#" {{action "delete_account" account on="click"}}>Delete</a></li>
-				<li><a href="#" {{action "toggle_admin" account on="click"}}>Toggle Admin</a></li>
-      {{/action-menu}}
+    <td>
+      {{toggle-button value=account.isDeviceMaker on-clicked=(action "toggle_device_maker" account)}}
+  	</td>
+		<td style="text-align:right;">
+      <button class="btn btn-danger btn-xs" {{action "delete_account" account on="click"}}><i class="fa fa-trash"/> Delete</button>
 		</td>
 	</tr>
 {{/each}}

@@ -6,9 +6,13 @@ const mongoose = require('mongoose');
 const conn = mongoose.connection;
 const Grid = require('gridfs-stream');
 const BUCKET = 'plugin_store';
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+const GenericController = require('./generic');
+const NodePlugin = require('../models/node-plugin');
 
 /* vim: set sw=2 ts=2 tw=2 et : */
-function upload(file, callback) {
+function uploadNodePlugin(file, callback) {
   let extract = tar.extract();
   let tarFile = fs.createReadStream(file.path);
   extract.on('entry', (header, stream, cb) => {
@@ -32,7 +36,7 @@ function upload(file, callback) {
               name: manifest.Name[0],
               type: manifest.Type[0],
               version: manifest.Version[0],
-              dll_path: path.parse(header.name).dir,
+              dll_path: path.parse(header.name).dir
             }
           });
           gfs.remove({
@@ -44,7 +48,7 @@ function upload(file, callback) {
               callback(null);
             });
             stream.on('error', (err) => {
-              callback("Internal failuer while uploading plugin");
+              callback('Internal failuer while uploading plugin');
             });
             tarFile.pipe(stream);
           });
@@ -71,7 +75,7 @@ function upload(file, callback) {
   tarFile.pipe(extract);
 }
 
-function delete_cb(req, res) {
+function deleteNodePlugin(req, res) {
   let gfs = Grid(conn.db, mongoose.mongo);
   gfs.remove({
     _id: req.params.id,
@@ -86,8 +90,34 @@ function delete_cb(req, res) {
   });
 }
 
-module.exports = {
-  upload: upload,
-  delete: delete_cb
+module.exports = (router) => {
+  GenericController({
+    plural: 'nodePlugins',
+    singular: 'nodePlugin'
+  }, NodePlugin, {
+    list: true,
+    show: true
+  }, {
+    beforeRender: function(nodePlugin, req, res) {
+      return {
+        _id: nodePlugin._id,
+        name: nodePlugin.metadata.name,
+        description: nodePlugin.metadata.description,
+        version: nodePlugin.metadata.description
+      };
+    }
+  })(router);
+
+  router.delete('/nodePlugins/:id', deleteNodePlugin );
+  router.post('/nodePlugins/upload', upload.single('plugin'), (req, res) => {
+    uploadNodePlugin(req.file, (err) => {
+      if (err) {
+        res.status(403).send(err);
+        return;
+      }
+
+      res.send('OK!');
+    });
+  });
 };
 /* vim: set sw=2 ts=2 tw=2 et : */

@@ -4,7 +4,8 @@ const mongoose   = require('mongoose'),
 const AccountSchema = new Schema({
   name: {type: String, unique: true, required: true, index: true},
   password: String,
-  "is-admin": {type: Boolean, default: false},
+  isAdmin: {type: Boolean, default: false},
+  isDeviceMaker: {type: Boolean, default: false}
 });
 
 module.exports = mongoose.model('Account', AccountSchema);

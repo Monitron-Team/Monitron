@@ -42,7 +42,7 @@ export default Ember.Component.extend({
 			formData.append('plugin', file.getSource());
 			Ember.$.ajax({
 				type: 'POST',
-				url: ENV['data-adapter'].host + '/api/v1/node-plugins/upload',
+				url: ENV['data-adapter'].host + '/api/v1/nodePlugins/upload',
 				data: formData,
 				cache: false,
 				contentType: false,

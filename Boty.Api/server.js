@@ -2,19 +2,10 @@ const co = require('co');
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const API = require('json-api');
 const bodyParser = require('body-parser');
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
-const NodePluginController = require('./controllers/node-plugins.js');
 const options = require('./options.js');
-
-const models = {
-  'NodePlugin': require('./models/node-plugin.js'),
-  'Account': require('./models/account.js'),
-  'Session': require('./models/session.js'),
-  'Contact': require('./models/contact.js')
-};
+const Session = require('./models/session');
+const Account = require('./models/account');
 
 mongoose.connect(
   options.mongo_url,
@@ -31,96 +22,9 @@ mongoose.connect(
 app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
   next();
 });
-
-const adapter = new API.dbAdapters.Mongoose(models);
-const registry = new API.ResourceTypeRegistry({
-  'node-plugins': {
-    urlTemplates: {
-      'self': '/node-plugins/{id}'
-    },
-    beforeRender: (resource, req, res) => {
-      let metadata = resource._attrs.metadata;
-      resource._attrs = {
-        name: metadata.name,
-        description: metadata.description,
-        version: metadata.version
-      };
-      return resource;
-    }
-  },
-  'contacts': {
-    urlTemplates: {
-      'self': '/contacts/{id}'
-    },
-    beforeRender: (resource, req, res) => {
-      resource.removeAttr('password');
-      return resource;
-    },
-    beforeSave: co.wrap(function*(resource, req, res) {
-      if (req.method === 'PATCH') {
-        if (resource.password === null || resource.password === '') {
-          let contact;
-          try {
-            contact = yield models.Contact.findOne({_id: resource._id}).exec();
-          } catch (err) {
-            res.status(500).send(err);
-            return Promise.resolve(null);
-          }
-
-          resource.setAttr('password', contact.password);
-        }
-      } else {
-        if (resource.password === null || resource.password === '') {
-          res.status(500).send('Invalid password');
-          return Promise.resolve(null);
-        }
-      }
-
-      return Promise.resolve(resource);
-    })
-  },
-  'accounts': {
-    urlTemplates: {
-      'self': '/accounts/{id}'
-    },
-    beforeRender: (resource, req, res) => {
-      resource.removeAttr('password');
-      return resource;
-    },
-    beforeSave: co.wrap(function*(resource, req, res) {
-      if (req.method === 'PATCH') {
-        if (resource.password === null || resource.password === '') {
-          let account;
-          try {
-            account = yield models.Account.findOne({_id: resource._id}).exec();
-          } catch (err) {
-            res.status(500).send(err);
-            return Promise.resolve(null);
-          }
-
-          resource.setAttr('password', account.password);
-        }
-      } else {
-        if (resource.password === null || resource.password === '') {
-          res.status(500).send('Invalid password');
-          return Promise.resolve(null);
-        }
-      }
-
-      return Promise.resolve(resource);
-    })
-  }
-}, {
-  'dbAdapter': adapter
-});
-
-let api_controller = new API.controllers.API(registry);
-//let docs_controller = new API.controllers.Documentation(registry, {name: 'Boty API'});
-let front = new API.httpStrategies.Express(api_controller);//, docs_controller);
-let request_handler = front.apiRequest.bind(front);
 
 const port = process.env.port || 9898;
 
@@ -128,74 +32,57 @@ const router = express.Router();
 
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: true }));
+router.use('*', (req, res, next) => {
+  try {
+    next();
+  } catch (e) {
+    console.log(e)
+    throw e;
+  }
+});
+
+router.use('*', co.wrap(function*(req, res, next) {
+  if (req.method === 'OPTIONS') {
+    next();
+    return;
+  }
+
+  req.auth = {
+    isAuthorized: false,
+    account: null
+  };
+
+  if (req.headers.authorization) {
+    let token = req.headers.authorization.split(/ /)[1];
+    try {
+      let session = yield Session.findOne({_id: token});
+      if (session !== null) {
+        req.auth.account = yield Account.findOne({_id: session.account});
+        if (req.auth.account !== null) {
+          req.auth.isAuthorized = true;
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  next();
+}));
+
 app.use('/api/v1/', router);
 
-const allowedGET = [
+
+const CONTROLLERS = [
+  'accounts',
+  'sessions',
   'node-plugins',
-  'contacts',
-  'accounts'
-].join('|');
-const allowedPOST = [
-  'contacts',
-  'accounts'
-].join('|');
-const allowedPATCH = [
-  'contacts',
-  'accounts'
-].join('|');
-const allowedDELETE = [
-  'contacts',
-  'accounts'
-].join('|');
-router.get('/:type(' + allowedGET + ')', request_handler);
-router.get('/:type('+ allowedGET + ')/:id', request_handler);
-router.post('/:type(' + allowedPOST + ')', request_handler);
-router.patch('/:type(' + allowedPATCH + ')/:id', request_handler);
-router.delete('/:type(' + allowedDELETE + ')/:id', request_handler);
-router.get('/sessions/create', (req, res) => {
-  res.status(403).send("You shouldn't do that");
-});
-router.delete('/node-plugins/:id', NodePluginController.delete );
-router.post('/node-plugins/upload', upload.single('plugin'), (req, res, next) => {
-  NodePluginController.upload(req.file, (err) => {
-    if (err) {
-      res.status(403).send(err);
-      return;
-    }
+  'contacts'
+];
 
-    res.send('OK!');
-  });
-});
-router.post('/sessions/create', (req, res) => {
-  models.Account.findOne({
-    name: req.body.username,
-    password: req.body.password
-  }, (err, account) => {
-    if (err) {
-      res.status(403).send(err);
-      return;
-    }
-
-    if (account === null) {
-      res.status(403).send('Userame or password are incorrect');
-      return;
-    }
-
-    models.Session.create({
-      account: account
-    }, (err, session) => {
-      if (err) {
-        res.status(500).send(err);
-      }
-
-      res.json({
-        account: account._id,
-        is_admin: account["is-admin"],
-        id_token: session._id
-      });
-    })
-  });
-});
+for(let i in CONTROLLERS) {
+  require('./controllers/' + CONTROLLERS[i])(router);
+}
 
 app.listen(port, '0.0.0.0');
 

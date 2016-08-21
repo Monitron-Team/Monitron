@@ -1,8 +1,8 @@
-import RESTAdapter from 'ember-data/adapters/rest';
+import DS from 'ember-data';
 import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
 import ENV from '../config/environment';
 
-export default RESTAdapter.extend(DataAdapterMixin, {
+export default DS.RESTAdapter.extend(DataAdapterMixin, {
   authorizer: 'authorizer:boty',
   host: ENV['data-adapter'].host,
   namespace: 'api/v1'

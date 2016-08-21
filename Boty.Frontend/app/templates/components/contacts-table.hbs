@@ -1,0 +1,29 @@
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th></th><th>Name</th><th></th>
+		</tr>
+  </thead>
+  <tbody>
+{{#each model as |contact|}}
+<tr>
+  <td style="width:1px">
+    {{#if (eq contact.kind "user")}}
+      <i class="fa fa-user"/>
+    {{else if (eq contact.kind "device")}}
+      <i class="fa fa-plug"/>
+    {{else if (eq contact.kind "netbot")}}
+      <i class="fa fa-cloud"/>
+    {{/if}}
+  </td>
+  <td>{{contact.jid.name}}<span class="text-muted">@{{contact.jid.domain}}</span></td>
+  <td style="text-align:right">
+      {{#if (eq contact.kind "user")}}
+        <button class="btn btn-danger btn-xs" {{action "delete_account" contact on="click"}}><i class="fa fa-trash"/> Delete</button>
+        <button class="btn btn-default btn-xs" {{action "edit_account" contact on="click"}}><i class="fa fa-pencil"/> Edit</button>
+      {{/if}}
+  </td>
+</tr>
+{{/each}}
+  </tbody>
+</table>

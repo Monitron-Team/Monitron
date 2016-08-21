@@ -21,7 +21,7 @@
       <label for="password">Password:</label>
       {{input type="password" class="form-control" value=model.password placeholder="Password" id="password" required=true}}
     </div>
-    <button type="submit" class="btn btn-primary">Register!</button>
+    <button type="submit" class="btn btn-primary" disabled={{registerDisabled}}>Register!</button>
   </form>
 </div>
 <!-- vim: set tabstop=2 shiftwidth=2 expandtab: -->

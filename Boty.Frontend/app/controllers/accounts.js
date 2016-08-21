@@ -13,6 +13,14 @@ export default Ember.Controller.extend({
       console.log(account.changedAttributes());
       account.save().catch((err) => console.log(err));
       console.log(account.get('isAdmin'));
+    },
+    toggle_device_maker(account) {
+      console.log(account.get('isDeviceMaker'));
+      let old_value = account.get('isDeviceMaker');
+      account.set('isDeviceMaker', old_value === false);
+      console.log(account.changedAttributes());
+      account.save().catch((err) => console.log(err));
+      console.log(account.get('isDeviceMaker'));
     }
   }
 });
