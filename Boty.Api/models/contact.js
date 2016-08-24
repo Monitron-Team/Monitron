@@ -16,13 +16,15 @@ const JidGetter = function(v) {
 
 const RosterItem = new Schema({
   jid: {type: String, required: true, get: JidGetter, set: JidSetter},
+  alias: {type: String},
   groups: {type: [String], index: true, trim: true}
-});
+}, {_id: false, id: false});
 
 const Contact = new Schema({
   jid: {type: String, required: true, unique: true, index: true, get: JidGetter, set: JidSetter},
   owner: {type: ObjectId, ref: 'Account'},
-  password: [String],
+  description: {type: String},
+  password: String,
   kind: {type: String, required: true, lowercase: true, trim: true},
   roster: [RosterItem]
 });

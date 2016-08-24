@@ -31,6 +31,13 @@ module.exports = (router) => {
         return null;
       }
 
+      for(let i in contact.roster) {
+        let item = contact.roster[i];
+        item._id = item.jid.name + '@' + item.jid.domain;
+      }
+
+      delete contact.password
+
       return contact;
     },
     beforeSave: co.wrap(function* (contact, req, res) {
@@ -44,6 +51,8 @@ module.exports = (router) => {
           }
         }
       }
+
+      contact.jid = contact.jid.name + '@' + contact.jid.domain;
 
       return contact;
     })

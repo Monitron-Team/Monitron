@@ -29,7 +29,7 @@ export default Base.extend({
               Ember.run(function() {
                 resolve({
                   account: response.account,
-                  isAdmin: response["is-admin"],
+                  isAdmin: response.is_admin,
                   token: response.id_token
                 });
               });

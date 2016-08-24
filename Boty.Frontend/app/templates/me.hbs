@@ -13,57 +13,97 @@
 {{#action-menu title="New" icon="fa-plus"}}
   <li><a href="#" data-toggle="modal" data-target="#new-user-dialog"><i class="fa fa-user"/> Create new IM user</a></li>
   <li><a href="#" data-toggle="modal" data-target="#pair-device-dialog"><i class="fa fa-plug"/> Pair with a device</a></li>
-  <li><a href="#"data-toggle="modal" data-target="#start-netbot-dialog"><i class="fa fa-cloud"/> Start a new NetBot&#8482;</a></li>
+  <li><a href="#" data-toggle="modal" data-target="#start-netbot-dialog"><i class="fa fa-cloud"/> Start a new NetBot&#8482;</a></li>
 {{/action-menu}}
 {{contacts-table model=model.contacts}}
 {{#modal-dialog
-  title="Create new user"
-  dialog-id="new-user-dialog"
-  on-show=(action "CreateUserDialog_onShow")
+  id="new-user-dialog"
+  on-show=(action "onDialogShow")
+  on-hide=(action "preventHide" is-crating-user)
   is-form=true
-  on-submit=(action "createUser" model)
+  on-submit=(action "createUser" model.account)
   as |section|
   }}
-  {{#if (eq section "body")}}
+  {{#if (eq section "title")}}
+    <h4 class="modal-title"><i class="fa fa-user"/> Create new user</h4>
+  {{else if (eq section "body")}}
     {{error-box errors=errors}}
     <div class="form-group">
-      <label for="usename">User Name:</label>
+      <label for="contact-name">User Name:</label>
       <div class="input-group">
-        {{input type="text" class="form-control" placeholder="username" id="username" required=true}}
+        {{input type="text" class="form-control" placeholder="username" id="contact-name" required=true disabled=is-creating-user}}
         <span class="input-group-addon">@monitron.ddns.net</span>
       </div>
     </div>
     <div class="form-group">
-      <label for="password">Password:</label>
-      {{input type="password" class="form-control" value=password placeholder="Password" id="password" required=true}}
+      <label for="description">Description:</label>
+      {{input type="text" class="form-control" placeholder="description" id="description" required=true disabled=is-creating-user}}
     </div>
-  {{else if (eq section "footer")}}
-    <button type="submit" class="btn btn-primary">Create</button>
-  {{/if}}
-{{/modal-dialog}}
-{{#modal-dialog
-  title="Pair with a device (TODO)"
-  dialog-id="pair-device-dialog"
-  on-show=(action "PairDeviceDialog_onShow")
-  as |section|
-  }}
-  {{#if (eq section "body")}}
     <div class="form-group">
-      <label for="device_serial">Device Serial:</label>
-      {{input type="text" class="form-control" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" id="device_serial" required=true}}
+      <label for="password">Password:</label>
+      {{input type="password" class="form-control" value=password placeholder="Password" id="password" required=true disabled=is-creating-user}}
     </div>
   {{else if (eq section "footer")}}
-      <button type="button" class="btn btn-primary">Pair</button>
+    <button type="submit" class="btn btn-primary" disabled={{is-creating-user}}>Create{{#if is-creating-user}}ing{{spinner-icon}}{{/if}}</button>
   {{/if}}
 {{/modal-dialog}}
 {{#modal-dialog
-  title="Start a new NetBot&#8482; (TODO)"
-  dialog-id="start-netbot-dialog"
-  on-show=(action "StartNetbotDialog_onShow")
+  id="pair-device-dialog"
+  on-show=(action "onDialogShow")
+  on-hide=(action "preventHide" is-pairing-device)
+  is-form=true
+  on-submit=(action "pairDevice" model.account)
   as |section|
   }}
-  {{#if (eq section "body")}}
+  {{#if (eq section "title")}}
+    <h4 class="modal-title"><i class="fa fa-plug"/> Pair with device</h4>
+  {{else if (eq section "body")}}
+    {{error-box errors=errors}}
+    <div class="form-group">
+      <label for="device-serial">Device Serial:</label>
+      {{input type="text" class="form-control" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" id="device-serial" required=true disabled=is-pairing-device}}
+    </div>
+    <div class="form-group">
+      <label for="device-description">Description:</label>
+      {{input type="text" class="form-control" placeholder="description" id="device-description" required=true disabled=is-pairing-device}}
+    </div>
   {{else if (eq section "footer")}}
-      <button type="button" class="btn btn-primary">Start</button>
+    <button type="submit" class="btn btn-primary" disabled={{is-pairing-device}}>Pair{{#if is-pairing-device}}ing{{spinner-icon}}{{/if}}</button>
+  {{/if}}
+{{/modal-dialog}}
+{{#modal-dialog
+  id="start-netbot-dialog"
+  on-show=(action "onDialogShow")
+  on-hide=(action "preventHide" is-starting-netbot)
+  is-form=true
+  on-submit=(action "startNetBot" model.account)
+  as |section|
+  }}
+  {{#if (eq section "title")}}
+    <h4 class="modal-title"><i class="fa fa-cloud"/> Start a new NetBot&#8482;</h4>
+  {{else if (eq section "body")}}
+    {{error-box errors=errors}}
+    <div class="form-group">
+      <label for="bot-user-name">Bot User Name:</label>
+      {{input type="text" class="form-control" placeholder="username" id="bot-user-name" required=true disabled=is-starting-netbot}}
+    </div>
+    <div class="form-group">
+      <label for="netbot-description">Description:</label>
+      {{input type="text" class="form-control" placeholder="description" id="netbot-description" required=true disabled=is-starting-netbot}}
+    </div>
+    <div class="form-group">
+      <label for="node-plugin">Node Plugin:</label>
+      <select id="node-plugin" class="form-control" disabled={{if plugins false true}}>
+        {{#if plugins}}
+          {{#each plugins as |plugin|}}
+            <option value={{plugin.id}}>{{plugin.name}} <span class="text-muted">({{plugin.version}})</span></option>
+          {{/each}}
+        {{else}}
+          <option>Fetching plugin list...</option>
+        {{/if}}
+      </select>
+    </div>
+  {{else if (eq section "footer")}}
+    <button type="submit" class="btn btn-primary" disabled={{is-starting-netbot}}>Start{{#if is-starting-netbot}}ing{{spinner-icon}}{{/if}}</button>
   {{/if}}
 {{/modal-dialog}}

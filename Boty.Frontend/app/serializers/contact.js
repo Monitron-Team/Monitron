@@ -5,6 +5,10 @@ export default DS.RESTSerializer.extend(DS.EmbeddedRecordsMixin, {
     jid: {
       embedded: 'allways'
     },
+    roster: {
+      serialize: 'records',
+      deserialize: 'records'
+    },
     owner: {
       serialize: 'id',
       deserialize: 'id'

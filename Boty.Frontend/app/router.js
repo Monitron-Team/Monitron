@@ -13,6 +13,10 @@ Router.map(function() {
   this.route('register');
   this.route('log-in');
   this.route('me');
+
+  this.route('contact', function() {
+    this.route('edit', {path: '/:contact_id'});
+  });
 });
 
 export default Router;

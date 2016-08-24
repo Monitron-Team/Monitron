@@ -13,7 +13,7 @@
           <button for="file" class="btn btn-default" disabled={{uploading}} type="button" id="file-picker">Select file</button>
         </span>
         {{#if uploading}}
-          <span class="form-control"><img src="/spinner.svg"/> Uploading...</span>
+          <span class="form-control">{{spinner-icon}} Uploading...</span>
         {{/if}}
         {{#unless uploading}}
           <span href="javascript:;" class="form-control">{{fileName}}</span>

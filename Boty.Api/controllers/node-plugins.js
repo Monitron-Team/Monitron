@@ -103,7 +103,7 @@ module.exports = (router) => {
         _id: nodePlugin._id,
         name: nodePlugin.metadata.name,
         description: nodePlugin.metadata.description,
-        version: nodePlugin.metadata.description
+        version: nodePlugin.metadata.version
       };
     }
   })(router);

@@ -6,5 +6,7 @@ export default Model.extend({
   jid: attr('jid'),
   owner: belongsTo('account', { async: true }),
   password: attr('string'),
-  kind: attr('string')
+  description: attr('string'),
+  kind: attr('string'),
+  roster: hasMany('roster-item', { async: false })
 });

@@ -17,9 +17,6 @@ let GenericController = function (entity, model, verbs, cbs) {
         obj = yield cbs.beforeRender(obj, req, res);
       }
 
-      obj.id = obj._id;
-      delete obj._id;
-
       if (obj === null) {
         continue;
       }
