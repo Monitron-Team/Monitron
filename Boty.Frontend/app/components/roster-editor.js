@@ -9,7 +9,7 @@ export default Ember.Component.extend({
   },
   didUpdate() {
     let model = this.get("model");
-  }
+  },
   actions: {
     addContact(contact) {
       let model = this.get("model");
