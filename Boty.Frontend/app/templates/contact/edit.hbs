@@ -1,6 +1,7 @@
 {{#page-header}}
   <i class="fa fa-pencil-square-o"/> Edit: {{jid-span jid=model.jid}} {{kind-icon kind=model.kind}}
 {{/page-header}}
+{{error-box errors=errors}}
 <form {{action "submission" on="submit"}}>
   <div class="form-group">
     <label for="description">Description:</label>

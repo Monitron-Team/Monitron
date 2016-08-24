@@ -37,7 +37,7 @@
     </div>
     <div class="form-group">
       <label for="description">Description:</label>
-      {{input type="text" class="form-control" placeholder="description" id="description" required=true disabled=is-creating-user}}
+      {{input type="text" class="form-control" placeholder="description" id="description" disabled=is-creating-user}}
     </div>
     <div class="form-group">
       <label for="password">Password:</label>
@@ -65,7 +65,7 @@
     </div>
     <div class="form-group">
       <label for="device-description">Description:</label>
-      {{input type="text" class="form-control" placeholder="description" id="device-description" required=true disabled=is-pairing-device}}
+      {{input type="text" class="form-control" placeholder="description" id="device-description" disabled=is-pairing-device}}
     </div>
   {{else if (eq section "footer")}}
     <button type="submit" class="btn btn-primary" disabled={{is-pairing-device}}>Pair{{#if is-pairing-device}}ing{{spinner-icon}}{{/if}}</button>
@@ -89,7 +89,7 @@
     </div>
     <div class="form-group">
       <label for="netbot-description">Description:</label>
-      {{input type="text" class="form-control" placeholder="description" id="netbot-description" required=true disabled=is-starting-netbot}}
+      {{input type="text" class="form-control" placeholder="description" id="netbot-description" disabled=is-starting-netbot}}
     </div>
     <div class="form-group">
       <label for="node-plugin">Node Plugin:</label>

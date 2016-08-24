@@ -14,7 +14,10 @@ let GenericController = function (entity, model, verbs, cbs) {
 
       let obj = results[i].toObject({getters: true});
       if (cbs.beforeRender) {
-        obj = yield cbs.beforeRender(obj, req, res);
+        try {
+          obj = yield cbs.beforeRender(obj, req, res);
+        } catch (e) {
+        }
       }
 
       if (obj === null) {
@@ -23,6 +26,7 @@ let GenericController = function (entity, model, verbs, cbs) {
 
       response.push(obj);
     }
+
     res.send({[entity.plural] : response});
   });
 

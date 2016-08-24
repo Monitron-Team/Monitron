@@ -4,7 +4,7 @@ const GenericController = require('./generic');
 
 let isOwnerAuth = function(contact, req) {
   let ownerId = contact.owner.toString();
-  let authId = req.auth.account._id.toString();
+  let authId = req.auth.account.id;
   return ownerId === authId;
 };
 
@@ -28,7 +28,7 @@ module.exports = (router) => {
   },{
     beforeRender: (contact, req, res) => {
       if (!isOwnerAuth(contact, req)) {
-        return null;
+        return Promise.resolve(null);
       }
 
       for(let i in contact.roster) {
@@ -47,13 +47,16 @@ module.exports = (router) => {
             let origContact = yield Contact.findOne({_id: contact.id}).exec();
             contact.password = origContact.password;
           } catch(e) {
-            return null;
+            return Promise.resolve(null);
           }
         }
       }
 
-      contact.jid = contact.jid.name + '@' + contact.jid.domain;
+      if (contact.roster.length > 0) {
+        contact.jid = contact.jid.name + '@' + contact.jid.domain;
+      }
 
+      console.log(contact);
       return contact;
     })
   })(router);
