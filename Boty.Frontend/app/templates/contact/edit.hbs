@@ -1,0 +1,14 @@
+{{#page-header}}
+  <i class="fa fa-pencil-square-o"/> Edit: {{jid-span jid=model.jid}} {{kind-icon kind=model.kind}}
+{{/page-header}}
+<form {{action "submission" on="submit"}}>
+  <div class="form-group">
+    <label for="description">Description:</label>
+    {{input type="text" class="form-control" id="description" placeholder="description" value=model.description}}
+  </div>
+  <div class="form-group">
+    <label for="roster">Buddy List:</label>
+    {{roster-editor id="roster" model=model.roster components=components}}
+  </div>
+  <button type="submit" class="btn btn-primary">Save{{#if is-saving}}ing {{spinner-icon}}{{/if}}</button>
+</form>

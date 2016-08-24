@@ -1,0 +1,10 @@
+{{#each model.groups as |group|}}
+<div class="btn-group" role="group" style="margin-bottom:2.5px">
+  <a class="btn btn-default btn-sm disabled" style="cursor:default">{{group}}</a>
+  <button type="button" class="btn btn-default btn-sm" {{action "removeGroup" group on="click"}}><i class="fa fa-close"/></button>
+</div>
+{{/each}}
+<div class="btn-group" role="group">
+  <input type="text" class="btn btn-default btn-sm" style="cursor:auto; background-image: linear-gradient(#ffffff, #f0f0f1 50%, #ffffff); color: black; text-shadow:none;"/>
+  <button class="btn btn-info btn-sm" {{action "addGroup" on="click"}}><i class="fa fa-plus"/></button>
+</div>

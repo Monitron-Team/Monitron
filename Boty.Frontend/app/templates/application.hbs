@@ -16,7 +16,9 @@
     <div class="collapse navbar-collapse" id="menu-collapse">
       <ul class="nav navbar-nav">
           {{#if session.isAuthenticated}}
-            <li>{{ link-to 'Accounts' 'accounts'}}</li>
+            {{#if session.data.authenticated.isAdmin}}
+              <li>{{ link-to 'Accounts' 'accounts'}}</li>
+            {{/if}}
             <li>{{ link-to 'Node Plugins' 'node-plugins'}}</li>
           {{/if}}
         <li>{{ link-to 'About' 'about' }}</li>
@@ -24,16 +26,19 @@
 
       <ul class="nav navbar-nav navbar-right">
           {{#if session.isAuthenticated}}
-            <li><a href="#" {{ action 'invalidateSession' on='click' }} >Logout</a></li>
+            <li><a href="#" {{ action 'invalidateSession' on='click' }} ><i class="fa fa-sign-out"/> Logout</a></li>
           {{else}}
-            <li>{{ link-to 'Log-In' 'log-in' }}</li>
+            <li>{{#link-to 'log-in' }}<i class="fa fa-sign-in"/> Log-In{{/link-to}}</li>
           {{/if}}
       </ul>
     </div>
   </div>
 </nav>
 
-<div class="container">
+<div class="container" style="margin-bottom: 40px">
     {{outlet}}
 </div>
+<footer class="navbar navbar-default navbar-fixed-bottom footer">
+  <p class="navbar-text">&#169; The Boty Team (2016)</p>
+</footer>
 <!-- vim: set tabstop=2 shiftwidth=2 expandtab: -->

@@ -1,0 +1,9 @@
+{{#if (eq kind "user")}}
+  <i class="fa fa-user"/>
+{{else if (eq kind "device")}}
+  <i class="fa fa-plug"/>
+{{else if (eq kind "netbot")}}
+  <i class="fa fa-cloud"/>
+{{else}}
+  <i class="fa fa-question-circle"/>
+{{/if}}

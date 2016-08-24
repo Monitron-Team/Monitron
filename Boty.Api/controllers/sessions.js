@@ -29,7 +29,7 @@ module.exports = (router) => {
 
         res.json({
           account: account._id,
-          is_admin: account['is-admin'],
+          is_admin: account.isAdmin,
           id_token: session._id
         });
       });

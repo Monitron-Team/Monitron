@@ -1,0 +1,34 @@
+<table class="table">
+<thead>
+  <tr>
+    <th></th><th>Name</th><th>Alias</th><th>Groups</th>
+  </tr>
+</thead>
+<tbody>
+  {{#each model as |item|}}
+    <tr>
+      <td style="width:1px"><button class="btn btn-danger btn-xs" {{action "removeContact" item on="click"}}><i class="fa fa-minus"/></button></td>
+      <td style="width:1px;">{{jid-span jid=item.jid}}</td>
+      <td style="width:200px">{{input type="text" class="form-control input-sm" placeholder="alias" value=item.alias}}</td>
+      <td>
+        {{group-list-editor model=item}}
+      </td>
+    </tr>
+  {{/each}}
+</tbody>
+</table>
+<a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#add-contact-dialog"><i class="fa fa-plus"/> Add Contact</a>
+{{#modal-dialog
+  id="add-contact-dialog"
+  as |section|
+  }}
+  {{#if (eq section "title")}}
+    <h4>Select a contact</h4>
+  {{else if (eq section "body")}}
+    <div class="list-group" style="height: 200px; overflow:auto;">
+      {{#each contacts as |contact|}}
+        <button class="list-group-item" {{action "addContact" contact on="click"}}>{{kind-icon kind=contact.kind}} {{jid-span jid=contact.jid}}</button>
+      {{/each}}
+    </div>
+  {{/if}}
+{{/modal-dialog}}

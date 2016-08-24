@@ -7,6 +7,9 @@
   roles:
     - common
 
+  handlers:
+    - include: handlers/main.yml
+
 - name: set up boss servers
   hosts: boss_servers
   remote_user: root
@@ -23,6 +26,9 @@
     - frontend_server
     - api_server
 
+  handlers:
+    - include: handlers/main.yml
+
 - name: set up worker servers
   hosts: worker_servers
   remote_user: root
@@ -30,3 +36,7 @@
     - firewall
     - local_monitor_node
     - worker_node
+
+  handlers:
+    - include: handlers/main.yml
+
