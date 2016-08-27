@@ -58,6 +58,16 @@
   notify:
    - restart Prosody
 
+- name: upload json module
+  copy: src=dkjson.lua dest={{prosody_lib_path}} mode=644 owner=root group=root
+  notify:
+   - restart Prosody
+
+- name: upload Boty Auth module
+  copy: src=mod_auth_boty.lua dest={{prosody_module_path}} mode=644 owner=root group=root
+  notify:
+   - restart Prosody
+
 - name: create Monitron admin
   prosody_adduser: jid=monitron_admin@{{domain_name}} password={{monitron_admin_password}}
 

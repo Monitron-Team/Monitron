@@ -41,6 +41,7 @@ module.exports = function(environment) {
     ENV['data-adapter'] = {
       host: 'http://localhost:9898'
     };
+    ENV['domain'] = "boss.monitron.test";
   }
 
   if (environment === 'test') {
@@ -57,6 +58,7 @@ module.exports = function(environment) {
 
   if (environment === 'vagrant') {
     ENV['ember-simple-auth'].crossOriginWhitelist = 'http://boss.monitron.test:9898';
+    ENV['domain'] = "boss.monitron.test";
     ENV['data-adapter'] = {
       host: 'http://boss.monitron.test:9898'
     };
@@ -64,6 +66,7 @@ module.exports = function(environment) {
 
   if (environment === 'production') {
     ENV['ember-simple-auth'].crossOriginWhitelist = 'http://monitron.ddns.net:9898';
+    ENV['domain'] = "monitron.ddns.net";
     ENV['data-adapter'] = {
       host: 'http://monitron.ddns.net:9898'
     };

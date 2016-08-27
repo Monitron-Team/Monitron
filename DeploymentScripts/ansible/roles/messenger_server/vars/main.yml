@@ -2,4 +2,5 @@
 prosody_conf_path: /etc/prosody/prosody.cfg.lua
 monitron_site_conf_path: "/etc/prosody/conf.d/{{domain_name}}.cfg.lua"
 pki_path: /etc/pki/prosody/
+prosody_lib_path: /usr/lib64/prosody/
 prosody_module_path: /usr/lib64/prosody/modules/

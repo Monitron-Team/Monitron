@@ -24,6 +24,7 @@ const Contact = new Schema({
   jid: {type: String, required: true, unique: true, index: true, get: JidGetter, set: JidSetter},
   owner: {type: ObjectId, ref: 'Account'},
   description: {type: String},
+  updatedAt: {type: Date, default: Date.now},
   password: String,
   kind: {type: String, required: true, lowercase: true, trim: true},
   roster: [RosterItem]

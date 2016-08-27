@@ -7,8 +7,8 @@
 <tbody>
   {{#each model as |item|}}
     <tr>
-      <td style="width:1px"><button class="btn btn-danger btn-xs" {{action "removeContact" item on="click"}}><i class="fa fa-minus"/></button></td>
-      <td style="width:1px;">{{jid-span jid=item.jid}}</td>
+      <td style="width:1px"><div style="margin-top:5px"><a class="btn btn-danger btn-xs" {{action "removeContact" item on="click"}}><i class="fa fa-minus"/></a></div></td>
+      <td style="width:1px;"><div style="margin-top:5px">{{jid-span jid=item.jid}}</div></td>
       <td style="width:200px">{{input type="text" class="form-control input-sm" placeholder="alias" value=item.alias}}</td>
       <td>
         {{group-list-editor model=item}}
@@ -27,7 +27,7 @@
   {{else if (eq section "body")}}
     <div class="list-group" style="height: 200px; overflow:auto;">
       {{#each contacts as |contact|}}
-        <button class="list-group-item" {{action "addContact" contact on="click"}}>{{kind-icon kind=contact.kind}} {{jid-span jid=contact.jid}}</button>
+        <a href="#" class="list-group-item" {{action "addContact" contact on="click"}}>{{kind-icon kind=contact.kind}} {{jid-span jid=contact.jid}}</a>
       {{/each}}
     </div>
   {{/if}}

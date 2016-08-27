@@ -1,3 +1,4 @@
+const log = require('./log')
 const co = require('co');
 const express = require('express');
 const app = express();
@@ -7,14 +8,16 @@ const options = require('./options.js');
 const Session = require('./models/session');
 const Account = require('./models/account');
 
+mongoose.Promise = global.Promise
+
 mongoose.connect(
   options.mongo_url,
   options.mongo_options,
   (err) => {
     if (err) {
-      console.log(err);
+      log.error(err);
     } else {
-      console.log("connected");
+      log.info("connected");
     }
   }
 );
@@ -33,10 +36,11 @@ const router = express.Router();
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: true }));
 router.use('*', (req, res, next) => {
+  log.info('Got request for %s %s', req.method, req.originalUrl);
   try {
     next();
   } catch (e) {
-    console.log(e)
+    log.error(e)
     throw e;
   }
 });
@@ -63,7 +67,7 @@ router.use('*', co.wrap(function*(req, res, next) {
         }
       }
     } catch (e) {
-      console.log(e);
+      log.error(e);
     }
   }
 
@@ -86,6 +90,6 @@ for(let i in CONTROLLERS) {
 
 app.listen(port, '0.0.0.0');
 
-console.log('Listening on port ' + port);
+log.info('Listening on port ' + port);
 
 /* vim: set sw=2 ts=2 tw=2 et : */

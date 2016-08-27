@@ -31,8 +31,8 @@
     <div class="form-group">
       <label for="contact-name">User Name:</label>
       <div class="input-group">
-        {{input type="text" class="form-control" placeholder="username" id="contact-name" required=true disabled=is-creating-user}}
-        <span class="input-group-addon">@monitron.ddns.net</span>
+        {{input type="text" class="form-control" placeholder="username" id="contact-name" required=true disabled=is-creating-user pattern="[a-zA-Z0-9_]+"}}
+        <span class="input-group-addon">@{{domain}}</span>
       </div>
     </div>
     <div class="form-group">
@@ -85,7 +85,10 @@
     {{error-box errors=errors}}
     <div class="form-group">
       <label for="bot-user-name">Bot User Name:</label>
-      {{input type="text" class="form-control" placeholder="username" id="bot-user-name" required=true disabled=is-starting-netbot}}
+      <div class="input-group">
+        {{input type="text" class="form-control" placeholder="username" id="bot-user-name" required=true disabled=is-starting-netbot pattern="[a-zA-Z0-9_]"}}
+        <span class="input-group-addon">@{{domain}}</span>
+      </div>
     </div>
     <div class="form-group">
       <label for="netbot-description">Description:</label>

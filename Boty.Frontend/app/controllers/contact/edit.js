@@ -7,11 +7,13 @@ export default Ember.Controller.extend({
       self.set('is-saving', true);
       let model = this.get("model");
       model.save()
+        .then((m)=> {
+          model.get('roster').filterBy('isNew').invoke('unloadRecord');
+          this.rerender();
+        })
         .catch((e)=>this.set('errors', e.errors))
         .finally(()=>{
-        self.set('is-saving', false);
-        model.get('roster').filterBy('isNew').invoke('unloadRecord');
-        this.set('model', model);
+          self.set('is-saving', false);
       });
     }
   }

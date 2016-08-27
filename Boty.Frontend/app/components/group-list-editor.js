@@ -2,18 +2,28 @@ import Ember from 'ember';
 
 export default Ember.Component.extend({
   actions: {
+    addGroupKey(e) {
+      if (e.key == "Enter") {
+        this.send('addGroup')
+        return false;
+      }
+
+    },
     addGroup() {
       let input = $(this.element).find("input");
       let name = input.val();
       if (name === "") {
         return;
       }
+
       let model = this.get("model");
       let groups = model.get("groups");
-      groups.push(name);
-      console.log(this.get("model"));
-      input.val("");
-      model.set("groups", groups);
+      if (groups.indexOf(name) === -1) {
+        groups.push(name);
+        model.set("groups", groups);
+        input.val("");
+      }
+
       this.rerender();
     },
     removeGroup(group) {

@@ -3,6 +3,8 @@ Description=Boty API Service
 
 [Service]
 ExecStart=/usr/bin/node /opt/Boty.Api/server.js
+{% if api_server_debug %}Environment="DEBUG=1"
+{% endif %}
 WorkingDirectory=/opt/Boty.Api/
 Restart=always
 StandardOutput=syslog

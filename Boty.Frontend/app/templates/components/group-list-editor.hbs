@@ -5,6 +5,7 @@
 </div>
 {{/each}}
 <div class="btn-group" role="group">
-  <input type="text" class="btn btn-default btn-sm" style="cursor:auto; background-image: linear-gradient(#ffffff, #f0f0f1 50%, #ffffff); color: black; text-shadow:none;"/>
-  <button class="btn btn-info btn-sm" {{action "addGroup" on="click"}}><i class="fa fa-plus"/></button>
+  <input type="text" class="btn btn-default btn-sm" onkeydown={{action "addGroupKey"}}
+    style="cursor:auto; background-image: linear-gradient(#ffffff, #f0f0f1 50%, #ffffff); color: black; text-shadow:none; margin-bottom:2.5px;"/>
+  <a class="btn btn-info btn-sm" {{action "addGroup" on="click"}}><i class="fa fa-plus"/></a>
 </div>

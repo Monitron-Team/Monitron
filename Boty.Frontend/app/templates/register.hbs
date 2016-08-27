@@ -15,7 +15,7 @@
   <form {{action "submission" on="submit"}}>
     <div class="form-group">
       <label for="username">User Name:</label>
-      {{input type="text" value=model.name class="form-control" placeholder="User Name" id="username" required=true}}
+      {{input type="text" value=model.name class="form-control" placeholder="User Name" id="username" required=true pattern="[a-zA-Z0-9_]+"}}
     </div>
     <div class="form-group">
       <label for="password">Password:</label>

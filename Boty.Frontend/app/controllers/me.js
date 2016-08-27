@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import ENV from '../config/environment';
 
 const DEVICES = {
   "2a6bfd4b-75b3-4639-a47c-6cbaee76a825": {
@@ -16,6 +17,7 @@ const DEVICES = {
 };
 
 export default Ember.Controller.extend({
+  domain: ENV["domain"],
   actions: {
     onDialogShow(e) {
       let self = this;
@@ -34,7 +36,7 @@ export default Ember.Controller.extend({
       component.set("errors", []);
       let store = this.store;
       let contact = store.createRecord('contact', {
-        jid: {name: name, domain: "monitron.ddns.net"},
+        jid: {name: name, domain: this.get("domain")},
         owner: account,
         description: description,
         password: password,
@@ -102,7 +104,7 @@ export default Ember.Controller.extend({
       component.set("errors", []);
 
       let contactInfo = {
-        jid: {name: name, domain: "monitron.ddns.net"},
+        jid: {name: name, domain: this.get("domain")},
         owner: account,
         description: description,
         password: "123456",
