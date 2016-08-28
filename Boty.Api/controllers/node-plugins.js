@@ -7,6 +7,7 @@ const conn = mongoose.connection;
 const Grid = require('gridfs-stream');
 const BUCKET = 'plugin_store';
 const multer = require('multer');
+const log = require('../log');
 const upload = multer({ dest: 'uploads/' });
 const GenericController = require('./generic');
 const NodePlugin = require('../models/node-plugin');
@@ -67,7 +68,7 @@ function uploadNodePlugin(file, callback) {
   });
 
   extract.on('error', (err) => {
-    console.log(err);
+    log.error(err);
     fs.unlink(file.path, () => {
       callback('Could not open, make sure it\'s a valid plugin pack');
     });

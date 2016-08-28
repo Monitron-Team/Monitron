@@ -5,6 +5,7 @@ local usermanager = require("core.usermanager")
 local new_sasl = require("util.sasl").new
 
 local datamanager = require("util.datamanager")
+local rm_roster_push = require "core.rostermanager".roster_push;
 
 local host = module.host
 local provider = {}
@@ -60,6 +61,7 @@ local function test_password(username, password)
 end
 
 local function user_exists(username)
+	module:log("info", "Checking if contact %s exists", username)
 	local req_body = json.encode({
 		username = username,
 	})
@@ -99,7 +101,7 @@ local function roster_load(username)
 	username = username
 	local raw_roster = _roster_get(username)
 	local roster = {
-		[false] = {version = nil}
+		[false] = {version = true}
 	}
 
 	for _, item in ipairs(raw_roster) do
@@ -147,7 +149,6 @@ function provider.get_sasl_handler()
 end
 
 local function replace_contacts(username, host, roster)
-	module:log("debug", print_tbl(roster))
 	for k, _ in pairs(roster) do
 		roster[k] = nil
 	end
@@ -159,20 +160,71 @@ local function replace_contacts(username, host, roster)
 
 	roster[false].version = true
 
-	module:log("debug", "Loaded roster for '%s@%s': %s", username, host, print_tbl(roster))
+	module:log("debug", "Loaded roster for '%s@%s'", username, host)
 end
 
-local function clear_roster(username, host, datastore, data)
+local function cancel_roster_save(username, host, datastore, data)
 	if datastore == "roster" then
 		module:log("Clearing roster before saving")
-		return username, host, datastore, {}
+		return false
+	end
+end
+
+local function intersect(a, b)
+	local res = {}
+	for k, _ in pairs(a) do
+		if b[k] == nil then
+			res[k] = true
+		end
+	end
+	for k, _ in pairs(b) do
+		if a[k] == nil then
+			res[k] = true
+		end
+	end
+
+	return res;
+end
+
+local function handle_external_update(username, host, roster)
+	module:log("info",
+		"Updating roster for '%s@%s' due to external change",
+		username,
+		host)
+
+	local real_roster = roster_load(username .. "@" .. host)
+	local changed = {}
+	for k, v in pairs(real_roster) do
+		if
+			roster[k] == nil
+			or roster[k].name ~= real_roster[k].name
+			or intersect(real_roster[k].groups or {}, roster[k].groups or {})
+		then
+			roster[k] = v
+			changed[#changed + 1] = k
+		end
+	end
+
+	for k, _ in pairs(roster) do
+		if real_roster[k] == nil then
+			roster[k] = nil
+			changed[#changed + 1] = k
+		end
+	end
+
+	module:log("debug", "changed entries for %s@%s: %s", username, host, print_tbl(changed))
+	for _, itemjid in ipairs(changed) do
+		if itemjid ~= false then
+			rm_roster_push(username, host, itemjid)
+		end
 	end
 end
 
 function module.load()
 	module:log("Registering hooks")
 	module:hook("roster-load", replace_contacts);
-	datamanager.add_callback(clear_roster);
+	module:hook("roster-external-update", handle_external_update);
+	datamanager.add_callback(cancel_roster_save);
 end
 
 module:provides("auth", provider);

@@ -2,6 +2,7 @@ const log = require('../log');
 const co = require('co');
 const Contact = require('../models/contact');
 const GenericController = require('./generic');
+const adhoc = require('../adhoc');
 
 let isOwnerAuth = function(contact, req) {
   let ownerId = contact.owner.toString();
@@ -12,6 +13,7 @@ let isOwnerAuth = function(contact, req) {
 module.exports = (router) => {
   router.use('/contacts', co.wrap(function*(req, res, next) {
     if (req.path !== '/login' &&  req.path !== '/isuser' && !req.path.startsWith('/roster') && req.method !== 'OPTIONS' && !req.auth.isAuthorized) {
+      log.debug('Rejected contact related request: %s', req.path);
       res.status(403).send({errors: [{code: 403, msg: 'Unauthorized access'}]});
     } else {
       next();
@@ -19,6 +21,7 @@ module.exports = (router) => {
   }));
   router.get('/contacts/isuser', co.wrap(function* (req, res) {
     let username = req.body.username;
+    log.debug('Got user check request for `%s`', username);
     if (!username) {
       res.status(403).send('Problem with authentication information');
       return;
@@ -26,7 +29,7 @@ module.exports = (router) => {
 
     let result = yield Contact.findOne({jid: username});
     if (result === null) {
-      res.status(404).send('Problem with authentication information');
+      res.status(404).send('User not found');
       return;
     }
 
@@ -66,7 +69,6 @@ module.exports = (router) => {
     }
 
     let resultObj = result.toObject();
-    console.log(resultObj.roster);
     res.send(resultObj.roster);
   }));
   GenericController({
@@ -86,7 +88,7 @@ module.exports = (router) => {
 
       for(let i in contact.roster) {
         let item = contact.roster[i];
-        item._id = item.jid.name + '@' + item.jid.domain;
+        item._id = contact.jid.name + '@' + contact.jid.domain + '>' + item.jid.name + '@' + item.jid.domain;
       }
 
       delete contact.password
@@ -103,15 +105,22 @@ module.exports = (router) => {
             return Promise.resolve(null);
           }
         }
-      }
 
-      if (contact.roster.length > 0) {
         contact.jid = contact.jid.name + '@' + contact.jid.domain;
       }
 
-      contact.updatedAt = Date.now;
+      contact.updatedAt = Date.now();
 
       return contact;
-    })
-  })(router);
+    }),
+    afterSave: function(contact, req, res) {
+      log.debug(
+        'Updating xmpp server about roster change for: %s@%s',
+        contact.jid.name,
+        contact.jid.domain);
+      adhoc.notifyRosterUpdate(contact.jid.name + '@' + contact.jid.domain);
+      return Promise.resolve();
+    }
+  }
+  )(router);
 };

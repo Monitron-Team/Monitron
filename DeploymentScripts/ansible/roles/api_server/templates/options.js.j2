@@ -6,5 +6,9 @@ const mongo_options = {
 
 module.exports = {
   mongo_url: mongo_url,
-  mongo_options: mongo_options
+  mongo_options: mongo_options,
+  xmpp: {
+  	username: 'monitron_admin',
+	password: '{{monitron_admin_password}}'
+  }
 };

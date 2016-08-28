@@ -68,14 +68,27 @@
   notify:
    - restart Prosody
 
+- name: create admin account
+  become: yes
+  become_user: mongodb
+  script: create_admin_account.sh '{{monitron_admin_password}}'
+
 - name: create Monitron admin
-  prosody_adduser: jid=monitron_admin@{{domain_name}} password={{monitron_admin_password}}
+  become: yes
+  become_user: mongodb
+  script: add_system_contact.sh 'monitron_admin@{{domain_name}}' '{{monitron_admin_password}}' 'monitron admin'
 
 - name: create Server admin
-  prosody_adduser: jid=admin@{{domain_name}} password={{admin_password}}
+  become: yes
+  become_user: mongodb
+  script: add_system_contact.sh 'admin@{{domain_name}}' '{{admin_password}}' 'server admin'
 
 - name: create Management user
-  prosody_adduser: jid=themanagement@{{domain_name}} password={{monitron_management_password}}
+  become: yes
+  become_user: mongodb
+  script: add_system_contact.sh 'themanagement@{{domain_name}}' '{{monitron_management_password}}' 'management'
 
 - name: create Local Monitor user
-  prosody_adduser: jid=local_monitor@{{domain_name}} password={{local_monitor_password}}
+  become: yes
+  become_user: mongodb
+  script: add_system_contact.sh 'local_monitor@{{domain_name}}' '{{local_monitor_password}}' 'local monitor'

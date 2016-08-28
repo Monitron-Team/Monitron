@@ -275,13 +275,53 @@ local delete_roster_item_command_handler = adhoc_simple(delete_roster_item_layou
     }
 end);
 
+-- Notify a roster update
+local notify_roster_update_item_layout = dataforms_new{
+    title = "Notify a Roster Update";
+    instructions = "Fill out this form to notify an update of a user's roster.";
+
+    { name = "FORM_TYPE", type = "hidden", value = MONITRON_COMMAND_PATH.."add-roster-item"};
+    { name = "accountjid", type = "jid-single", required = true, label = "The Jabber ID for the roster owner" };
+};
+
+local notify_roster_update_command_handler = adhoc_simple(notify_roster_update_item_layout, function(fields, err)
+    if err then
+        return generate_error_message(err);
+    end
+
+    local username, host, _ = jid.split(fields.accountjid)
+    module:log("info", "Got request to update the roster of %s", fields.accountjid);
+    local session = hosts[host].sessions[username]
+    local error = nil
+
+    if session == nil then
+	module:log("debug", "User %s not logged in, no reason to update", fields.accountjid);
+	return {
+		status = "completed",
+		info = "User not logged in, no action taken"
+	};
+    end
+
+    local roster = session.roster;
+
+    hosts[host].events.fire_event('roster-external-update', username, host, roster);
+
+    return {
+    	status = "completed",
+    	error = error,
+    	info = "Roster update notifiaction send"
+    }
+end);
+
 local add_user_desc = adhoc_new("Add User", MONITRON_COMMAND_PATH.."add-user", add_user_command_handler, "monitron_admin");
 local delete_user_desc = adhoc_new("Delete User", MONITRON_COMMAND_PATH.."delete-user", delete_user_command_handler, "monitron_admin");
 local add_roster_item_desc = adhoc_new("Add Roster Item", MONITRON_COMMAND_PATH.."add-roster-item", add_roster_item_command_handler, "monitron_admin");
 local delete_roster_item_desc = adhoc_new("Delete Roster Item", MONITRON_COMMAND_PATH.."delete-roster-item", delete_roster_item_command_handler, "monitron_admin");
+local notify_roster_update_desc = adhoc_new("Notify Roster Update", MONITRON_COMMAND_PATH.."notify-roster-update", notify_roster_update_command_handler, "monitron_admin");
 
 module:provides("adhoc", add_user_desc);
 module:provides("adhoc", delete_user_desc);
 module:provides("adhoc", add_roster_item_desc);
 module:provides("adhoc", delete_roster_item_desc);
+module:provides("adhoc", notify_roster_update_desc);
 

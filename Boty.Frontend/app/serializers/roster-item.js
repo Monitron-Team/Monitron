@@ -6,6 +6,9 @@ export default DS.RESTSerializer.extend(DS.EmbeddedRecordsMixin, {
   attrs: {
     jid: {
       embedded: 'allways'
+    },
+    groups: {
+      embedded: 'allways'
     }
   }
 });

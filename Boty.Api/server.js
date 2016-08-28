@@ -1,26 +1,44 @@
-const log = require('./log')
 const co = require('co');
 const express = require('express');
-const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const log = require('./log');
 const options = require('./options.js');
 const Session = require('./models/session');
 const Account = require('./models/account');
+const xmpp = require('./xmpp');
+const Element = require('node-xmpp-core').Element;
 
-mongoose.Promise = global.Promise
+const port = process.env.port || 9898;
 
+xmpp.connect({
+  jid: options.xmpp.username,
+  password: options.xmpp.password,
+  reconnect: true
+});
+
+mongoose.Promise = global.Promise;
+
+let mongoConnetFinishedHandler = function(err) {
+  if (err) {
+    log.error('Could not connect to database: %s', err);
+    // Never give up, never surrender
+    mongoose.connect(
+      options.mongo_url,
+      options.mongo_options,
+      mongoConnetFinishedHandler);
+  } else {
+    log.info('Connected to the database');
+  }
+};
+
+log.info('Connecting to database');
 mongoose.connect(
   options.mongo_url,
   options.mongo_options,
-  (err) => {
-    if (err) {
-      log.error(err);
-    } else {
-      log.info("connected");
-    }
-  }
-);
+  mongoConnetFinishedHandler);
+
+const app = express();
 
 app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -29,18 +47,16 @@ app.use(function(req, res, next) {
   next();
 });
 
-const port = process.env.port || 9898;
+app.use(bodyParser.json());
 
 const router = express.Router();
-
-app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/api/v1/', router);
 router.use('*', (req, res, next) => {
   log.info('Got request for %s %s', req.method, req.originalUrl);
   try {
     next();
   } catch (e) {
-    log.error(e)
+    log.error(e);
     throw e;
   }
 });
@@ -73,9 +89,6 @@ router.use('*', co.wrap(function*(req, res, next) {
 
   next();
 }));
-
-app.use('/api/v1/', router);
-
 
 const CONTROLLERS = [
   'accounts',

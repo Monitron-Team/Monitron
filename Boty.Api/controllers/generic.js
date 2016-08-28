@@ -1,4 +1,5 @@
 const co = require('co');
+const log = require('../log');
 
 let GenericController = function (entity, model, verbs, cbs) {
   if (cbs === null || cbs === undefined) {
@@ -69,7 +70,7 @@ let GenericController = function (entity, model, verbs, cbs) {
       instance = new model(obj);
       yield instance.save();
     } catch (e) {
-      console.log(e);
+      log.error(e);
       if (e.code === 11000) {
         res.status(500).send({errors: [{code: 500, msg: entity.singular + ' already exists'}]});
       } else {
@@ -78,13 +79,17 @@ let GenericController = function (entity, model, verbs, cbs) {
       return;
     }
 
+    if (cbs.afterSave) {
+      yield cbs.afterSave(instance, req, res);
+    }
+
     yield renderResponse([instance], req, res);
   });
 
   let updateEntity = co.wrap(function* (req, res) {
     let obj = req.body[entity.singular];
     obj.id = req.params.id;
-    if (cbs["beforeSave"]) {
+    if (cbs.beforeSave) {
       obj = yield cbs.beforeSave(obj, req, res);
     }
 
@@ -96,6 +101,10 @@ let GenericController = function (entity, model, verbs, cbs) {
     } catch (e) {
       res.status(500).send({errors: [{code: 500, msg: e.message}]});
       return;
+    }
+
+    if (cbs.afterSave) {
+      yield cbs.afterSave(result, req, res);
     }
 
     yield renderResponse([result], req, res);

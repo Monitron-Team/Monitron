@@ -6,6 +6,10 @@ const mongo_options = {
 
 module.exports = {
   mongo_url: mongo_url,
-  mongo_options: mongo_options
+  mongo_options: mongo_options,
+  xmpp: {
+    username: 'monitron_admin@boss.monitron.test',
+    password: 'HellIsForHeroes@@'
+  }
 };
 /* vim: set sw=2 ts=2 tw=2 et : */
