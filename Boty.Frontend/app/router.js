@@ -17,6 +17,7 @@ Router.map(function() {
   this.route('contact', function() {
     this.route('edit', {path: '/:contact_id'});
   });
+  this.route('serial');
 });
 
 export default Router;
