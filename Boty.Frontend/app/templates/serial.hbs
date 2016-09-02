@@ -1,6 +1,5 @@
-{{page-header title="Add a device serial to inentory"}}
-
-
+{{#page-header title=model.account.name}}
+{{/page-header}}
 
 <form {{action "addSerial" model.account on="submit"}}>
   {{#if lastUpload}}
@@ -12,11 +11,16 @@
     <div class="alert alert-danger" role="alert">{{errorMessage}}</div>
   {{/if}}
   <div class="form-group">
-    {{input type="text" value=newSerial class="form-control" placeholder="XXXx-XXX" id="newSerial" required=true}}
+    {{input type="text" value=newSerial class="form-control" placeholder="XXXX-XXX" id="newSerial" required=true}}
   </div>
   <button type="submit" class="btn btn-primary">Add</button>
 </form>
+<h1>maor</h1>
 
+
+
+<li><a href="#" data-toggle="modal" data-target="#add-serial-dialog"><i class="fa fa-user"/> Add serial</a></li>
+ 
 
 
 
@@ -27,16 +31,41 @@
 	</tr>
   </thead>
   <tbody>
-{{#each model as |serial|}}
+{{#each model.serials as |serial|}}
+  {{#if (eq serial.maker model.account.name )}}
   <tr>
   <td>{{serial.serial_key}}</td>
 		<td style="text-align:right;">
       <button class="btn btn-danger btn-xs" {{action "delete_account" account on="click"}}><i class="fa fa-trash"/> Delete</button>
 		</td>
 	</tr>
+  {{/if}}
 {{/each}}
+
   </tbody>
 </table>
+
+
+
+
+{{#modal-dialog
+  id="add-serial-dialog"
+  is-form=true
+  on-submit=(action "addSerial" model.account)
+  as |section|
+  }}
+  {{#if (eq section "title")}}
+    <h4 class="modal-title"><i class="fa fa-cloud"/> Start a new NetBot&#8482;</h4>
+  {{else if (eq section "body")}}
+    {{error-box errors=errors}}
+    <div class="form-group">
+      <label for="netbot-description">Description:</label>
+      {{input type="text" class="form-control" placeholder="description" id="netbot-description" disabled=is-starting-netbot}}
+    </div>
+  {{else if (eq section "footer")}}
+    <button type="submit" class="btn btn-primary" disabled={{is-starting-netbot}}>Add{{#if is-starting-netbot}}ing{{spinner-icon}}{{/if}}</button>
+  {{/if}}
+{{/modal-dialog}}
 
 
 

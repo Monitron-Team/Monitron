@@ -7,7 +7,8 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
     let accountId = this.get("session.data").authenticated.account;
     return {
       account: this.store.findRecord('account', accountId),
-      contacts: this.store.findAll('contact')
+      contacts: this.store.findAll('contact'),
+      serials: this.store.findAll('serial')
     };
 	}
 });

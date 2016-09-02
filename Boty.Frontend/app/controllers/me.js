@@ -28,6 +28,8 @@ export default Ember.Controller.extend({
         .then((res) => self.set("plugins", res));
     },
     createUser(account) {
+      alert("maorrr");
+      alert(account);
       this.set('is-creating-user', true);
       let component = this;
       let name = $('#contact-name').val();
@@ -66,7 +68,15 @@ export default Ember.Controller.extend({
       let serial = $('#device-serial').val();
       let description = $('#device-description').val();
       component.set("errors", []);
-      let device_info = DEVICES[serial];
+      //let device_info = DEVICES[serial];
+      let device_info = this.store.query('serial', {serial_key:serial})
+      .then(function(device_info){alert(device_info.get('serial_key'))})
+      .catch(function(error){
+        alert('todo catch')
+      }
+        );
+      
+
       if (!device_info) {
         component.set("errors", [
           {msg: "Invalid serial"}

@@ -94,6 +94,7 @@ const CONTROLLERS = [
   'sessions',
   'node-plugins',
   'contacts',
+  'serials',
   'netbots'
 ];
 

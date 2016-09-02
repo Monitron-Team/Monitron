@@ -19,8 +19,12 @@
             {{#if session.data.authenticated.isAdmin}}
               <li>{{ link-to 'Accounts' 'accounts'}}</li>
             {{/if}}
+            {{#if session.data.authenticated.isAdmin }}
+              <li>{{ link-to 'Serials' 'serial'}}</li>
+            {{/if}}            
             <li>{{ link-to 'Node Plugins' 'node-plugins'}}</li>
           {{/if}}
+
         <li>{{ link-to 'About' 'about' }}</li>
       </ul>
 
