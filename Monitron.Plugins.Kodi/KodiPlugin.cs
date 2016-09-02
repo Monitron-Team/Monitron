@@ -5,6 +5,8 @@ using System;
 using System.Net;
 using System.Reflection;
 using System.Linq;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace Monitron.Plugins.Kodi
 {
@@ -25,12 +27,17 @@ namespace Monitron.Plugins.Kodi
         private const int k_MaxVolume = 100;
         private const int k_MinVolume = 0;
         private const int k_VolError = -1;
+		private const bool k_ActiveBot = true;
+		private const string k_BotyDomain = "@boty.ddns.com";
+		private Dictionary<Identity, bool> m_AudioBots = new Dictionary<Identity, bool>();
 
         // Kodi parameters
         private readonly string r_Url;
         private int m_Volume;
         private MovieDetails[] m_Movies;
         private string m_VideoListMsg;
+
+		private AsynchronousSocketListener m_SocketServer = new AsynchronousSocketListener();
 
         public IMessengerClient MessangerClient
         {
@@ -55,9 +62,36 @@ namespace Monitron.Plugins.Kodi
             r_Client_ConnectionStateChanged(r_Client, new ConnectionStateChangedEventArgs(r_Client.IsConnected));
 
             registerToJabber(i_MessangerClient);
-
             initKodiParams();
+
+			m_SocketServer.MessageArrived += r_Client_MessageArrived;
+			new Thread(m_SocketServer.StartListening).Start();
         }
+
+		private void findAudioBots()
+		{
+			IMessengerRpc rpc = (r_Client as IMessengerRpc);
+			foreach(var buddy in r_Client.Buddies)
+			{
+				string[] resources = buddy.Resources;
+				if(resources.Length > 0)
+				{
+					var buddyIden = buddy.Identity;
+					buddyIden.Resource = resources[0];
+					string[] implementedInterfaces = rpc.GetRegisterServersList(buddyIden);
+
+					if(implementedInterfaces.Contains("IAudioBot"))
+					{
+						m_AudioBots.Add(buddyIden, k_ActiveBot);
+					}
+				}
+			}
+		}
+
+		private List<KeyValuePair<Identity, bool>> getActiveAudioBots()
+		{
+			return m_AudioBots.Where(item => item.Value == k_ActiveBot).ToList();
+		}
 
         private void registerToJabber(IMessengerClient r_Client)
         {
@@ -68,6 +102,78 @@ namespace Monitron.Plugins.Kodi
             }
         }
 
+		private void r_Client_MessageArrived(object sender, MessageArrivedEventArgs e)
+		{
+			switch(e.Message)
+			{
+				case "GetAccount":
+				{
+					e.ReturnValue = r_Client.Identity.UserName + k_BotyDomain;
+					break;
+				}
+				case "GetFriends":
+				{
+					String friendString = String.Empty;
+					foreach(BuddyListItem buddy in r_Client.Buddies)
+					{
+						friendString += buddy.Identity.UserName + k_BotyDomain + ";";
+					}
+
+					e.ReturnValue = friendString;
+					break;
+				}
+				case "GetAudioBots":
+				{
+					string audioBotsString = String.Empty;
+					foreach(KeyValuePair<Identity, bool> item in m_AudioBots)
+					{
+						audioBotsString += item.Key.UserName + k_BotyDomain + "," + item.Value + ";";
+					}
+					e.ReturnValue = audioBotsString;
+					break;
+				}
+				case "GetVolume":
+				{
+					getVolume();
+					e.ReturnValue = m_Volume.ToString();
+					break;
+				}
+				default:
+				{
+					if(e.Message.Contains("ActiveAudioBots"))
+					{
+						string botName = getAudioBotName(e.Message);
+						changeAudioBotStatus(botName, k_ActiveBot);
+					}
+					else if(e.Message.Contains("DeactiveAudioBots"))
+					{
+						string botName = getAudioBotName(e.Message);
+						changeAudioBotStatus(botName, !k_ActiveBot);
+					}
+					break;
+				}
+			}
+		}
+
+		private void changeAudioBotStatus(string i_BotName, bool i_Status)
+		{
+			foreach(KeyValuePair<Identity, bool> bot in m_AudioBots)
+			{
+				if(bot.Key.UserName == i_BotName)
+				{
+					if(m_AudioBots.ContainsKey(bot.Key))
+					{
+						m_AudioBots[bot.Key] = i_Status;
+						break;
+					}
+				}
+			}
+		}
+
+		private string getAudioBotName(string i_Content)
+		{
+			return i_Content.Split(";".ToCharArray())[1];
+		}
         private void r_Client_ConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
         {
             if (e.IsConnected)
@@ -80,6 +186,8 @@ namespace Monitron.Plugins.Kodi
                     string welcomeMessage = "Hi, I am a Kodi bot :)";
                     r_Client.SendMessage(buddy.Identity, welcomeMessage);
                 }
+
+				findAudioBots();
             }
         }
 
@@ -268,23 +376,13 @@ namespace Monitron.Plugins.Kodi
         [RemoteCommand(MethodName = "play")]
         public string KodiPlay(Identity i_Buddy, int i_Video)
         {
-			IMessengerRpc rpc = (r_Client as IMessengerRpc);
-			foreach(var buddy in r_Client.Buddies)
-			{
-				string[] resources = buddy.Resources;
-				if(resources.Length > 0)
-				{
-					var buddyIden = buddy.Identity;
-					buddyIden.Resource = resources[0];
-					string[] implementedInterfaces = rpc.GetRegisterServersList(buddyIden);
+			List<KeyValuePair<Identity, bool>> activeAudioBots = getActiveAudioBots();
 
-					if(implementedInterfaces.Contains("IAudioBot"))
-					{
-						IMessengerRpc AudioRpc = (r_Client as IMessengerRpc);
-						IAudioBot audioBot = AudioRpc.CreateRpcClient<IAudioBot>(buddyIden);
-						audioBot.PauseAudio();
-					}
-				}
+			foreach(KeyValuePair<Identity, bool> activeAudioBot in activeAudioBots)
+			{
+				IMessengerRpc AudioRpc = (r_Client as IMessengerRpc);
+				IAudioBot audioBot = AudioRpc.CreateRpcClient<IAudioBot>(activeAudioBot.Key);
+				audioBot.PauseAudio();
 			}
 
 			string msg = string.Empty;

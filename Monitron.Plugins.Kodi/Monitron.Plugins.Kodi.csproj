@@ -50,6 +50,8 @@
   <ItemGroup>
     <Compile Include="KodiPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AsynchronousSocketListener.cs" />
+    <Compile Include="MessageArrived.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Monitron.Common\Monitron.Common.csproj">
