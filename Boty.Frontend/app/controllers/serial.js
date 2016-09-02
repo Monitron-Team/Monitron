@@ -4,47 +4,39 @@ import ENV from '../config/environment';
 export default Ember.Controller.extend({
   isUsed: false,
   actions: {
-    assign() {
-      this.set("isUsed", true);
-      this.model.save()
-        .then((account) => this.transitionToRoute('serial'))
-        .catch((err) => {
-          if (err.errors && err.errors[0]) {
-            this.set('errorMessage', err.errors[0].msg);
-          }
-          else {
-            this.set('errorMessage', err.message);
-          }
-        })
-        .finally(() => {
-          this.set("assignDisabled", false);
-        });
-    },
-    addSerial(account){
-      alert(10000);
-      alert(account)
-      let gg = this.get('newSerial');
-      alert(gg);
-    },
-    createUser(account) {
+    addSerial(account) {
+      let name = account.get('name') 
+      alert(name)
       let component = this;
+      let serialKey = this.get('newSerial');
+      alert(serialKey);
       component.set("errors", []);
       let store = this.store;
-      let contact = store.createRecord('contact', {
-        jid: {name: name, domain: this.get("domain")},
-        owner: account,
-        description: description,
-        password: password,
-        kind: "user",
-        roster: [],
+      alert(store);
+      let randomUserName = Math.floor(Math.random()* Math.pow(10,15)).toString(16)
+      alert(randomUserName)
+      let makerDomain = "boss.monitron.com"
+      let newuser = {
+        jid: {name: randomUserName, domain: makerDomain},
+        password: "123456",
+        kind: "device",
+        roster: []
+        }
+      let contact = store.createRecord('contact',newuser)
+        contact.save()
+        
+      let newSerial = store.createRecord('serial', {
+        maker: name,
+        serial_key: serialKey,
+        jid: newuser.jid
       });
-      contact.save()
+      newSerial.save()
         .then(() => {
           window.setTimeout(()=>$("#new-user-dialog").modal('hide'));
         })
         .catch((e) => {
           component.set("errors", e.errors);
-          contact.deleteRecord();
+          newSerial.deleteRecord();
         })
         .finally(() => {
           component.set('is-creating-user', false);
@@ -54,9 +46,8 @@ export default Ember.Controller.extend({
       let self = this;
       $(e.target).find("input").val("");
       this.set("errors", []);
-      this.set("plugins", null);
-      this.store.findAll("node-plugin")
-        .then((res) => self.set("plugins", res));
+      this.store.findAll("serial")
+        .then((res) => self.set("serials", res));
     },
     preventHide(shouldPrevent, e) {
       if (shouldPrevent) {
