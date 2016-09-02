@@ -2,16 +2,14 @@ import DS from 'ember-data';
 
 export default DS.Transform.extend({
   deserialize(serialized) {
+    let parts = serialized.split(/@/);
     return {
-      name: serialized.name,
-      domain: serialized.domain
+      name: parts[0],
+      domain: parts[1]
     };
   },
 
   serialize(deserialized) {
-    return {
-      name: deserialized.name,
-      domain: deserialized.domain
-    };
+    return deserialized.name + '@' + deserialized.domain;
   }
 });

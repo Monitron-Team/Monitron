@@ -13,7 +13,6 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\x86\Debug</OutputPath>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>DEBUG;</DefineConstants>
   </PropertyGroup>
@@ -21,7 +20,6 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\x86\Release</OutputPath>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -34,18 +32,11 @@
       <Project>{F6C59DF6-5C97-4B51-925C-DBD8DC245779}</Project>
       <Name>Monitron.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Monitron.PluginDataStore.Local\Monitron.PluginDataStore.Local.csproj">
-      <Project>{4140B458-B63E-4D0E-AC79-462B99BAE930}</Project>
-      <Name>Monitron.PluginDataStore.Local</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Xml" />
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Options">
       <HintPath>..\packages\Mono.Options.4.4.0.0\lib\net4-client\Mono.Options.dll</HintPath>

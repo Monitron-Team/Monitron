@@ -12,10 +12,11 @@ using S22.Xmpp.Im;
 
 using Monitron.Common;
 using System.Drawing;
+using System.Xml;
 
 namespace Monitron.Clients.XMPP
 {
-    public sealed class XMPPMessengerClient : IMessengerClient, IMessengerRpc , IDisposable
+    public sealed class XMPPMessengerClient : IMessengerClient, IMessengerRpc, IPubSub, IDisposable
     {
         private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
             (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -351,6 +352,25 @@ namespace Monitron.Clients.XMPP
 		{
 			return m_Client.GetImplementedInterfaces(i_Identity.ToJid());
 		}
+
+        #region IPubSub implementation
+
+        public void Subscribe(string node, Action<Identity, XmlElement> action)
+        {
+            m_Client.Subscribe(node, (Jid jid, XmlElement elem) => action(jid.ToIdentity(), elem));
+        }
+
+        public void Unsubscribe(string node)
+        {
+            m_Client.Unsubscribe(node);
+        }
+
+        public void Publish(string node, string itemid = null, params XmlElement[] data)
+        {
+            m_Client.Publish(node, itemid, data);
+        }
+
+        #endregion
     }
 }
 

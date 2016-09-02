@@ -1,6 +1,6 @@
 ---
 - name: upload frontend
-  synchronize: src=../../Boty.Frontend/dist dest=/var/www/ archive=no checksum=yes delete=yes recursive=yes
+  synchronize: src=../../Boty.Frontend/dist/{{ember_dist}}/ dest=/var/www/ archive=no checksum=yes delete=yes recursive=yes
 
 - name: update selinux context
   raw: restorecon -R /var/www/

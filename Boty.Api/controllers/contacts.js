@@ -3,12 +3,19 @@ const co = require('co');
 const Contact = require('../models/contact');
 const GenericController = require('./generic');
 const adhoc = require('../adhoc');
+const NetBot = require('../models/netbot');
 
 let isOwnerAuth = function(contact, req) {
   let ownerId = contact.owner.toString();
   let authId = req.auth.account.id;
   return ownerId === authId;
 };
+
+function _generatePassword() {
+  return Math.floor((1 + Math.random()) * 0x10000)
+    .toString(16)
+    .substring(1);
+}
 
 module.exports = (router) => {
   router.use('/contacts', co.wrap(function*(req, res, next) {
@@ -88,10 +95,10 @@ module.exports = (router) => {
 
       for(let i in contact.roster) {
         let item = contact.roster[i];
-        item._id = contact.jid.name + '@' + contact.jid.domain + '>' + item.jid.name + '@' + item.jid.domain;
+        item._id = contact.id + '>' + item.jid;
       }
 
-      delete contact.password
+      delete contact.password;
 
       return contact;
     },
@@ -106,7 +113,10 @@ module.exports = (router) => {
           }
         }
 
-        contact.jid = contact.jid.name + '@' + contact.jid.domain;
+      } else {
+        if (contact.kind === 'netbot') {
+          contact.password = _generatePassword();
+        }
       }
 
       contact.updatedAt = Date.now();
@@ -115,12 +125,26 @@ module.exports = (router) => {
     }),
     afterSave: function(contact, req, res) {
       log.debug(
-        'Updating xmpp server about roster change for: %s@%s',
-        contact.jid.name,
-        contact.jid.domain);
-      adhoc.notifyRosterUpdate(contact.jid.name + '@' + contact.jid.domain);
+        'Updating xmpp server about roster change for: %s', contact.jid);
+      adhoc.notifyRosterUpdate(contact.jid);
       return Promise.resolve();
-    }
+    },
+    beforeDelete: co.wrap(function* (id, req, res) {
+      let contact = yield Contact.findOne({_id: id});
+      if (contact) {
+        let updatedContacts = yield Contact.find({roster: {$elemMatch: {jid: contact.jid}}});
+        yield Contact.update({}, {$pull: {roster: {jid: contact.jid}}}, {multi: true});
+        for (let i = 0; i < updatedContacts.length; i++) {
+          adhoc.notifyRosterUpdate(updatedContacts[i].jid);
+        }
+      }
+
+      return true;
+    }),
+    afterDelete: co.wrap(function* (id, req, res) {
+      yield NetBot.remove({contact: id});
+      adhoc.notifyNetbotUpdate();
+    })
   }
   )(router);
 };

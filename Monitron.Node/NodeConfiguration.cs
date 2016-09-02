@@ -4,7 +4,6 @@ using System.Xml.Serialization;
 using System.IO;
 
 using Monitron.Common;
-using Monitron.PluginDataStore.Local;
 
 namespace Monitron.Node
 {

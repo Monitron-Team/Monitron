@@ -31,13 +31,6 @@ namespace Monitron.Plugins.Management
 			r_Client = new XmppClient(i_AdminHost, i_AdminUsername, i_AdminPassword);
             r_Client.Connect();
             r_Admin = new AdminClient(r_Client);
-
-			string[] groups = new string[1] {"Bots"};
-
-			Identity bot1 = new Identity { UserName = "daniel", Domain = "monitron.ddns.net" };
-			Identity bot2 = new Identity { UserName = "kodi", Domain = "monitron.ddns.net" };
-				
-			AddRosterItem(bot1, bot2, groups);
 		}
 
 		private BsonDocument serializeIdentity(Identity i_Identity)

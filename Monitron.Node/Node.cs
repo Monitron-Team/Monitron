@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Threading;
 
 using Monitron.Common;
-using Monitron.PluginDataStore.Local;
 
 namespace Monitron.Node
 {

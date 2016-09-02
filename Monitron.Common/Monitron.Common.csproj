@@ -30,12 +30,13 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="Newtonsoft.Json, Version=9.0.1.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="RestSharp">
       <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IAudioBot.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="FileTransferProgressEventArgs.cs" />
     <Compile Include="FileTransferAbortedEventArgs.cs" />
     <Compile Include="IMessengerRpc.cs" />
+    <Compile Include="IPubSub.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

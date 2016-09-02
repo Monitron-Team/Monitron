@@ -18,7 +18,7 @@
    - restart Docker service
 
 - name: install Docker client
-  dnf: name=docker-client state=latest
+  dnf: name=docker-client state=latest enablerepo=updates-testing
 
 - name: force service restart
   meta: flush_handlers

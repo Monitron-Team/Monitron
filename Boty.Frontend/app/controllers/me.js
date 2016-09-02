@@ -107,25 +107,33 @@ export default Ember.Controller.extend({
         jid: {name: name, domain: this.get("domain")},
         owner: account,
         description: description,
-        password: "123456",
         kind: "netbot",
-        roster: [],
+        roster: []
       }
+
       let store = this.store;
-      window.setTimeout(()=>{
-        let contact = store.createRecord('contact', contactInfo);
-        contact.save()
-          .then(() => {
-            window.setTimeout(()=>$("#start-netbot-dialog").modal('hide'));
-          })
-          .catch((e) => {
-            component.set("errors", e.errors);
-            contact.deleteRecord();
-          })
-          .finally(() => {
-            component.set('is-starting-netbot', false);
-          });
-      }, 4 * 1000);
+      let contact = store.createRecord('contact', contactInfo);
+      let e = document.getElementById('node-plugin');
+      let nodePluginId = e.options[e.selectedIndex].value;
+
+      contact.save()
+        .then((contact) => {
+          window.setTimeout(()=>$("#start-netbot-dialog").modal('hide'));
+          store.findRecord('node-plugin', nodePluginId)
+            .then(function(nodePlugin) {
+              store.createRecord('netbot', {
+                contact: contact,
+                nodePlugin: nodePlugin
+              }).save();
+            });
+        })
+        .catch((e) => {
+          component.set("errors", e.errors);
+          contact.deleteRecord();
+        })
+        .finally(() => {
+          component.set('is-starting-netbot', false);
+        });
     }
   }
 });

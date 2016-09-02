@@ -45,6 +45,8 @@ client.connect = function(options) {
           waiter.resolve(stanza);
         }
       }
+    } else if (stanza.name === 'presence') {
+      this.emit('presence', stanza);
     }
   });
 
@@ -52,12 +54,26 @@ client.connect = function(options) {
   this._origConnect();
 };
 
+client.sendPresence = function(priority) {
+  if (!priority) {
+    priority = 1;
+  }
+  this.send(
+    new Element('presence')
+    .c('priority', priority)
+    .up()
+    .c('c', {hash: 'sha-1', ver: 'Q5q9yxHXoLv60S1T8S6uUnrwbMU=', node: 'S22.Xmpp', xmlns: 'http://jabber.org/protocol/caps'})
+    .tree()
+  );
+};
+
 client.iqRequest = function(iq, element) {
   if (!iq.id) {
     iq.id = 'nodejs' + _generateId();
   }
 
-  let stanza = new Stanza('iq', iq).cnode(element);
+  let stanza = new Stanza('iq', iq).cnode(element).tree();
+  log.debug(stanza.toString());
   let promise = new Promise(function(resolve, reject) {
     pendingRequests[iq.id] = {
       resolve: resolve,

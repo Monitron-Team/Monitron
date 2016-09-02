@@ -92,3 +92,8 @@
   become: yes
   become_user: mongodb
   script: add_system_contact.sh 'local_monitor@{{domain_name}}' '{{local_monitor_password}}' 'local monitor'
+
+- name: set up rosters
+  become: yes
+  become_user: mongodb
+  script: set_up_rosters.sh

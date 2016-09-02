@@ -187,7 +187,9 @@ local add_roster_item_command_handler = adhoc_simple(add_roster_item_layout, fun
     end
     local username, host, resource = jid.split(fields.accountjid)
     local itemjid = jid_prep(fields.itemjid)
-    local session = hosts[host].sessions[username]
+    local host_obj = hosts[host]
+    local sessions = host_obj and host_obj.sessions
+    local session =  sessions and sessions[username]
     local roster = nil
     local error = nil
     local info = nil

@@ -112,11 +112,22 @@ let GenericController = function (entity, model, verbs, cbs) {
 
   let deleteEntity = co.wrap(function* (req, res) {
     let id = req.params.id;
+    if (cbs.beforeDelete) {
+      let shouldDelete = yield cbs.beforeDelete(id, req, res);
+      if (!shouldDelete) {
+        res.status(403).send({errors: [{code: 403, msg: 'Deletion not allowed'}]});
+        return;
+      }
+    }
     try {
       yield model.remove({_id: id}).exec();
     } catch (e) {
       res.status(500).send({errors: [{code: 500, msg: e.message}]});
       return;
+    }
+
+    if (cbs.afterDelete) {
+      yield cbs.afterDelete(id, req, res);
     }
 
     yield renderResponse([], req, res);

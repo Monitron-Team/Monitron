@@ -111,7 +111,15 @@ namespace Monitron
             );
         }
 
-        public async Task<PluginManifest> GetManifest(string i_PluginId)
+        public async Task<string> GetPluginIdAsync(ObjectId id) {
+            GridFSBucket bucket = getBucket();
+            Task<GridFSFileInfo> metadata = await bucket
+                .FindAsync(Builders<GridFSFileInfo>.Filter.Eq("_id", id))
+                .ContinueWith((arg) => arg.Result.FirstAsync());
+            return metadata.Result.Metadata.GetValue("id").AsString;
+        }
+
+        public PluginManifest GetManifest(string i_PluginId)
         {
             GridFSBucket bucket = getBucket();
             BsonDocument metadata = bucket

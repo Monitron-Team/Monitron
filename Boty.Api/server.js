@@ -7,7 +7,6 @@ const options = require('./options.js');
 const Session = require('./models/session');
 const Account = require('./models/account');
 const xmpp = require('./xmpp');
-const Element = require('node-xmpp-core').Element;
 
 const port = process.env.port || 9898;
 
@@ -94,7 +93,8 @@ const CONTROLLERS = [
   'accounts',
   'sessions',
   'node-plugins',
-  'contacts'
+  'contacts',
+  'netbots'
 ];
 
 for(let i in CONTROLLERS) {

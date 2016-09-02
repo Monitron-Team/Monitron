@@ -1,6 +1,7 @@
 const co = require('co');
 const xmpp = require('./xmpp');
 const Element = require('node-xmpp-core').Element;
+const Message = require('node-xmpp-core').Message;
 
 let notifyRosterUpdate = co.wrap(function*(jid) {
   let session = yield xmpp.executeAdHocCommand(xmpp.jid.domain, 'http://monitron.ddns.net/protocol/admin#notify-roster-update');
@@ -22,7 +23,14 @@ let notifyRosterUpdate = co.wrap(function*(jid) {
     throw new Error(session.node.getText());
   }
 });
+function notifyNetbotUpdate() {
+  xmpp.send(new Message({
+    to: 'themanagement@' + xmpp.jid.domain
+  }).c('body').t('reload_netbots'));
+}
+
 
 module.exports = {
-  notifyRosterUpdate: notifyRosterUpdate
-}
+  notifyRosterUpdate: notifyRosterUpdate,
+  notifyNetbotUpdate: notifyNetbotUpdate
+};

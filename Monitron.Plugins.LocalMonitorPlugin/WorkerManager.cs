@@ -15,6 +15,9 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 {
     public class WorkerManager : IWorkerManager
     {
+        private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
+            (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
         private readonly StoredPluginsManager r_PluginsManager;
         
         public WorkerManager(StoredPluginsManager i_PluginsManager)
@@ -62,12 +65,16 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 						Name = i_Name,
                         Image = "monitron/node-container",
                         Tty = false,
+                        HostConfig = new HostConfig {
+                            AutoRemove = true,
+                        }
                     });
                 
 				containerId = resp.ID;
             }
             catch (Exception e)
             {
+                sr_Log.Error(e);
                 return new CreateInstanceResult
                 {
                     Success = false,
@@ -80,6 +87,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
                                         new HostConfig
                 {
                     Privileged = false,
+                    AutoRemove = true,
                 });
 
             if (!containerStarted)

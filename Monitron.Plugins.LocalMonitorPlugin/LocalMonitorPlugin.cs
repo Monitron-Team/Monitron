@@ -65,7 +65,7 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 
 				foreach(var buddy in r_Client.Buddies) 
 				{
-                    if (!buddy.Groups.Contains("Management"))
+                    if (buddy.Groups.Contains("Admin"))
                     {
                         string welcomeMessange = "\nI am running. Waiting for your commands:";
                         r_Client.SendMessage(buddy.Identity, welcomeMessange);

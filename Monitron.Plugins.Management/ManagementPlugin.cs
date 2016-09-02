@@ -15,6 +15,11 @@ using System.Collections.Generic;
 using Monitron.Plugins.LocalMonitorPlugin.Common;
 using System.Text;
 using System.Security;
+using System.Xml;
+using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Driver.Linq;
+using System.Threading;
 
 namespace Monitron.Plugins.Management
 {
@@ -38,7 +43,7 @@ namespace Monitron.Plugins.Management
 		private UserAccountsManager m_UserManager;
 
         private IInstanceAllocationStrategy m_IstanceAllocationStrategy;
-        
+
         public IMessengerClient MessangerClient
         {
             get
@@ -50,6 +55,8 @@ namespace Monitron.Plugins.Management
         private readonly RpcAdapter r_Adapter;
 
         private readonly Dictionary<string, IWorkerManager> r_AvailableWorkers = new Dictionary<string, IWorkerManager>();
+
+        Timer m_reloadTimer;
 
         public ManagementPlugin(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
         {
@@ -64,12 +71,14 @@ namespace Monitron.Plugins.Management
                     IMessengerRpc rpc = (r_Client as IMessengerRpc);
                     IWorkerManager wm = rpc.CreateRpcClient<IWorkerManager>(e.Buddy);
                     r_AvailableWorkers.Add(e.Buddy.Resource, wm);
+                    reloadInstances();
                 }
             };
             i_MessangerClient.BuddySignedOut += (sender, e) => {
                 if (e.Buddy.UserName == k_WorkerUserName)
                 {
                     r_AvailableWorkers.Remove(e.Buddy.Resource);
+                    reloadInstances();
                 }
             };
             sr_Log.Info("Management Plugin starting");
@@ -81,6 +90,8 @@ namespace Monitron.Plugins.Management
 			m_MongoDB = createMongoDatabase();
 			sr_Log.Debug("Setting up Stored Plugin Manager");
 			r_PluginsManager = new StoredPluginsManager(m_MongoDB);
+            m_reloadTimer = new Timer((obj) => reloadInstances(), null, 0, 60 * 1000);
+
         }
         private void i_MessangerClient_FileTransferAborted (object sender, FileTransferAbortedEventArgs e)
         {
@@ -152,6 +163,7 @@ namespace Monitron.Plugins.Management
                 sr_Log.Debug("Setting up nickname");
                 r_Client.SetNickname("The Management");
                 sr_Log.Debug("Setting up avatar");
+                sr_Log.DebugFormat("Roster: {0}", string.Join(", ", r_Client.Buddies.Select((i) => i.Identity.ToString()).ToArray()));
                 r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.Management.MonitronAvatar.png"));
                 r_Client.AddBuddy(
                     new Identity { Domain = this.r_Client.Identity.Domain, UserName = "admin" },
@@ -171,12 +183,6 @@ namespace Monitron.Plugins.Management
                     i_AdminUsername: r_DataStore.Read<string>("admin_user"),
                     i_AdminPassword: r_DataStore.Read<string>("admin_password")
                 );
-                Identity adminIdent = new Identity { Domain = this.r_Client.Identity.Domain, UserName = "admin" };
-                Identity localMonitorIdent = new Identity { Domain = this.r_Client.Identity.Domain, UserName = k_WorkerUserName };
-                m_UserManager.AddRosterItem(adminIdent, localMonitorIdent, "Monitron");
-                m_UserManager.AddRosterItem(localMonitorIdent, adminIdent, "admin");
-                m_UserManager.AddRosterItem(r_Client.Identity, localMonitorIdent, "Workers");
-                m_UserManager.AddRosterItem(localMonitorIdent, r_Client.Identity, "Management");
             }
         }
 
@@ -264,6 +270,136 @@ namespace Monitron.Plugins.Management
             return "\n" + string.Join("\n", r_AvailableWorkers.Keys);
         }
 
+        private Dictionary<string, IWorkerManager> getInstanceMapping() {
+            Dictionary<string, IWorkerManager> instanceLocation = new Dictionary<string, IWorkerManager>();
+            foreach (var worker in r_AvailableWorkers.Values)
+            {
+                foreach (var instance in worker.ListInstances().Statuses)
+                {
+
+                    if (!instance.Status.ToLower().StartsWith("up"))
+                    {
+                        worker.RemoveInstance(instance.Name);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            instanceLocation.Add(instance.Name, worker);
+                        }
+                        catch (Exception)
+                        {
+                            worker.RemoveInstance(instance.Name);
+                        }
+                    }
+                }
+            }
+
+            return instanceLocation;
+        }
+
+        private bool m_isAllocating = false;
+
+        private async Task reloadInstances() {
+            Task<List<BsonDocument>> netbots = await m_MongoDB.GetCollection<BsonDocument>("netbots")
+                .FindAsync(Builders<BsonDocument>.Filter.Empty)
+                .ContinueWith((task) => task.Result.ToListAsync());
+            lock (r_AvailableWorkers)
+            {
+                if (m_isAllocating)
+                {
+                    return;
+                }
+
+                m_isAllocating = true;
+            }
+            try
+            {
+                var instanceLocation = getInstanceMapping();
+
+                foreach (var netbot in netbots.Result)
+                {
+                    string id = netbot.GetValue("_id").AsObjectId.ToString();
+                    IWorkerManager worker;
+                    if (!instanceLocation.TryGetValue(id, out worker))
+                    {
+                        await allocateInstance(netbot);
+                    }
+
+                    instanceLocation.Remove(id);
+                }
+
+                // Remove deleted instances
+                foreach (var entry in instanceLocation)
+                {
+                    entry.Value.RemoveInstance(entry.Key);
+                }
+            }
+            catch (Exception e)
+            {
+                sr_Log.Error("Error reallocating instances: ", e);
+            }
+            finally {
+                lock (r_AvailableWorkers)
+                {
+                    m_isAllocating = false;
+                }
+            }
+        }
+
+        private async Task allocateInstance(BsonDocument i_NetBot)
+        {
+            string pluginId = await r_PluginsManager.GetPluginIdAsync(i_NetBot.GetValue("nodePlugin").AsObjectId);
+            Task<BsonDocument> contact = await m_MongoDB.GetCollection<BsonDocument>("contacts")
+                .FindAsync(Builders<BsonDocument>.Filter.Eq("_id", i_NetBot.GetValue("contact").AsObjectId))
+                .ContinueWith((task) => task.Result.FirstAsync());
+            if (contact.IsFaulted)
+            {
+                return;
+            }
+
+            IWorkerManager workerManager = m_IstanceAllocationStrategy.SelectWorkerForNewInstance(r_AvailableWorkers.Values);
+            if (workerManager == null)
+            {
+                sr_Log.Warn("Could not allocate new instance, system at full capacity");
+            }
+
+            string[] jid = contact.Result.GetValue("jid").AsString.Split('@');
+            Account botIdentity = new Account(jid[0], contact.Result.GetValue("password").AsString, jid[1]);
+
+            CreateInstanceResult result;
+            try{
+                result = workerManager.CreateInstance(
+                    i_NetBot.GetValue("_id").AsObjectId.ToString(),
+                    pluginId,
+                    generateConfiguration(botIdentity, r_PluginsManager.GetManifest(pluginId)));
+            }
+            catch (Exception e)
+            {
+                result = new CreateInstanceResult
+                    {
+                        Success = false,
+                        Error = e.Message,
+                    };
+            }
+        }
+
+        [RemoteCommand(
+            MethodName="reload_netbots",
+            Description="reload netbots from DB"
+        )]
+        public string ReloadNetBot(Identity Identity) {
+            try
+            {
+                reloadInstances().Wait();
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+            return "";
+        }
+
         [RemoteCommand(
             MethodName="create_instance",
             Description="create a new instance of a plugin"
@@ -286,7 +422,7 @@ namespace Monitron.Plugins.Management
                 result = workerManager.CreateInstance(
                     botIdentity.UserName,
                     i_PluginId,
-                    generateConfiguration(buddy, r_PluginsManager.GetManifest(i_PluginId).Result));
+                    generateConfiguration(buddy, r_PluginsManager.GetManifest(i_PluginId)));
             }
             catch (Exception e)
             {
@@ -506,9 +642,8 @@ namespace Monitron.Plugins.Management
                 {
                     instancesFound = true;
                     result.Append(worker.Key.PadRight(10));
-                    var parts = instance.Name.Split(new char[] { '-' }, 2);
-                    result.Append(parts[0].PadRight(10));
-                    result.Append(parts[1].PadRight(30));
+                    result.Append(instance.Name);
+                    result.Append("   ");
                     result.AppendLine(instance.Status);
                 }
             }

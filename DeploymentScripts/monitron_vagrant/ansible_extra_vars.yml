@@ -5,3 +5,4 @@ mono_debug: false
 mono_debug_port: 6699
 api_server_debug: true
 journald_max_use: 50M
+ember_dist: vagrant

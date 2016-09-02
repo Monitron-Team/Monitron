@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net.Security;
+using System.Xml;
 
 namespace S22.Xmpp.Client {
 	/// <summary>
@@ -1486,6 +1487,18 @@ namespace S22.Xmpp.Client {
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
+
+        public void Subscribe(string node, Action<Jid, XmlElement> action) {
+            pep.Subscribe(node, action);
+        }
+
+        public void Unsubscribe(string node) {
+            pep.Unsubscribe(node);
+        }
+
+        public void Publish(string node, string itemid = null, params XmlElement[] data) {
+            pep.Publish(node, itemid, data);
+        }
 
 		/// <summary>
 		/// Releases all resources used by the current instance of the XmppClient

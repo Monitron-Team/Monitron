@@ -19,7 +19,6 @@
         <button class="btn btn-danger btn-xs" {{action "delete_account" contact on="click"}}><i class="fa fa-chain-broken"/> Unpair</button>
       {{else if (eq contact.kind "netbot")}}
         <button class="btn btn-danger btn-xs" {{action "delete_account" contact on="click"}}><i class="fa fa-trash"/> Destroy</button>
-        <button class="btn btn-warning btn-xs"><i class="fa fa-pause-circle-o"/> Pause</button>
       {{/if}}
       {{#link-to "contact.edit" contact class="btn btn-default btn-xs" }}<i class="fa fa-pencil"/> Edit{{/link-to}}
   </td>

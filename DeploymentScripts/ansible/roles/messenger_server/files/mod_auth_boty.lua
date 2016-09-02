@@ -5,7 +5,9 @@ local usermanager = require("core.usermanager")
 local new_sasl = require("util.sasl").new
 
 local datamanager = require("util.datamanager")
-local rm_roster_push = require "core.rostermanager".roster_push;
+local rm_roster_push = require "core.rostermanager".roster_push
+local modulemanager = require("modulemanager")
+local mod_presence = modulemanager.load(module.host, 'presence')
 
 local host = module.host
 local provider = {}
@@ -120,6 +122,9 @@ local function roster_load(username)
 		end
 	end
 
+	-- Make sure the user is not friends with itself
+	roster[username] = nil
+
 	return roster
 end
 
@@ -167,6 +172,8 @@ local function cancel_roster_save(username, host, datastore, data)
 	if datastore == "roster" then
 		module:log("Clearing roster before saving")
 		return false
+	else
+		return username, host, datastore, data
 	end
 end
 
@@ -185,6 +192,15 @@ local function intersect(a, b)
 
 	return res;
 end
+
+local function split_string(s, sep)
+	local fields
+        sep, fields = sep or ":", {}
+        local pattern = string.format("([^%s]+)", sep)
+        s:gsub(pattern, function(c) fields[#fields+1] = c end)
+        return fields
+end
+
 
 local function handle_external_update(username, host, roster)
 	module:log("info",
@@ -216,6 +232,8 @@ local function handle_external_update(username, host, roster)
 	for _, itemjid in ipairs(changed) do
 		if itemjid ~= false then
 			rm_roster_push(username, host, itemjid)
+			local fields = split_string(itemjid, "@")
+			mod_presence.send_presence_of_available_resources(fields[1], fields[2], username .. '@' .. host)
 		end
 	end
 end
