@@ -88,11 +88,14 @@ module.exports = (router) => {
     update: true,
     delete: true
   },{
-    beforeRender: (contact, req, res) => {
-      if (!isOwnerAuth(contact, req)) {
-        return Promise.resolve(null);
+    beforeList: (query, req, res) => {
+      if (!req.auth.isAuthorized) {
+        return {owner: null};
+      } else {
+        return {owner: req.auth.account.id};
       }
-
+    },
+    beforeRender: (contact, req, res) => {
       for(let i in contact.roster) {
         let item = contact.roster[i];
         item._id = contact.id + '>' + item.jid;
@@ -103,6 +106,9 @@ module.exports = (router) => {
       return contact;
     },
     beforeSave: co.wrap(function* (contact, req, res) {
+      if (!req.auth.isAuthorized) {
+        return Promise.resolve(null);
+      }
       if (req.method === 'PUT') {
         if (contact.password === undefined || contact.password === null) {
           try {
@@ -119,6 +125,7 @@ module.exports = (router) => {
         }
       }
 
+      contact.owner = req.auth.account.id;
       contact.updatedAt = Date.now();
 
       return contact;

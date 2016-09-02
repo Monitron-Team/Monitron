@@ -33,8 +33,13 @@ let GenericController = function (entity, model, verbs, cbs) {
 
   let listEntitys = co.wrap(function* (req, res) {
     let results;
+    let query = req.query;
+    if (cbs.beforeList) {
+      query = yield cbs.beforeList(query, req, res);
+    }
+
     try {
-      results = yield model.find({}).exec();
+      results = yield model.find(query).exec();
     } catch (e) {
       res.status(500).send({errors: [{code: 500, msg: e.message}]});
       return;
