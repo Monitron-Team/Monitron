@@ -32,7 +32,7 @@
   </thead>
   <tbody>
 {{#each model.serials as |serial|}}
-  {{#if (eq serial.maker model.account.name )}}
+  {{#if (eq serial.maker.name model.account.name )}}
   <tr>
   <td>{{serial.serial_key}}</td>
 		<td style="text-align:right;">

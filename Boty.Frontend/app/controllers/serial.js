@@ -23,21 +23,29 @@ export default Ember.Controller.extend({
         roster: []
         }
       let contact = store.createRecord('contact',newuser)
-        contact.save()
-        
-      let newSerial = store.createRecord('serial', {
-        maker: name,
+      contact.save().then(function(contact_info){
+        alert(contact_info.get('jid'))
+        alert('before new serial');
+        let newSerial = store.createRecord('serial', {
+        maker: account,
         serial_key: serialKey,
-        jid: newuser.jid
-      });
-      newSerial.save()
-        .then(() => {
-          window.setTimeout(()=>$("#new-user-dialog").modal('hide'));
+        contact: contact,
+        });
+        newSerial.save()
+          .then(() => {
+            alert('fuckmyliife');
+            window.setTimeout(()=>$("#new-user-dialog").modal('hide'));
+            alert('fuckmyliif again');
+          })
+          .catch((e) => {
+            alert('catch!');
+            component.set("errors", e.errors);
+            newSerial.deleteRecord();
+          })
+        .catch(function(error){
+          alert('todo catch')
         })
-        .catch((e) => {
-          component.set("errors", e.errors);
-          newSerial.deleteRecord();
-        })
+      })
         .finally(() => {
           component.set('is-creating-user', false);
         });
