@@ -28,8 +28,6 @@ export default Ember.Controller.extend({
       .then((res) => self.set("plugins", res));
     },
     createUser(account) {
-      alert("maorrr");
-      alert(account);
       this.set('is-creating-user', true);
       let component = this;
       let name = $('#contact-name').val();
@@ -67,51 +65,28 @@ export default Ember.Controller.extend({
       let component = this;
       let serial = $('#device-serial').val();
       let description = $('#device-description').val();
+      let store = account.get('store');
       component.set("errors", []);
-      //let device_info = DEVICES[serial];
-      alert('pairing');
-      let device_info = this.store.queryRecord('serial', {serial_key:serial})
-      .then(function(device_info){
-        alert(device_info.get('serial_key'));
-        let device_contact = device_info.get('contact');
-        let device_maker = device_info.get('maker');
-        alert(device_contact.get('owner').get('name'))
-        
-      })
-      .catch(function(error){
-        alert('todo catch')
-      }
-      );
-      alert(device_info);
-
-      if (!device_info) {
-        component.set("errors", [
-          {msg: "Invalid serial"}
-          ]);
-        component.set('is-pairing-device', false);
-        return;
-      }
-        device_info.set('owner', account);
-        device_info.set('description', description);
-//      device_info.owner = account;
-//      device_info.description = description;
-//      let store = this.store;
-      window.setTimeout(()=>{
-        //let contact = store.createRecord('contact', device_info);
-        contact.save()
-        .then(() => {
-          window.setTimeout(()=>$("#pair-device-dialog").modal('hide'));
+      store.query('serial', {serial_key: serial})
+        .then((result) => {
+          if (result.get('length') !== 1) {
+            component.set('errors', [{code:404, msg: 'A device with this kind of serial does not exist'}]);
+            return;
+          }
+          let serial = result.popObject();
+          serial.pair()
+            .then((result) => {
+							$('#device-serial').val('');
+							$('#device-description').val('');
+              store.findAll('contact');
+              window.setTimeout(()=>$("#pair-device-dialog").modal('hide'));
+            })
+            .catch((e) => component.set('errors', e.errors));
         })
-        .catch((e) => {
-          component.set("errors", [
-            {msg: "Device already paired, either with you or with another account."}
-            ]);
-          contact.deleteRecord();
-        })
+        .catch((e) => component.set('errors', e.errors))
         .finally(() => {
           component.set('is-pairing-device', false);
         });
-      }, 4 * 1000);
     },
     startNetBot(account) {
       this.set('is-starting-netbot', true);

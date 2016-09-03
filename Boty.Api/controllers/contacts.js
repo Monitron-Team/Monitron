@@ -18,14 +18,6 @@ function _generatePassword() {
 }
 
 module.exports = (router) => {
-  router.use('/contacts', co.wrap(function*(req, res, next) {
-    if (req.path !== '/login' &&  req.path !== '/isuser' && !req.path.startsWith('/roster') && req.method !== 'OPTIONS' && !req.auth.isAuthorized) {
-      log.debug('Rejected contact related request: %s', req.path);
-      res.status(403).send({errors: [{code: 403, msg: 'Unauthorized access'}]});
-    } else {
-      next();
-    }
-  }));
   router.get('/contacts/isuser', co.wrap(function* (req, res) {
     let username = req.body.username;
     log.debug('Got user check request for `%s`', username);
@@ -139,6 +131,10 @@ module.exports = (router) => {
     beforeDelete: co.wrap(function* (id, req, res) {
       let contact = yield Contact.findOne({_id: id});
       if (contact) {
+        if (contact.kind === 'device') {
+          return false;
+        }
+
         let updatedContacts = yield Contact.find({roster: {$elemMatch: {jid: contact.jid}}});
         yield Contact.update({}, {$pull: {roster: {jid: contact.jid}}}, {multi: true});
         for (let i = 0; i < updatedContacts.length; i++) {

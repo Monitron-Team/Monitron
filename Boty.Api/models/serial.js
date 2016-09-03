@@ -2,13 +2,11 @@ const mongoose   = require('mongoose'),
       Schema     = mongoose.Schema,
       ObjectId   = mongoose.Schema.ObjectId;
 
-
-
-
 const Serial = new Schema({
   serial_key: {type: String, unique: true, required: true, index: true},
+  isPaired: {type: Boolean, default: false},
   maker: {type: ObjectId, ref: 'Account'},
-  contact: {type: ObjectId, ref: 'Contact'},
+  contact: {type: ObjectId, ref: 'Contact'}
 });
 
 module.exports = mongoose.model('Serial', Serial);

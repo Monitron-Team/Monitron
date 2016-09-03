@@ -3,7 +3,7 @@ const winston = require('winston');
 
 let level = 'info';
 if (process.env.DEBUG) {
-    level = 'debug';
+  level = 'debug';
 }
 
 let logger = new (winston.Logger)({

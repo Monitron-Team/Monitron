@@ -3,74 +3,81 @@ const co = require('co');
 const Serial = require('../models/serial');
 const Contact = require('../models/contact');
 const GenericController = require('./generic');
-const adhoc = require('../adhoc');
-
-let isOwnerAuth = function(contact, req) {
-  let ownerId = contact.owner.toString();
-  let authId = req.auth.account.id;
-  return ownerId === authId;
-};
 
 module.exports = (router) => {
-  router.use('/serials', co.wrap(function*(req, res, next) {
-    if (req.path !== '/login' &&  req.path !== '/isuser' && !req.path.startsWith('/roster') && req.method !== 'OPTIONS' && !req.auth.isAuthorized) {
-      log.debug('Rejected contact related request: %s', req.path);
-      res.status(403).send({errors: [{code: 403, msg: 'Unauthorized access'}]});
-    } else {
-      next();
+  router.post('/serials/:id/unpair', co.wrap(function* (req, res) {
+    if (!req.auth.isAuthorized) {
+      res.status(403).send({errors: [{code: 403, msg: 'Must be authenticated to unpair'}]});
+      return;
     }
+
+    let serialNum = req.params.id;
+    let newOwner = req.auth.account;
+    log.info('Trying to unpair serial "%s" with "%s"', serialNum, newOwner.name);
+    let serial = yield Serial.findOne({serial_key: serialNum});
+    if (!serial) {
+      res.status(404).send({errors: [{code:404, msg: 'Serial not found'}]});
+      return;
+    }
+
+    if (!serial.isPaired) {
+      res.status(403).send({errors: [{code: 403, msg: 'Device not paired'}]});
+      return;
+    }
+
+    serial.isPaired = false;
+
+    log.debug('Serial found, looking for matching contact');
+    let contact = yield Contact.findOne({_id: serial.contact});
+    if (!contact) {
+      res.status(404).send({errors: [{code: 404, msg: 'Serial expired'}]});
+      return;
+    }
+
+    log.debug('Contact found, unpairing...');
+    contact.owner = serial.maker;
+    contact.roster = [];
+    contact.description = '';
+    yield contact.save();
+    yield serial.save();
+
+    res.status(200).send(serial.toObject());
   }));
-  router.get('/serials/isuser', co.wrap(function* (req, res) {
-    let username = req.body.username;
-    log.debug('Got user check request for `%s`', username);
-    if (!username) {
-      res.status(403).send('Problem with authentication information');
+  router.post('/serials/:id/pair', co.wrap(function* (req, res) {
+    if (!req.auth.isAuthorized) {
+      res.status(403).send({errors: [{code: 403, msg: 'Must be authenticated to pair'}]});
       return;
     }
 
-    let result = yield Contact.findOne({jid: username});
-    if (result === null) {
-      res.status(404).send('User not found');
+    let serialNum = req.params.id;
+    let newOwner = req.auth.account;
+    log.info('Trying to pair serial "%s" with "%s"', serialNum, newOwner.name);
+    let serial = yield Serial.findOne({serial_key: serialNum});
+    if (!serial) {
+      res.status(404).send({errors: [{code:404, msg: 'Serial not found'}]});
       return;
     }
 
-    res.send('OK');
-  }));
-  router.post('/contacts/login', co.wrap(function* (req, res) {
-    let username = req.body.username;
-    let password = req.body.password;
-    log.debug('Got auth request for `%s`', username);
-    if ((!username) || (!password)) {
-      res.status(403).send('Problem with authentication information');
+    if (serial.isPaired) {
+      res.status(403).send({errors: [{code: 403, msg: 'Device already paired'}]});
       return;
     }
 
-    let result = yield Contact.findOne({jid: username, password: password});
-    if (result === null) {
-      log.debug('Auth request failed for `%s`', username);
-      res.status(403).send('Problem with authentication information');
+    serial.isPaired = true;
+
+    log.debug('Serial found, looking for matching contact');
+    let contact = yield Contact.findOne({_id: serial.contact});
+    if (!contact) {
+      res.status(404).send({errors: [{code: 404, msg: 'Serial expired'}]});
       return;
     }
 
-    log.debug('Auth request succeeded for `%s`', username);
+    log.debug('Contact found, pairing...');
+    contact.owner = newOwner._id;
+    yield contact.save();
+    yield serial.save();
 
-    res.send('OK');
-  }));
-  router.get('/contacts/roster/:username', co.wrap(function* (req, res) {
-    let username = req.params.username;
-    if (!username) {
-      res.status(404).send('Invalid user name');
-      return;
-    }
-
-    let result = yield Contact.findOne({jid: username});
-    if (result === null) {
-      res.status(404).send('User not found');
-      return;
-    }
-
-    let resultObj = result.toObject();
-    res.send(resultObj.roster);
+    res.status(200).send(serial.toObject());
   }));
   GenericController({
     plural: 'serials',
@@ -82,16 +89,27 @@ module.exports = (router) => {
     update: true,
     delete: true
   },{
-    beforeRender: (serial, req, res) => {
-      
-      return serial;
+    beforeList: (query, req, res) => {
+      if (!req.auth.isAuthorized) {
+        return {maker: null};
+      } else if (query.serial_key) {
+        return {serial_key: query.serial_key};
+      } else if (query.contact) {
+        return {contact: query.contact};
+      } else {
+        query.maker = req.auth.account.id;
+        return query;
+      }
     },
     beforeSave: co.wrap(function* (serial, req, res) {
+      if (!req.auth.isAuthorized) {
+        return Promise.resolve(null);
+      }
+
+      serial.maker = req.auth.account.id;
+
       return serial;
     }),
-    afterSave: function(serial, req, res) {
-      return Promise.resolve();
-    }
   }
   )(router);
 };

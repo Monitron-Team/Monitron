@@ -16,7 +16,7 @@
       {{#if (eq contact.kind "user")}}
         <button class="btn btn-danger btn-xs" {{action "delete_account" contact on="click"}}><i class="fa fa-trash"/> Delete</button>
       {{else if (eq contact.kind "device")}}
-        <button class="btn btn-danger btn-xs" {{action "delete_account" contact on="click"}}><i class="fa fa-chain-broken"/> Unpair</button>
+        <button class="btn btn-danger btn-xs" {{action "unpair" contact on="click"}}><i class="fa fa-chain-broken"/> Unpair</button>
       {{else if (eq contact.kind "netbot")}}
         <button class="btn btn-danger btn-xs" {{action "delete_account" contact on="click"}}><i class="fa fa-trash"/> Destroy</button>
       {{/if}}
