@@ -26,7 +26,8 @@ namespace Monitron.Plugins.MPD
 				return r_Client;
 			}
 		}
-        private Mpc m_Mpc;
+
+		private Mpc m_Mpc;
 
 		public MPDPlugin(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
 		{
@@ -43,6 +44,14 @@ namespace Monitron.Plugins.MPD
             }
 			registerToJabber(r_Client);
             r_Client_ConnectionStateChanged(r_Client, new ConnectionStateChangedEventArgs(r_Client.IsConnected));
+		}
+
+		private void vertifyConnection()
+		{
+			if (m_Mpc!=null)
+			{
+				connectMPDServer();
+			}
 		}
 
 		private void registerToJabber(IMessengerClient r_Client)
@@ -69,8 +78,6 @@ namespace Monitron.Plugins.MPD
                 port);
             m_Mpc = new Mpc();
             m_Mpc.Connection = new MpcConnection(ie);
-            m_Mpc.Connection.AutoConnect = true;
-            m_Mpc.Update();
             new Thread(PopulatePlayList).Start();
 
 		}
@@ -92,10 +99,18 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="get-details")]
 		public string GetMPDServerDetails(Identity i_Buddy)
 		{
-			return m_Mpc.Stats().ToString();
+			vertifyConnection();
+			if(m_Mpc != null)
+			{
+				return m_Mpc.Stats().ToString();
+			} 
+			else
+			{
+				return "Cannot get details";
+			}
 		}
 
-        //[RemoteCommand(MethodName="set_host")]
+        //[RemoteCommand(MethodName="set-host")]
         public string setHost(Identity i_Buddy, string i_Host, int i_Port)
         {
             m_DataStore.Write("host", i_Host);
@@ -117,6 +132,7 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="songs-list")]
 		public string GetSongsList(Identity i_Buddy)
 		{
+			vertifyConnection();
 			string songString = null;
             List<string> songs = m_Mpc.PlaylistInfo()
                 .Select((item) => string.Format("{0} - {1}", item.Artist, item.Title))
@@ -148,7 +164,8 @@ namespace Monitron.Plugins.MPD
 
         [RemoteCommand(MethodName="set-volume")]
         public string setVolume(Identity i_Buddy, int volume) {
-            m_Mpc.SetVol(volume);
+			vertifyConnection();            
+			m_Mpc.SetVol(volume);
             return string.Format("Volume set to: {0}", m_Mpc.Status().Volume);
         }
 
@@ -161,6 +178,7 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="play-from")]
         public string PlaySong(Identity i_Buddy, int num)
 		{
+			vertifyConnection();
 			if(m_Mpc != null)
 			{
 				IMessengerRpc rpc = (r_Client as IMessengerRpc);
@@ -202,6 +220,7 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="next")]
 		public string NextSong(Identity i_Buddy)
 		{
+			vertifyConnection();
 			if (m_Mpc != null)
 			{
 				m_Mpc.Next();
