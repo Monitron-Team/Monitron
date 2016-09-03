@@ -46,6 +46,14 @@ namespace Monitron.Plugins.MPD
             r_Client_ConnectionStateChanged(r_Client, new ConnectionStateChangedEventArgs(r_Client.IsConnected));
 		}
 
+		private void vertifyConnection()
+		{
+			if (m_Mpc!=null)
+			{
+				connectMPDServer();
+			}
+		}
+
 		private void registerToJabber(IMessengerClient r_Client)
 		{
 			IMessengerRpc rpc = (r_Client as IMessengerRpc);
@@ -91,7 +99,15 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="get_details")]
 		public string GetMPDServerDetails(Identity i_Buddy)
 		{
-			return m_Mpc.Stats().ToString();
+			vertifyConnection();
+			if(m_Mpc != null)
+			{
+				return m_Mpc.Stats().ToString();
+			} 
+			else
+			{
+				return "Cannot get details";
+			}
 		}
 
         [RemoteCommand(MethodName="set_host")]
@@ -116,6 +132,7 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="songs_list")]
 		public string GetSongsList(Identity i_Buddy)
 		{
+			vertifyConnection();
 			string songString = null;
 			List<string> songs = m_Mpc.List(ScopeSpecifier.Title);
 
@@ -132,6 +149,7 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="stop")]
 		public string StopSong(Identity i_Buddy)
 		{
+			vertifyConnection();
 			if (m_Mpc != null)
 			{
 				m_Mpc.Stop();
@@ -146,6 +164,7 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="play")]
 		public string PlaySong(Identity i_Buddy)
 		{
+			vertifyConnection();
 			if(m_Mpc != null)
 			{
 				IMessengerRpc rpc = (r_Client as IMessengerRpc);
@@ -181,6 +200,7 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="next")]
 		public string NextSong(Identity i_Buddy)
 		{
+			vertifyConnection();
 			if (m_Mpc != null)
 			{
 				m_Mpc.Next();
@@ -195,16 +215,18 @@ namespace Monitron.Plugins.MPD
 			
 		private void PopulatePlayList()
 		{
-			List<string> songs = m_Mpc.List(ScopeSpecifier.Filename);
-
-			foreach(string song in songs)
+			if(m_Mpc != null)
 			{
-				try
+				List<string> songs = m_Mpc.List(ScopeSpecifier.Filename);
+				foreach(string song in songs)
 				{
-					m_Mpc.Add(song);
-				}
-				catch(MpdResponseException)
-				{
+					try
+					{
+						m_Mpc.Add(song);
+					} 
+					catch(MpdResponseException)
+					{
+					}
 				}
 			}
 		}

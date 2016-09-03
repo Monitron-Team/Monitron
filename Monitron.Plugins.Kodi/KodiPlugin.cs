@@ -28,7 +28,6 @@ namespace Monitron.Plugins.Kodi
         private const int k_MinVolume = 0;
         private const int k_VolError = -1;
 		private const bool k_ActiveBot = true;
-		private const string k_BotyDomain = "@boty.ddns.com";
 		private Dictionary<Identity, bool> m_AudioBots = new Dictionary<Identity, bool>();
 
         // Kodi parameters
@@ -108,7 +107,7 @@ namespace Monitron.Plugins.Kodi
 			{
 				case "GetAccount":
 				{
-					e.ReturnValue = r_Client.Identity.UserName + k_BotyDomain;
+					e.ReturnValue = r_Client.Identity.UserName + "@" + r_Client.Identity.Domain;
 					break;
 				}
 				case "GetFriends":
@@ -116,7 +115,23 @@ namespace Monitron.Plugins.Kodi
 					String friendString = String.Empty;
 					foreach(BuddyListItem buddy in r_Client.Buddies)
 					{
-						friendString += buddy.Identity.UserName + k_BotyDomain + ";";
+						string buddyFullUserAndDomain = buddy.Identity.UserName + "@" + buddy.Identity.Domain;
+						bool foundInAudioBots = false;
+
+						foreach(KeyValuePair<Identity, bool> iden in m_AudioBots)
+						{
+							string idenFullUserAndDomain = iden.Key.UserName + "@" + iden.Key.Domain;
+							if(idenFullUserAndDomain == buddyFullUserAndDomain)
+							{
+								foundInAudioBots = true;
+								break;
+							}
+						}
+
+						if(!foundInAudioBots)
+						{
+							friendString += buddy.Identity.UserName + "@" + buddy.Identity.Domain + ";";
+						}
 					}
 
 					e.ReturnValue = friendString;
@@ -127,7 +142,7 @@ namespace Monitron.Plugins.Kodi
 					string audioBotsString = String.Empty;
 					foreach(KeyValuePair<Identity, bool> item in m_AudioBots)
 					{
-						audioBotsString += item.Key.UserName + k_BotyDomain + "," + item.Value + ";";
+						audioBotsString += item.Key.UserName + "@" + item.Key.Domain + "," + item.Value + ";";
 					}
 					e.ReturnValue = audioBotsString;
 					break;
@@ -159,7 +174,7 @@ namespace Monitron.Plugins.Kodi
 		{
 			foreach(KeyValuePair<Identity, bool> bot in m_AudioBots)
 			{
-				if(bot.Key.UserName == i_BotName)
+				if(bot.Key.UserName + "@" + bot.Key.Domain == i_BotName)
 				{
 					if(m_AudioBots.ContainsKey(bot.Key))
 					{
@@ -194,8 +209,8 @@ namespace Monitron.Plugins.Kodi
         private void initKodiParams()
         {
 			sr_Log.Info("Starting init params");
-			m_Movies = getVideoList();
-            getVolume();
+			//m_Movies = getVideoList();
+            //getVolume();
         }
 
         private void getVolume()
@@ -308,7 +323,8 @@ namespace Monitron.Plugins.Kodi
         [RemoteCommand(MethodName = "vol_up")]
         public string KodiVolumeUp(Identity i_Buddy)
         {
-            string msg = string.Empty;
+			getVolume();
+			string msg = string.Empty;
 
             if (m_Volume == k_MaxVolume)
             {
@@ -335,7 +351,8 @@ namespace Monitron.Plugins.Kodi
         [RemoteCommand(MethodName = "vol_down")]
         public string KodiVolumeDown(Identity i_Buddy)
         {
-            string msg = string.Empty;
+			getVolume();
+			string msg = string.Empty;
 
             if (m_Volume == k_MinVolume)
             {
@@ -385,6 +402,7 @@ namespace Monitron.Plugins.Kodi
 				audioBot.PauseAudio();
 			}
 
+			m_Movies = getVideoList();
 			string msg = string.Empty;
             string videoPath = getMoviePath(i_Video);
             if (string.IsNullOrEmpty(videoPath) == false)
@@ -399,7 +417,8 @@ namespace Monitron.Plugins.Kodi
         [RemoteCommand(MethodName = "list")]
         public string KodiList(Identity i_Buddy)
         {
-            return m_VideoListMsg;
+			m_Movies = getVideoList();
+			return m_VideoListMsg;
         }
 
         [RemoteCommand(MethodName = "stop")]
