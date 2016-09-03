@@ -25,7 +25,7 @@ export default Ember.Controller.extend({
       this.set("errors", []);
       this.set("plugins", null);
       this.store.findAll("node-plugin")
-        .then((res) => self.set("plugins", res));
+      .then((res) => self.set("plugins", res));
     },
     createUser(account) {
       alert("maorrr");
@@ -46,16 +46,16 @@ export default Ember.Controller.extend({
         roster: [],
       });
       contact.save()
-        .then(() => {
-          window.setTimeout(()=>$("#new-user-dialog").modal('hide'));
-        })
-        .catch((e) => {
-          component.set("errors", e.errors);
-          contact.deleteRecord();
-        })
-        .finally(() => {
-          component.set('is-creating-user', false);
-        });
+      .then(() => {
+        window.setTimeout(()=>$("#new-user-dialog").modal('hide'));
+      })
+      .catch((e) => {
+        component.set("errors", e.errors);
+        contact.deleteRecord();
+      })
+      .finally(() => {
+        component.set('is-creating-user', false);
+      });
     },
     preventHide(shouldPrevent, e) {
       if (shouldPrevent) {
@@ -69,40 +69,48 @@ export default Ember.Controller.extend({
       let description = $('#device-description').val();
       component.set("errors", []);
       //let device_info = DEVICES[serial];
-      let device_info = this.store.query('serial', {serial_key:serial})
-      .then(function(device_info){alert(device_info.get('serial_key'))})
+      alert('pairing');
+      let device_info = this.store.queryRecord('serial', {serial_key:serial})
+      .then(function(device_info){
+        alert(device_info.get('serial_key'));
+        let device_contact = device_info.get('contact');
+        let device_maker = device_info.get('maker');
+        alert(device_contact.get('owner').get('name'))
+        
+      })
       .catch(function(error){
         alert('todo catch')
       }
-        );
-      
+      );
+      alert(device_info);
 
       if (!device_info) {
         component.set("errors", [
           {msg: "Invalid serial"}
-        ]);
+          ]);
         component.set('is-pairing-device', false);
         return;
       }
-
-      device_info.owner = account;
-      device_info.description = description;
-      let store = this.store;
+        device_info.set('owner', account);
+        device_info.set('description', description);
+//      device_info.owner = account;
+//      device_info.description = description;
+//      let store = this.store;
       window.setTimeout(()=>{
-        let contact = store.createRecord('contact', device_info);
+        //let contact = store.createRecord('contact', device_info);
         contact.save()
-          .then(() => {
-            window.setTimeout(()=>$("#pair-device-dialog").modal('hide'));
-          })
-          .catch((e) => {
-            component.set("errors", [
-              {msg: "Device already paired, either with you or with another account."}
+        .then(() => {
+          window.setTimeout(()=>$("#pair-device-dialog").modal('hide'));
+        })
+        .catch((e) => {
+          component.set("errors", [
+            {msg: "Device already paired, either with you or with another account."}
             ]);
-            contact.deleteRecord();
-          })
-          .finally(() => {
-            component.set('is-pairing-device', false);
-          });
+          contact.deleteRecord();
+        })
+        .finally(() => {
+          component.set('is-pairing-device', false);
+        });
       }, 4 * 1000);
     },
     startNetBot(account) {
@@ -127,23 +135,23 @@ export default Ember.Controller.extend({
       let nodePluginId = e.options[e.selectedIndex].value;
 
       contact.save()
-        .then((contact) => {
-          window.setTimeout(()=>$("#start-netbot-dialog").modal('hide'));
-          store.findRecord('node-plugin', nodePluginId)
-            .then(function(nodePlugin) {
-              store.createRecord('netbot', {
-                contact: contact,
-                nodePlugin: nodePlugin
-              }).save();
-            });
-        })
-        .catch((e) => {
-          component.set("errors", e.errors);
-          contact.deleteRecord();
-        })
-        .finally(() => {
-          component.set('is-starting-netbot', false);
+      .then((contact) => {
+        window.setTimeout(()=>$("#start-netbot-dialog").modal('hide'));
+        store.findRecord('node-plugin', nodePluginId)
+        .then(function(nodePlugin) {
+          store.createRecord('netbot', {
+            contact: contact,
+            nodePlugin: nodePlugin
+          }).save();
         });
+      })
+      .catch((e) => {
+        component.set("errors", e.errors);
+        contact.deleteRecord();
+      })
+      .finally(() => {
+        component.set('is-starting-netbot', false);
+      });
     }
   }
 });
