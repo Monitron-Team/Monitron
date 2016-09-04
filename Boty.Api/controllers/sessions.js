@@ -29,7 +29,8 @@ module.exports = (router) => {
 
         res.json({
           account: account._id,
-          is_admin: account.isAdmin,
+          isAdmin: account.isAdmin,
+          isDeviceMaker: account.isDeviceMaker,
           id_token: session._id
         });
       });

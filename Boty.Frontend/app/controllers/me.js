@@ -80,6 +80,11 @@ export default Ember.Controller.extend({
 							$('#device-description').val('');
               store.findAll('contact');
               window.setTimeout(()=>$("#pair-device-dialog").modal('hide'));
+              serial.get('contact')
+                .then((contact) => {
+                  contact.set('description', description);
+                  contact.save();
+                });
             })
             .catch((e) => component.set('errors', e.errors));
         })

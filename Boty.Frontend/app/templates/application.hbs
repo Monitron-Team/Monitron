@@ -9,7 +9,7 @@
         <span class="icon-bar"></span>
       </button>
       {{#link-to 'index' class="navbar-brand"}}
-      <img src='icon.png' width=22 height=22 style='display:inline;'/> Boty
+      <img src='/icon.png' width=22 height=22 style='display:inline;'/> Boty
       {{/link-to}}
     </div>
 
@@ -19,9 +19,9 @@
             {{#if session.data.authenticated.isAdmin}}
               <li>{{ link-to 'Accounts' 'accounts'}}</li>
             {{/if}}
-            {{#if session.data.authenticated.isAdmin }}
-              <li>{{ link-to 'Serials' 'serial'}}</li>
-            {{/if}}            
+            {{#if session.data.authenticated.isDeviceMaker }}
+              <li>{{ link-to 'Devices' 'serial'}}</li>
+            {{/if}}
             <li>{{ link-to 'Node Plugins' 'node-plugins'}}</li>
           {{/if}}
 

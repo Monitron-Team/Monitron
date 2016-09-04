@@ -26,8 +26,7 @@ namespace Monitron.Plugins.MPD
 				return r_Client;
 			}
 		}
-
-		private Mpc m_Mpc;
+        private Mpc m_Mpc;
 
 		public MPDPlugin(IMessengerClient i_MessangerClient, IPluginDataStore i_DataStore)
 		{
@@ -70,6 +69,8 @@ namespace Monitron.Plugins.MPD
                 port);
             m_Mpc = new Mpc();
             m_Mpc.Connection = new MpcConnection(ie);
+            m_Mpc.Connection.AutoConnect = true;
+            m_Mpc.Update();
             new Thread(PopulatePlayList).Start();
 
 		}
@@ -88,13 +89,13 @@ namespace Monitron.Plugins.MPD
 			}
 		}
 
-		[RemoteCommand(MethodName="get_details")]
+		[RemoteCommand(MethodName="get-details")]
 		public string GetMPDServerDetails(Identity i_Buddy)
 		{
 			return m_Mpc.Stats().ToString();
 		}
 
-        [RemoteCommand(MethodName="set_host")]
+        //[RemoteCommand(MethodName="set_host")]
         public string setHost(Identity i_Buddy, string i_Host, int i_Port)
         {
             m_DataStore.Write("host", i_Host);
@@ -102,7 +103,7 @@ namespace Monitron.Plugins.MPD
             return "Host information updated";
         }
 
-        [RemoteCommand(MethodName="connect")]
+        //[RemoteCommand(MethodName="connect")]
         public string connect(Identity i_Buddy)
         {
             string IP = m_DataStore.Read<string>("host");
@@ -113,11 +114,13 @@ namespace Monitron.Plugins.MPD
             return "Connected to Boombox, Start playing!";
         }
 
-		[RemoteCommand(MethodName="songs_list")]
+		[RemoteCommand(MethodName="songs-list")]
 		public string GetSongsList(Identity i_Buddy)
 		{
 			string songString = null;
-			List<string> songs = m_Mpc.List(ScopeSpecifier.Title);
+            List<string> songs = m_Mpc.PlaylistInfo()
+                .Select((item) => string.Format("{0} - {1}", item.Artist, item.Title))
+                .ToList();
 
 			int index = 1;
 			foreach(string song in songs)
@@ -143,8 +146,20 @@ namespace Monitron.Plugins.MPD
 			}
 		}
 
-		[RemoteCommand(MethodName="play")]
-		public string PlaySong(Identity i_Buddy)
+        [RemoteCommand(MethodName="set-volume")]
+        public string setVolume(Identity i_Buddy, int volume) {
+            m_Mpc.SetVol(volume);
+            return string.Format("Volume set to: {0}", m_Mpc.Status().Volume);
+        }
+
+        [RemoteCommand(MethodName="play")]
+        public string PlaySong(Identity i_Buddy)
+        {
+            return PlaySong(i_Buddy, 1);
+        }
+
+		[RemoteCommand(MethodName="play-from")]
+        public string PlaySong(Identity i_Buddy, int num)
 		{
 			if(m_Mpc != null)
 			{
@@ -152,22 +167,28 @@ namespace Monitron.Plugins.MPD
 				foreach(var buddy in r_Client.Buddies) 
 				{
 					string[] resources = buddy.Resources;
-					if (resources.Length>0)
+					if (resources.Length > 0)
 					{
 						var buddyIden = buddy.Identity;
 						buddyIden.Resource = resources[0];
-						string[] implementedInterfaces = rpc.GetRegisterServersList(buddyIden);
+                        try
+                        {
+						    string[] implementedInterfaces = rpc.GetRegisterServersList(buddyIden);
 
-						if (implementedInterfaces.Contains("IMovieBot"))
-						{
-							IMessengerRpc movieRpc = (r_Client as IMessengerRpc);
-							IMovieBot movieBot = movieRpc.CreateRpcClient<IMovieBot>(buddyIden);
-							movieBot.PauseMovie();
-						}
+						    if (implementedInterfaces.Contains("IMovieBot"))
+						    {
+							    IMessengerRpc movieRpc = (r_Client as IMessengerRpc);
+							    IMovieBot movieBot = movieRpc.CreateRpcClient<IMovieBot>(buddyIden);
+							    movieBot.PauseMovie();
+						    }
+                        }
+                        catch
+                        {
+                        }
 					}
 				}
 
-				m_Mpc.Play();
+				m_Mpc.Play(num - 1);
 				return "start playing " + m_Mpc.CurrentSong().Title;
 			} 
 			else
@@ -195,18 +216,11 @@ namespace Monitron.Plugins.MPD
 			
 		private void PopulatePlayList()
 		{
-			List<string> songs = m_Mpc.List(ScopeSpecifier.Filename);
-
-			foreach(string song in songs)
-			{
-				try
-				{
-					m_Mpc.Add(song);
-				}
-				catch(MpdResponseException)
-				{
-				}
-			}
+            m_Mpc.Clear();
+            foreach (var song in m_Mpc.LsInfo().FileList)
+            {
+                m_Mpc.Add(song.File);
+            }
 		}
 
 		public string PauseAudio()

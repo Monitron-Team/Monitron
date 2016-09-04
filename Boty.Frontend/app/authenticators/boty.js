@@ -29,7 +29,8 @@ export default Base.extend({
               Ember.run(function() {
                 resolve({
                   account: response.account,
-                  isAdmin: response.is_admin,
+                  isAdmin: response.isAdmin,
+                  isDeviceMaker: response.isDeviceMaker,
                   token: response.id_token
                 });
               });
