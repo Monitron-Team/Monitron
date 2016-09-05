@@ -89,7 +89,7 @@ namespace Monitron.ImRpc
                 if (attr != null)
                 {
                     r_MethodCache.Add(
-                        attr.MethodName,
+						attr.MethodName.ToLower(),
                         new RpcMethod(attr.MethodName, attr.Description, meth, r_Obj)
                     );
                 }
@@ -122,7 +122,7 @@ namespace Monitron.ImRpc
             {
                 RpcMethod method;
 
-                if (!r_MethodCache.TryGetValue(i_CommandName, out method))
+				if (!r_MethodCache.TryGetValue(i_CommandName.ToLower(), out method))
                 {
                     string.Format("Command '{0}' does not exist", i_CommandName);
                 }
@@ -139,7 +139,7 @@ namespace Monitron.ImRpc
         {
             string commandName = i_Arguments[0];
             RpcMethod method;
-            if (!this.r_MethodCache.TryGetValue(commandName, out method))
+			if (!this.r_MethodCache.TryGetValue(commandName.ToLower(), out method))
             {
                 throw new KeyNotFoundException(string.Format("Command '{0}' does not exist", commandName));
             }
