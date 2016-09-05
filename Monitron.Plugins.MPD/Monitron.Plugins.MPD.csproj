@@ -47,6 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="MANIFEST.xml">
@@ -54,6 +57,7 @@
     </None>
     <None Include="LocalDataStore.json.example" />
     <None Include="node.config.example" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Boombox.png" />

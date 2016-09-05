@@ -13,6 +13,9 @@ namespace Monitron.Plugins.MPD
 {
 	public class MPDPlugin: INodePlugin, IAudioBot
 	{
+		private static readonly log4net.ILog sr_Log = log4net.LogManager.GetLogger
+			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
 		private readonly IMessengerClient r_Client;
 
 		private readonly RpcAdapter r_Adapter;
@@ -48,10 +51,7 @@ namespace Monitron.Plugins.MPD
 
 		private void vertifyConnection()
 		{
-			if (m_Mpc!=null)
-			{
-				connectMPDServer();
-			}
+			connectMPDServer();
 		}
 
 		private void registerToJabber(IMessengerClient r_Client)
@@ -78,8 +78,6 @@ namespace Monitron.Plugins.MPD
                 port);
             m_Mpc = new Mpc();
             m_Mpc.Connection = new MpcConnection(ie);
-            new Thread(PopulatePlayList).Start();
-
 		}
 
 		private void r_Client_ConnectionStateChanged (object sender, ConnectionStateChangedEventArgs e)
@@ -133,6 +131,7 @@ namespace Monitron.Plugins.MPD
 		public string GetSongsList(Identity i_Buddy)
 		{
 			vertifyConnection();
+			PopulatePlayList();
 			string songString = null;
             List<string> songs = m_Mpc.PlaylistInfo()
                 .Select((item) => string.Format("{0} - {1}", item.Artist, item.Title))
@@ -180,6 +179,7 @@ namespace Monitron.Plugins.MPD
         public string PlaySong(Identity i_Buddy, int num)
 		{
 			vertifyConnection();
+			PopulatePlayList();
 			if(m_Mpc != null)
 			{
 				IMessengerRpc rpc = (r_Client as IMessengerRpc);
@@ -193,16 +193,19 @@ namespace Monitron.Plugins.MPD
                         try
                         {
 						    string[] implementedInterfaces = rpc.GetRegisterServersList(buddyIden);
-
+							sr_Log.Info("Checking " + buddyIden.ToString() + " for implemented interfaces");
+							sr_Log.Info("implemented Interfaces: " + String.Join(", ", implementedInterfaces.Select(item=>item.ToString())));
 						    if (implementedInterfaces.Contains("IMovieBot"))
 						    {
-							    IMessengerRpc movieRpc = (r_Client as IMessengerRpc);
+								IMessengerRpc movieRpc = (r_Client as IMessengerRpc);
 							    IMovieBot movieBot = movieRpc.CreateRpcClient<IMovieBot>(buddyIden);
+								sr_Log.Debug("Pause movie for " + buddy.ToString());
 							    movieBot.PauseMovie();
 						    }
                         }
-                        catch
+						catch(Exception e)
                         {
+							sr_Log.Info(e);
                         }
 					}
 				}

@@ -81,7 +81,10 @@ namespace Monitron.Plugins.Kodi
 
 					if(implementedInterfaces.Contains("IAudioBot"))
 					{
-						m_AudioBots.Add(buddyIden, k_ActiveBot);
+						if (!m_AudioBots.ContainsKey(buddyIden))
+						{
+							m_AudioBots.Add(buddyIden, k_ActiveBot);
+						}
 					}
 				}
 			}
@@ -393,13 +396,21 @@ namespace Monitron.Plugins.Kodi
         [RemoteCommand(MethodName = "play")]
         public string KodiPlay(Identity i_Buddy, int i_Video)
         {
+			findAudioBots();
 			List<KeyValuePair<Identity, bool>> activeAudioBots = getActiveAudioBots();
 
 			foreach(KeyValuePair<Identity, bool> activeAudioBot in activeAudioBots)
 			{
-				IMessengerRpc AudioRpc = (r_Client as IMessengerRpc);
-				IAudioBot audioBot = AudioRpc.CreateRpcClient<IAudioBot>(activeAudioBot.Key);
-				audioBot.PauseAudio();
+				try
+				{
+					IMessengerRpc AudioRpc = (r_Client as IMessengerRpc);
+					IAudioBot audioBot = AudioRpc.CreateRpcClient<IAudioBot>(activeAudioBot.Key);
+					audioBot.PauseAudio();
+				}
+				catch(Exception e)
+				{
+					sr_Log.Info(e);
+				}
 			}
 
 			m_Movies = getVideoList();
