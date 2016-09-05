@@ -151,6 +151,7 @@ namespace Monitron.Plugins.MPD
 		[RemoteCommand(MethodName="stop")]
 		public string StopSong(Identity i_Buddy)
 		{
+			vertifyConnection();
 			if (m_Mpc != null)
 			{
 				m_Mpc.Stop();
