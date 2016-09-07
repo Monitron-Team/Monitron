@@ -156,6 +156,9 @@ namespace Monitron.Plugins.Kodi
 					e.ReturnValue = m_Volume.ToString();
 					break;
 				}
+                case "PlayStarted":
+                    stopAudioBots();
+                    break;
 				default:
 				{
 					if(e.Message.Contains("ActiveAudioBots"))
@@ -393,25 +396,29 @@ namespace Monitron.Plugins.Kodi
             return msg;
         }
 
+        private void stopAudioBots()
+        {
+            findAudioBots();
+            List<KeyValuePair<Identity, bool>> activeAudioBots = getActiveAudioBots();
+            foreach (KeyValuePair<Identity, bool> activeAudioBot in activeAudioBots)
+            {
+                try
+                {
+                    IMessengerRpc AudioRpc = (r_Client as IMessengerRpc);
+                    IAudioBot audioBot = AudioRpc.CreateRpcClient<IAudioBot>(activeAudioBot.Key);
+                    audioBot.PauseAudio();
+                }
+                catch (Exception e)
+                {
+                    sr_Log.Info(e);
+                }
+            }
+        }
+
         [RemoteCommand(MethodName = "play")]
         public string KodiPlay(Identity i_Buddy, int i_Video)
         {
-			findAudioBots();
-			List<KeyValuePair<Identity, bool>> activeAudioBots = getActiveAudioBots();
-
-			foreach(KeyValuePair<Identity, bool> activeAudioBot in activeAudioBots)
-			{
-				try
-				{
-					IMessengerRpc AudioRpc = (r_Client as IMessengerRpc);
-					IAudioBot audioBot = AudioRpc.CreateRpcClient<IAudioBot>(activeAudioBot.Key);
-					audioBot.PauseAudio();
-				}
-				catch(Exception e)
-				{
-					sr_Log.Info(e);
-				}
-			}
+			stopAudioBots();
 
 			m_Movies = getVideoList();
 			string msg = string.Empty;

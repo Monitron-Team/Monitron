@@ -51,7 +51,7 @@ namespace Monitron.Plugins.MPD
 
 		private void vertifyConnection()
 		{
-			connectMPDServer();
+            connectMPDServer();
 		}
 
 		private void registerToJabber(IMessengerClient r_Client)
@@ -78,6 +78,7 @@ namespace Monitron.Plugins.MPD
                 port);
             m_Mpc = new Mpc();
             m_Mpc.Connection = new MpcConnection(ie);
+            m_Mpc.Update();
 		}
 
 		private void r_Client_ConnectionStateChanged (object sender, ConnectionStateChangedEventArgs e)
@@ -172,45 +173,63 @@ namespace Monitron.Plugins.MPD
         [RemoteCommand(MethodName="play")]
         public string PlaySong(Identity i_Buddy)
         {
-            return PlaySong(i_Buddy, 1);
+            return PlaySong(i_Buddy, 0);
+        }
+
+        [RemoteCommand(MethodName="toggle-random")]
+        public string ToggleRandom(Identity i_Buddy) {
+            vertifyConnection();
+            PopulatePlayList();
+            m_Mpc.Random(m_Mpc.Status().Random == false);
+            return string.Format("Random is set to {0}", m_Mpc.Status().Random);
         }
 
 		[RemoteCommand(MethodName="play-from")]
         public string PlaySong(Identity i_Buddy, int num)
 		{
 			vertifyConnection();
-			PopulatePlayList();
 			if(m_Mpc != null)
 			{
-				IMessengerRpc rpc = (r_Client as IMessengerRpc);
-				foreach(var buddy in r_Client.Buddies) 
-				{
-					string[] resources = buddy.Resources;
-					if (resources.Length > 0)
-					{
-						var buddyIden = buddy.Identity;
-						buddyIden.Resource = resources[0];
-                        try
+                PopulatePlayList();
+                if (num < 1)
+                {
+                    m_Mpc.Play();
+                }
+                else
+                {
+                    m_Mpc.Play(num - 1);
+                }
+                new Thread(delegate()
+                    {
+                        IMessengerRpc rpc = (r_Client as IMessengerRpc);
+                        foreach (var buddy in r_Client.Buddies)
                         {
-						    string[] implementedInterfaces = rpc.GetRegisterServersList(buddyIden);
-							sr_Log.Info("Checking " + buddyIden.ToString() + " for implemented interfaces");
-							sr_Log.Info("implemented Interfaces: " + String.Join(", ", implementedInterfaces.Select(item=>item.ToString())));
-						    if (implementedInterfaces.Contains("IMovieBot"))
-						    {
-								IMessengerRpc movieRpc = (r_Client as IMessengerRpc);
-							    IMovieBot movieBot = movieRpc.CreateRpcClient<IMovieBot>(buddyIden);
-								sr_Log.Debug("Pause movie for " + buddy.ToString());
-							    movieBot.PauseMovie();
-						    }
-                        }
-						catch(Exception e)
-                        {
-							sr_Log.Info(e);
-                        }
-					}
-				}
+                            string[] resources = buddy.Resources;
+                            if (resources.Length > 0)
+                            {
+                                var buddyIden = buddy.Identity;
+                                buddyIden.Resource = resources[0];
+                                try
+                                {
+                                    string[] implementedInterfaces = rpc.GetRegisterServersList(buddyIden);
+                                    sr_Log.Info("Checking " + buddyIden.ToString() + " for implemented interfaces");
+                                    sr_Log.Info("implemented Interfaces: " + String.Join(", ", implementedInterfaces.Select(item => item.ToString())));
+                                    if (implementedInterfaces.Contains("IMovieBot"))
+                                    {
+                                        IMessengerRpc movieRpc = (r_Client as IMessengerRpc);
+                                        IMovieBot movieBot = movieRpc.CreateRpcClient<IMovieBot>(buddyIden);
+                                        sr_Log.Debug("Pause movie for " + buddy.ToString());
+                                        movieBot.PauseMovie();
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    sr_Log.Info(e);
+                                }
+                            }
+                        }    
+                    }).Start();
 
-				m_Mpc.Play(num - 1);
 				return "start playing " + m_Mpc.CurrentSong().Title;
 			} 
 			else
@@ -239,8 +258,9 @@ namespace Monitron.Plugins.MPD
 			
 		private void PopulatePlayList()
 		{
-            m_Mpc.Clear();
-            foreach (var song in m_Mpc.LsInfo().FileList)
+            var playlist = new SortedSet<String>(m_Mpc.PlaylistInfo().Select(item => item.File));
+            var songsToAdd = m_Mpc.LsInfo().FileList.Where(item => !playlist.Contains(item.File));
+            foreach (var song in songsToAdd)
             {
                 m_Mpc.Add(song.File);
             }
