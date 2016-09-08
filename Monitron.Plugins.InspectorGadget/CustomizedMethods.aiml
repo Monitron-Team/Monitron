@@ -25,16 +25,14 @@
       <get name="add::first"/> + <get name="add::second"/> = {{add}}
     </template>
   </category>
-
-
   <category>
-    <pattern>give me a movie title with my name</pattern>
+    <pattern>movie title with my name</pattern>
     <template>
-      {{movieDetailsByName}}. This is an example of how I remember stuff you told me, and able to send it to methods written by programmer long after I was compiled.
+      {{movieDetailsByName}}. 2This is an example of how I remember stuff you told me, and able to send it to methods written by programmer long after I was compiled.
     </template>
   </category>
   <category>
-    <pattern>show me a picture of *</pattern>
+    <pattern>picture of *</pattern>
     <template>
       <think>
         <set name="imagesearch::subject">

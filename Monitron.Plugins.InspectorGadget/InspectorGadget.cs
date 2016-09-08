@@ -40,7 +40,7 @@ namespace Monitron.Plugins.InspectorGadget
             r_Client_ConnectionStateChanged(this, null);
             r_Client = i_MessangerClient;
             this.r_Ai = new AI.AI(this, r_Client);
-            using (var fs = new FileStream("./CustomizedMethods.aiml", FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream("CustomizedMethods.aiml", FileMode.Open, FileAccess.Read))
             {
                 XmlDocument doc = new XmlDocument();
                 doc.Load(fs);
@@ -197,7 +197,7 @@ namespace Monitron.Plugins.InspectorGadget
                 sr_Log.Debug("Setting up avatar");
                 r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.InspectorGadget.inspector_gadget.png"));
                 sr_Log.Debug("sending a wellcom message");
-                string welcomeMessage = "\nHi, I am Inspector Gadget and I want to die!";
+                string welcomeMessage = "\nHi, I am Inspector Gadget!";
                     
                 foreach (var buddy in r_Client.Buddies)
                 {
