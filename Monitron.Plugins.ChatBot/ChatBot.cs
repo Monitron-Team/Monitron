@@ -31,8 +31,6 @@ namespace Monitron.Plugins.ChatBot
         {
             if (r_Client.IsConnected)
             {
-                r_Ai.GlobalSettings.updateSetting("name", "Chat Bot");
-                r_Ai.GlobalSettings.updateSetting("location", "Cloud");
                 r_Client.SetNickname("Chat Bot");
                 r_Client.SetAvatar(Assembly.GetExecutingAssembly().GetManifestResourceStream("Monitron.Plugins.ChatBot.Avatar.jpg"));
             }

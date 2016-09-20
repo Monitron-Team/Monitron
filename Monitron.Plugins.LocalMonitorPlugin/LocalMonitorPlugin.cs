@@ -30,7 +30,6 @@ namespace Monitron.Plugins.LocalMonitorPlugin
 			}
 		}
 
-		private readonly RpcAdapter r_Adapter;
 		private ProcessMonitor m_ProcessMonitor;
         private readonly IPluginDataStore r_DataStore;
         private readonly WorkerManager r_WorkerManager;
@@ -41,7 +40,6 @@ namespace Monitron.Plugins.LocalMonitorPlugin
             r_Client = i_MessangerClient;
             r_DataStore = i_DataStore;
             sr_Log.Debug("Setting up rpc");
-            r_Adapter = new RpcAdapter(this, r_Client);
             r_PluginsManager = new Monitron.StoredPluginsManager(createMongoDatabase());
             r_WorkerManager = new WorkerManager(r_PluginsManager);
             sr_Log.Debug("Setting up Process Monitor");

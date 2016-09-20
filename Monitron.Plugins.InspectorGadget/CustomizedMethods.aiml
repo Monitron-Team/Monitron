@@ -1,0 +1,45 @@
+﻿<aiml>
+  <category>
+    <pattern>echo *</pattern>
+    <template>
+      <think>
+        <set name="echo::text">
+          <star index="1"/>
+        </set>
+      </think>
+      You said: {{echo}}
+    </template>
+  </category>
+
+  <category>
+    <pattern>add * *</pattern>
+    <template>
+      <think>
+        <set name="add::first">
+          <star index="2"/>
+        </set>
+        <set name="add::second">
+          <star index="1"/>
+        </set>
+      </think>
+      <get name="add::first"/> + <get name="add::second"/> = {{add}}
+    </template>
+  </category>
+  <category>
+    <pattern>movie title with my name</pattern>
+    <template>
+      {{movieDetailsByName}}. 2This is an example of how I remember stuff you told me, and able to send it to methods written by programmer long after I was compiled.
+    </template>
+  </category>
+  <category>
+    <pattern>picture of *</pattern>
+    <template>
+      <think>
+        <set name="imagesearch::subject">
+          <star index="1"/>
+        </set>
+      </think>
+      Here is a link to a picture of <get name="imagesearch::subject"/> : {{imageSearch}}
+    </template>
+  </category>
+</aiml>

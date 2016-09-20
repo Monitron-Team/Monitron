@@ -26,6 +26,16 @@
 	<template>
 		{{movieDetailsByName}}. This is an example of how I remember stuff you told me, and able to send it to methods written by programmer long after I was compiled.
 	</template>
-</category>  
-
+</category>
+  <category>
+    <pattern>show me a picture of *</pattern>
+    <template>
+      <think>
+        <set name="imagesearch::subject">
+          <star index="1"/>
+        </set>
+      </think>
+      Here is a link to a picture of <get name="imagesearch::subject"/> : {{imageSearch}}
+    </template>
+  </category>
 </aiml>
